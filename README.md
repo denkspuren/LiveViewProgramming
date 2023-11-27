@@ -1,5 +1,7 @@
 # Clerk: Live View Programming with Java's JShell
 
+Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
+
 ## Motivation: Clerk, das will ich auch haben!
 
 In der Kalenderwoche 47/2023 bin ich per Zufall auf [Clerk](https://clerk.vision/) gestoßen. Clerk erweitert das Programmieren mit Clojure im Stil der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface), wie man das z.B. von [Jupyter bzw. JupyterLab](https://jupyter.org/) her kennt. Der Witz ist jedoch: Während man in Jupyter im Browser ein webbasiertes Notizbuch für die interaktive Programmierung anlegt und mit Notizen und Code befüllt, bleibt man bei Clerk vollständig in der lieb gewordenen Entwicklungsumgebung und programmiert von dort aus eine Notizbuchsicht, die man sich im Webbrowser anschauen kann.
@@ -114,17 +116,33 @@ Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Das ist für eine
 
 > Wenn Sie bei der Umsetzung eines HTTP-Servers einspringen, mithelfen und mitdenken wollen: Meine Idealvorstellung ist, dass Clerk ohne Abhängigkeiten von anderen Libraries auskommt und sich nur der Boardmittel des JDK bedient. In dem API `com.sun.net.httpserver` sind drei neue Klassen dazu gekommen, die eine Realisierung vielleicht etwas einfacher machen, siehe [JEP 408](https://openjdk.org/jeps/408).
 
-# Anmerkungen
+# Der Prototyp ist erst der Anfang
+
+## Vision
 
 Meine Vision ist, Clerk in der Programmierausbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen. Wenn einmal ein HTTP-Server realisiert ist, wird Clerk ein schönes Beispiel für webbasierte Server-Client-Programmierung abgeben und es kann in seinen Fähigkeiten kontinuierlich erweitert werden. Mit Clerk wäre damit auch ein Rahmenwerk gegeben für die Programmierung von Web-Anwendungen.
 
 Besonders geignet scheint mir Clerk aber auch für Programmier-Anfänger:innen zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte daran erprobt, indem man Logo-Zeichnungen generiert. Gerne würde ich auch Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline). Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen.
 
-Ein paar weitere Notizen:
+## Mitmach-Aufruf
 
-* So behelfsmäßig mein Prototyp mit `index.html` und einem kontinuierlichen Browserrefresh arbeitet: Dennoch könnte das Beschreiben und Erweitern z.B. einer Dokumentationsdatei z.B. im Markdown-Format genau auf diese Weise erfolgen. Dafür braucht es keinen HTTP-Server.
+> Sie sind gerne willkommen, sich an der Entwicklung der Clerk-Idee, eines _Live View Programming with Java's JShell_, zu beteiligen.
 
-> So weit so gut. Sie sind gerne willkommen, sich an der Entwicklung der Clerk-Idee, eines Live View Programming with Java's JShell, zu beteiligen.
+Dazu ein paar Punkte, die mir in den Sinn kommen:
+
+* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"?
+
+* Wie könnte man z.B. eine Bibliothek wie `https://www.chartjs.org/` in Clerk einbinden? Das würde die Einsatzmöglichkeiten für Clerk bereichern.
+
+* Es wird ein Webserver, d.h. ein HTTP-Server benötigt. Hier würde mir schon eine beispielhafte Umsetzung für eine einfache Anwendung (also nicht gleich für Clerk) helfen, von der ich lernen kann. Wie oben beschrieben: am besten nur mit den Boardmitteln des JDK. Etwas, was in der JShell läuft und am besten nicht mehr als 100 LOC hat.
+
+* Sobald es Clerk mit einem HTTP-Server gibt, wäre eine interaktive Anwendung eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet in Clerk statt.
+
+* So behelfsmäßig mein Prototyp mit `index.html` und einem kontinuierlichen Browserrefresh arbeitet: Dennoch könnte das Beschreiben und Erweitern z.B. einer statischen Dokumentationsdatei etwa im Markdown-Format genau auf diese Weise erfolgen. Dafür braucht es keinen HTTP-Server. Clerk könnte Dateiformate wie auch Formate unterstützen, die über den Webserver ausgeliefert werden.
+
+* Tatsächlich wäre ein Object-Inspektor, der über Reflection ein Object-Diagramm z.B. mit Hilfe von Graphviz erzeugt, eine großartige Sache. Das ist aber ein Problem für sich und kann, wenn gelöst, in Clerk als Dienst eingearbeitet werden.
+
+Wie man Clerk modular gestalten möchte zum Zwecke der Erweiterung, ob man es doch als `jar`-Datei ausliefern sollte, ... diesen Fragen kann man sich widmen, wenn der Prototyp reift und mit einem HTTP-Server ausgestattet ist. _Learning by doing!_
 
 Herzlichst,<br>
 Dominikus Herzberg
