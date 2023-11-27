@@ -6,7 +6,7 @@ Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JS
 
 In der Kalenderwoche 47/2023 bin ich per Zufall auf [Clerk](https://clerk.vision/) gestoßen. Clerk erweitert das Programmieren mit Clojure im Stil der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface), wie man das z.B. von [Jupyter bzw. JupyterLab](https://jupyter.org/) her kennt. Der Witz ist jedoch: Während man in Jupyter im Browser ein webbasiertes Notizbuch für die interaktive Programmierung anlegt und mit Notizen und Code befüllt, bleibt man bei Clerk vollständig in der lieb gewordenen Entwicklungsumgebung und programmiert von dort aus eine Notizbuchsicht, die man sich im Webbrowser anschauen kann.
 
-Auf der Clerk-Webseite läuft diese Art der Notizbuch-Programmierung unter dem Motto "Moldable Live Programming for Clojure". Die Idee von Clerk und der Umgang damit wird ausführlich in dem Dokument https://px23.clerk.vision/ beschrieben. Noch netter ist vielleicht dieses YouTube-Video, um schnell einen Zugang zu bekommen: https://youtu.be/3ANS2NTNgig
+Auf der Clerk-Webseite läuft diese Art der Notizbuch-Programmierung unter dem Motto "Moldable Live Programming for Clojure". Die Idee von Clerk und der Umgang damit werden ausführlich in dem Dokument https://px23.clerk.vision/ beschrieben. Noch netter ist vielleicht dieses YouTube-Video, um schnell einen Zugang zu bekommen: https://youtu.be/3ANS2NTNgig
 
 Die Idee von Clerk finde ich überaus bestechend: Das hätte ich auch gerne für die Java-Programmierung, vor allem mit der JShell. Die Idee hat das Potenzial, die Programmierausbildung mit meinen Studierenden grundlegend zu verändern.
 
@@ -14,7 +14,7 @@ Die Idee von Clerk finde ich überaus bestechend: Das hätte ich auch gerne für
 
 Weil mich die Idee von Clerk derart angefixt hat, grübelte ich über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Aber mir ließ das keine Ruhe! Also habe ich mich am Samstag und Sonntag der Kalenderwoche 47 an einen Prototypen gemacht, um herauszufinden, ob ich nicht was ähnliches für die JShell mit wenigen Zeilen Code hinbekomme.
 
-Der _Proof of Concept_ mit dem Prototyp ist geglückt! Man kann mit meiner Clerk-Variante aus der JShell heraus Markdown erzeugen, Code dokumentieren und Zeichnungen mit einer Logo-Schildkröte erstellen. Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
+Der _Proof of Concept_ mit dem Prototypen ist geglückt! Man kann mit meiner Clerk-Variante aus der JShell heraus Markdown erzeugen, Code dokumentieren und Zeichnungen mit einer Logo-Schildkröte erstellen. Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
 
 Wer mag, kann den Prototypen ausprobieren!
 
@@ -86,7 +86,7 @@ Das wirkt wie Spielerei und soll es auch sein. Programmieren darf Spaß machen -
 
 ### Clerk zur Code-Dokumentation
 
-Obwohl der Clerk-Prototyp einfach und kurz gehalten ist, kann man noch mehr damit machen. Zum Beispiel kann man ein Notizbuch als Dokumentation zum Java-Code erzeugen -- und das alles aus der Java-Datei heraus, so wie beim originalen Clerk für Clojure.
+Obwohl der Clerk-Prototyp einfach und kurz gehalten ist, kann man noch mehr damit machen. Zum Beispiel kann man ein Notizbuch als Dokumentation zum Java-Code erzeugen -- und das alles aus der Java-Datei heraus in der man programmiert, so wie beim originalen Clerk für Clojure.
 
 In dem git-Repository findet sich die Datei `logo.java`. Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
 
@@ -98,17 +98,17 @@ jshell> /o logo.java    // /o ist Kurzform von /open
 
 > Ich weiß, dass Dokument im Browser sieht nicht besonders schön aus. Das ist dem aktuellen Status des Prototypen geschuldet. Auch kenne ich mich mit CSS nicht wirklich aus. Hilfe ist gerne willkommen.
 
-Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann mir Codeauszüge an geeignete Stellen in meine Dokumentation setzen. Der Code in `logo.java` erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst. 🚀
+Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in `logo.java` erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst. 🚀
 
 Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Clerk in der Datei `logo.java` mit einem Editor Ihrer Wahl an.
 
-> Wie ich feststellen musste, wird das Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Template durcheinander und der Java-Code wird nicht sehr leserlich angezeigt.
+> Wie ich feststellen musste, wird das Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Template durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
 
 # Skizze zur Arbeitsweise des Clerk-Prototypen
 
 Wenn Sie sich den Inhalt der `index.html`-Datei anschauen, werden Sie vielleicht sofort verstehen, wie Clerk (siehe `clerk.java`) arbeitet und wie die Klasse `Turtle` (ebenfalls in `clerk.java`) sich Clerk zunutze macht:
 
-Clerk nutzt zwar HTML und JavaScript im Hintergrund -- anders ist eine Browser-Ansicht nicht zu erzeugen --, aber macht das, indem die entsprechenden Clerk-Methoden die `index.html`-Datei mit HTML- bzw. JavaScript-Anteilen vollschreibt. Die `index.html`-Datei wächst mit jedem weiteren Clerk-Methodenaufruf an. Nach der Abarbeitung von `logo.java` zählt `index.html` fast 10.000 Zeilen HTML-Code.
+Clerk nutzt HTML und JavaScript im Hintergrund -- anders ist eine Browser-Ansicht nicht zu erzeugen --, und macht das, indem die entsprechenden Clerk-Methoden die `index.html`-Datei mit HTML- bzw. JavaScript-Anteilen vollschreibt. Die `index.html`-Datei wächst mit jedem weiteren Clerk-Methodenaufruf an. Nach der Abarbeitung von `logo.java` zählt `index.html` fast 10.000 Zeilen HTML-Code.
 
 > Der Trick: Der Kopf der `index.html`-Datei weist den Browser an, diese Datei alle zwei Sekunden neu zu lesen und die Darstellung zu aktualisieren. Wenn `index.html` mit den Clerk-Methodenaufrufen wächst und wächst entsteht der Eindruck einer Interaktion.
 
@@ -120,9 +120,9 @@ Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Das ist für eine
 
 ## Vision
 
-Meine Vision ist, Clerk in der Programmierausbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen. Wenn einmal ein HTTP-Server realisiert ist, wird Clerk ein schönes Beispiel für webbasierte Server-Client-Programmierung abgeben und es kann in seinen Fähigkeiten kontinuierlich erweitert werden. Mit Clerk wäre damit auch ein Rahmenwerk gegeben für die Programmierung von Web-Anwendungen.
+Meine Vision ist, Clerk in der Programmierausbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen. Wenn einmal ein HTTP-Server realisiert ist, wird Clerk ein schönes Beispiel für webbasierte Client/Server-Programmierung abgeben, und es kann in seinen Fähigkeiten kontinuierlich erweitert werden. Mit Clerk wäre damit auch ein Rahmenwerk gegeben für die Programmierung von Web-Anwendungen.
 
-Besonders geignet scheint mir Clerk aber auch für Programmier-Anfänger:innen zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte daran erprobt, indem man Logo-Zeichnungen generiert. Gerne würde ich auch Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline). Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen.
+Besonders geignet scheint mir Clerk für Programmier-Anfänger:innen zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert. Gerne würde ich auch Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline). Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen.
 
 ## Mitmach-Aufruf
 
@@ -142,7 +142,7 @@ Dazu ein paar Punkte, die mir in den Sinn kommen:
 
 * Tatsächlich wäre ein Object-Inspektor, der über Reflection ein Object-Diagramm z.B. mit Hilfe von Graphviz erzeugt, eine großartige Sache. Das ist aber ein Problem für sich und kann, wenn gelöst, in Clerk als Dienst eingearbeitet werden.
 
-Wie man Clerk modular gestalten möchte zum Zwecke der Erweiterung, ob man es doch als `jar`-Datei ausliefern sollte, ... diesen Fragen kann man sich widmen, wenn der Prototyp reift und mit einem HTTP-Server ausgestattet ist. _Learning by doing!_
+Wie man Clerk modular gestalten könnte zum Zwecke der Erweiterung, ob man es doch als `jar`-Datei ausliefern sollte, ... diesen Fragen kann man sich widmen, wenn der Prototyp reift und mit einem HTTP-Server ausgestattet ist.
 
 Herzlichst,<br>
 Dominikus Herzberg
