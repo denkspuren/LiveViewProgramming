@@ -1,0 +1,9786 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="2">
+    <title>Clerk in Java Prototype</title>
+</head>
+<body>
+<!-- begin include content -->
+
+<div id="7gvph99x3u">
+# Turtle-Programmierung mit Clerk
+
+_Dominikus Herzberg_, _Technische Hochschule Mittelhessen_
+
+Bei der Programmiersprache [Logo](https://de.wikipedia.org/wiki/Logo_(Programmiersprache)) steht eine Schildkröte (_turtle_) im Mittelpunkt -- und zwar im wahrsten Sinne des Wortes. Auf einer weißen Fläche ist in der Mitte die Schildkröte platziert. An ihr ist ein Stift befestigt und sie ist zu Beginn nach rechts ausgerichtet, sie blickt Richtung Osten.
+
+Die Schildkröte kennt die folgenden Kommandos:
+
+Befehl | Bedeutung
+-------|----------
+`pendown()` | Setze den Stift auf die Zeichenfläche (Anfangseinstellung)
+`penup()`   | Hebe den Stift von der Zeichenfläche ab
+`forward(`_distance_`)`  | Bewege dich um _distance_ vorwärts
+`backward(`_distance_`)` | Bewege dich um _distance_ rückwärts
+`right(`_degrees_`)`     | Drehe dich um die Gradzahl _degrees_ nach rechts
+`left(`_degrees_`)`      | Drehe dich um die Gradzahl _degrees_ nach links
+
+Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
+
+> Wenn man die Befehle in der JShell zur Verfügung hat, benötigt man kein weiteres Wissen zu Logo. Man kann mit den Sprachkonstrukten von Java arbeiten.
+
+## Beispiel 1: Ein Quadrat aus Pfeilen
+
+Mit `new Turtle(300,300)` wird eine neue Schildkröte mittig auf eine Zeichenfläche der angegebenen Größe (Breite, Höhe) gesetzt. In den Grundeinstellungen sind die Breite und die Höhe auf 500 gesetzt.
+
+Die folgende Logo-Anwendung demonstriert, wie man mittels Methoden schrittweise graphische Einheiten erstellen und zusammensetzen kann.
+
+```java
+Turtle myFirstTurtle = new Turtle(300,300);
+
+Turtle arrowhead(Turtle t) {
+    return t.right(30).backward(10).forward(10).
+             left(60).backward(10).forward(10).right(30);
+}
+Turtle arrow(Turtle t, double length) {
+    return arrowhead(t.forward(length));
+}
+Turtle edge(Turtle t, double length, double space) {
+    return arrow(t, length).penUp().forward(space).penDown();
+}
+myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
+
+```
+
+Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich kleine Zwischenräume gelassen wurden.
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    var markdownContent = document.getElementById("7gvph99x3u").textContent;
+    var renderedHTML = marked.parse(markdownContent);
+    document.getElementById("7gvph99x3u").innerHTML = renderedHTML;
+</script>
+
+<canvas id="turtleCanvast9s6q6" width="300" height="300" style="border:1px solid #000;"></canvas>
+<script src="./Turtle/turtle.js"></script>
+<script>
+    // const canvas = document.getElementById('turtleCanvas');
+    const turtlet9s6q6 = new Turtle(document.getElementById('turtleCanvast9s6q6'));
+</script>
+
+<script>
+    turtlet9s6q6.forward(100.0);
+</script>
+
+<script>
+    turtlet9s6q6.right(30.0);
+</script>
+
+<script>
+    turtlet9s6q6.backward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.left(60.0);
+</script>
+
+<script>
+    turtlet9s6q6.backward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.right(30.0);
+</script>
+
+<script>
+    turtlet9s6q6.penUp();
+</script>
+
+<script>
+    turtlet9s6q6.forward(5.0);
+</script>
+
+<script>
+    turtlet9s6q6.penDown();
+</script>
+
+<script>
+    turtlet9s6q6.right(90.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(100.0);
+</script>
+
+<script>
+    turtlet9s6q6.right(30.0);
+</script>
+
+<script>
+    turtlet9s6q6.backward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.left(60.0);
+</script>
+
+<script>
+    turtlet9s6q6.backward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.right(30.0);
+</script>
+
+<script>
+    turtlet9s6q6.penUp();
+</script>
+
+<script>
+    turtlet9s6q6.forward(5.0);
+</script>
+
+<script>
+    turtlet9s6q6.penDown();
+</script>
+
+<script>
+    turtlet9s6q6.right(90.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(100.0);
+</script>
+
+<script>
+    turtlet9s6q6.right(30.0);
+</script>
+
+<script>
+    turtlet9s6q6.backward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.left(60.0);
+</script>
+
+<script>
+    turtlet9s6q6.backward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.right(30.0);
+</script>
+
+<script>
+    turtlet9s6q6.penUp();
+</script>
+
+<script>
+    turtlet9s6q6.forward(5.0);
+</script>
+
+<script>
+    turtlet9s6q6.penDown();
+</script>
+
+<script>
+    turtlet9s6q6.right(90.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(100.0);
+</script>
+
+<script>
+    turtlet9s6q6.right(30.0);
+</script>
+
+<script>
+    turtlet9s6q6.backward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.left(60.0);
+</script>
+
+<script>
+    turtlet9s6q6.backward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.forward(10.0);
+</script>
+
+<script>
+    turtlet9s6q6.right(30.0);
+</script>
+
+<script>
+    turtlet9s6q6.penUp();
+</script>
+
+<script>
+    turtlet9s6q6.forward(5.0);
+</script>
+
+<script>
+    turtlet9s6q6.penDown();
+</script>
+
+<script>
+    turtlet9s6q6.right(90.0);
+</script>
+
+<div id="9m9xouovt6">
+## Beispiel 2: Umsetzung eines Logo-Programms in Java
+
+Die Programmiersprache Logo ist nicht so schwer zu verstehen, wie das nachstehende Beispiel zeigt, das von dieser [Webseite](https://calormen.com/jslogo/) stammt. Auch wenn man kein Logo spricht, der Code ist leicht in Java umzusetzen.
+
+```logo
+TO tree :size
+   if :size < 5 [forward :size back :size stop]
+   forward :size/3
+   left 30 tree :size*2/3 right 30
+   forward :size/6
+   right 25 tree :size/2 left 25
+   forward :size/3
+   right 25 tree :size/2 left 25
+   forward :size/6
+   back :size
+END
+clearscreen
+tree 150
+```
+
+Die Java-Methode `tree` bildet das obige Logo-Programm nach; lediglich aus praktischen Überlegungen lasse ich den Rekursionsabbruch etwas früher greifen.
+
+```java
+Turtle turtle = new Turtle().left(90);
+
+void tree(Turtle turtle, double size) {
+    if (size < 10) {
+        turtle.forward(size).backward(size);
+        return;
+    }
+    turtle.forward(size / 3).left(30);
+    tree(turtle, size * 2.0 / 3.0);
+    turtle.right(30);
+
+    turtle.forward(size / 6).right(25);
+    tree(turtle, size / 2.0);
+    turtle.left(25);
+
+    turtle.forward(size / 3).right(25);
+    tree(turtle, size / 2.0);
+    turtle.left(25);
+
+    turtle.forward(size / 6).backward(size);
+}
+
+```
+
+Der Aufruf der Methode `tree` erzeugt etwas, was einem "Baum" ähnelt.
+
+```java
+tree(turtle, 150);
+
+```
+
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    var markdownContent = document.getElementById("9m9xouovt6").textContent;
+    var renderedHTML = marked.parse(markdownContent);
+    document.getElementById("9m9xouovt6").innerHTML = renderedHTML;
+</script>
+
+<canvas id="turtleCanvasy4poo6" width="500" height="500" style="border:1px solid #000;"></canvas>
+<script src="./Turtle/turtle.js"></script>
+<script>
+    // const canvas = document.getElementById('turtleCanvas');
+    const turtley4poo6 = new Turtle(document.getElementById('turtleCanvasy4poo6'));
+</script>
+
+<script>
+    turtley4poo6.left(90.0);
+</script>
+
+<script>
+    turtley4poo6.forward(50.0);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(33.333333333333336);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.584362139917697);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.389574759945131);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.779149519890263);
+</script>
+
+<script>
+    turtley4poo6.backward(8.779149519890263);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.1947873799725657);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.584362139917697);
+</script>
+
+<script>
+    turtley4poo6.backward(6.584362139917697);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.389574759945131);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.584362139917697);
+</script>
+
+<script>
+    turtley4poo6.backward(6.584362139917697);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.1947873799725657);
+</script>
+
+<script>
+    turtley4poo6.backward(13.168724279835393);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.2921810699588483);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.584362139917697);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.2921810699588483);
+</script>
+
+<script>
+    turtley4poo6.backward(19.75308641975309);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.backward(29.629629629629633);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.backward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.backward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(44.44444444444445);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.backward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(33.333333333333336);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.backward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(33.333333333333336);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.backward(66.66666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.backward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(33.333333333333336);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(50.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(33.333333333333336);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.backward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(33.333333333333336);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(50.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.backward(100.0);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(25.0);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.backward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(33.333333333333336);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(50.0);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.backward(18.75);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.backward(18.75);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(37.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(25.0);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.backward(18.75);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.backward(18.75);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(37.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.backward(75.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(50.0);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.backward(9.876543209876544);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.938271604938272);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.469135802469136);
+</script>
+
+<script>
+    turtley4poo6.backward(14.814814814814817);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.backward(22.222222222222225);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(33.333333333333336);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(50.0);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.backward(18.75);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.backward(18.75);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(37.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(25.0);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.backward(7.407407407407408);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.703703703703704);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.backward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(1.851851851851852);
+</script>
+
+<script>
+    turtley4poo6.backward(11.111111111111112);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(5.555555555555556);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.777777777777778);
+</script>
+
+<script>
+    turtley4poo6.backward(16.666666666666668);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.backward(25.0);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.backward(18.75);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.left(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.backward(8.333333333333334);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(4.166666666666667);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(6.25);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(2.0833333333333335);
+</script>
+
+<script>
+    turtley4poo6.backward(12.5);
+</script>
+
+<script>
+    turtley4poo6.right(30.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.right(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(9.375);
+</script>
+
+<script>
+    turtley4poo6.backward(9.375);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(3.125);
+</script>
+
+<script>
+    turtley4poo6.backward(18.75);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(6.25);
+</script>
+
+<script>
+    turtley4poo6.backward(37.5);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(12.5);
+</script>
+
+<script>
+    turtley4poo6.backward(75.0);
+</script>
+
+<script>
+    turtley4poo6.left(25.0);
+</script>
+
+<script>
+    turtley4poo6.forward(25.0);
+</script>
+
+<script>
+    turtley4poo6.backward(150.0);
+</script>
+
+<div id="uivzlfez9z">
+-- We are done!
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+    var markdownContent = document.getElementById("uivzlfez9z").textContent;
+    var renderedHTML = marked.parse(markdownContent);
+    document.getElementById("uivzlfez9z").innerHTML = renderedHTML;
+</script>
+
+<!-- end include content -->
+</body>
+</html>
+
