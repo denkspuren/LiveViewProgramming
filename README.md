@@ -110,6 +110,23 @@ Clerk nutzt zwar HTML und JavaScript im Hintergrund -- anders ist eine Browser-A
 
 > Der Trick: Der Kopf der `index.html`-Datei weist den Browser an, diese Datei alle zwei Sekunden neu zu lesen und die Darstellung zu aktualisieren. Wenn `index.html` mit den Clerk-Methodenaufrufen wächst und wächst entsteht der Eindruck einer Interaktion.
 
-Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Das ist für einen _Proof of Concept_ akzeptabel, ist aber die entscheidende Baustelle, die man als nächstes angehen muss. Die Lösung mit einer anwachsenden `index.html` zeigt jedoch, wie inkrementelle Anteile im Wechselspiel von Browser und Server übertragen werden müssen. Mit einem HTTP-Server steigen die Möglichkeiten noch einmal: Dann kann der Client-Code aus dem Browser, Funktionalität aus dem Java/JShell-Programm abrufen -- damit sind dann interaktive Anwendungen möglich. 
+Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Das ist für einen _Proof of Concept_ akzeptabel, ist aber die entscheidende Baustelle, die man als nächstes angehen muss. Die Lösung mit einer anwachsenden `index.html` zeigt jedoch, wie inkrementelle Anteile im Wechselspiel von Browser und Server übertragen werden müssen. Mit einem HTTP-Server steigen die Möglichkeiten noch einmal: Dann kann der Client-Code aus dem Browser, Funktionalität aus dem Java/JShell-Programm abrufen -- damit sind dann interaktive Anwendungen möglich.
+
+> Wenn Sie bei der Umsetzung eines HTTP-Servers einspringen, mithelfen und mitdenken wollen: Meine Idealvorstellung ist, dass Clerk ohne Abhängigkeiten von anderen Libraries auskommt und sich nur der Boardmittel des JDK bedient. In dem API `com.sun.net.httpserver` sind drei neue Klassen dazu gekommen, die eine Realisierung vielleicht etwas einfacher machen, siehe [JEP 408](https://openjdk.org/jeps/408).
+
+# Anmerkungen
+
+Meine Vision ist, Clerk in der Programmierausbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen. Wenn einmal ein HTTP-Server realisiert ist, wird Clerk ein schönes Beispiel für webbasierte Server-Client-Programmierung abgeben und es kann in seinen Fähigkeiten kontinuierlich erweitert werden. Mit Clerk wäre damit auch ein Rahmenwerk gegeben für die Programmierung von Web-Anwendungen.
+
+Besonders geignet scheint mir Clerk aber auch für Programmier-Anfänger:innen zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte daran erprobt, indem man Logo-Zeichnungen generiert. Gerne würde ich auch Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline). Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen.
+
+Ein paar weitere Notizen:
+
+* So behelfsmäßig mein Prototyp mit `index.html` und einem kontinuierlichen Browserrefresh arbeitet: Dennoch könnte das Beschreiben und Erweitern z.B. einer Dokumentationsdatei z.B. im Markdown-Format genau auf diese Weise erfolgen. Dafür braucht es keinen HTTP-Server.
+
+> So weit so gut. Sie sind gerne willkommen, sich an der Entwicklung der Clerk-Idee, eines Live View Programming with Java's JShell, zu beteiligen.
+
+Herzlichst,<br>
+Dominikus Herzberg
 
 
