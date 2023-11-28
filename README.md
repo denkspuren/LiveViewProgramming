@@ -69,7 +69,7 @@ Geben Sie nun 4x die folgende Anweisung für die Schildkröte ein. Warten Sie na
 turtle.forward(80).left(90)
 ```
 
-Sie sollten nun ein Quadrat im Zeichenfeld sehen. Die Schildkröte blickt am Schluss ihres Wegs nach unten gen Süden. Ergänzen wir einen "Kreis", den wir aus 12 Strichen zusammensetzen.
+Sie sollten nun ein Quadrat im Zeichenfeld sehen. Die Schildkröte blickt am Schluss ihres Wegs wieder gen Osten. Ergänzen wir einen "Kreis", den wir aus 12 Strichen zusammensetzen.
 
 ```java
 for (int i = 1; i <= 12; i++)
