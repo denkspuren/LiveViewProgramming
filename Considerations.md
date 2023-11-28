@@ -4,6 +4,21 @@
 
 Das Entscheidenste bleibt die Realisierung eines HTTP-Server.
 
+#### 💡 Generisches JavaScript-Interface
+
+Man kann die Klasse `Turtle` auch ganz anders gestalten, generischer -- damit aber auch fehlerträchtiger -- beim Aufruf der JavaScript-Methoden. In etwa so mit einer Command-Methode `cmd`:
+
+```java
+Turtle cmd(String methodName, Object... args) {
+    String argsString = Arrays.stream(args).
+                               map(o -> String.valueOf(o)).
+                               collect(Collectors.joining(","));
+    Clerk.script(STR."turtle\{ID}.\{methodName}(\{argsString})");
+}
+```
+
+Die Idee kann man im Hinterkopf behalten.
+
 #### ✅ 🔍 String Templates besser ausnutzen
 
 Derzeit benutze ich ein `preIndex.html` und ein `postIndex.html`. Vermutlich täte es auch ein `indexTemplate.html` mit einem Template-Ausdruck (_template expression_) `\{content}`, was die Gesamtkomposition der `index.html` erleichtern würde.
