@@ -2,7 +2,7 @@
 
 Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
 
-## Motivation: Clerk, das will ich auch haben!
+## 💟 Motivation: Clerk, das will ich auch haben!
 
 In der Kalenderwoche 47/2023 bin ich per Zufall auf [Clerk](https://clerk.vision/) gestoßen. Clerk erweitert das Programmieren mit Clojure im Stil der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface), wie man das z.B. von [Jupyter bzw. JupyterLab](https://jupyter.org/) her kennt. Der Witz ist jedoch: Während man in Jupyter im Browser ein webbasiertes Notizbuch für die interaktive Programmierung anlegt und mit Notizen und Code befüllt, bleibt man bei Clerk vollständig in der lieb gewordenen Entwicklungsumgebung und programmiert von dort aus eine Notizbuchsicht, die man sich im Webbrowser anschauen kann.
 
@@ -18,7 +18,7 @@ Der _Proof of Concept_ mit dem Prototypen ist geglückt! Man kann mit meiner Cle
 
 Wer mag, kann den Prototypen ausprobieren!
 
-## Ausprobiert: Clerk für die JShell
+## 💻 Ausprobiert: Clerk für die JShell
 
 Zum Ausprobieren muss das Java JDK 21 installiert (ich verwende das OpenJDK) und dieses Git-Repository heruntergeladen sein. Wer `git` installiert hat, kann das wie folgt machen.
 
@@ -32,7 +32,7 @@ Da der Code mit [String Templates](https://docs.oracle.com/en/java/javase/21/lan
 jshell -R-ea --enable-preview
 ```
 
-### Clerk zur interaktiven Live-View-Programmierung
+### 🎹 Clerk zur interaktiven Live-View-Programmierung
 
 Die Datei `clerk.java` wird in die JShell geladen und Clerk frisch aufgesetzt.
 
@@ -84,7 +84,7 @@ Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
 Das wirkt wie Spielerei und soll es auch sein. Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann.
 
-### Clerk zur Code-Dokumentation
+### 📄 Clerk zur Code-Dokumentation
 
 Obwohl der Clerk-Prototyp einfach und kurz gehalten ist, kann man noch mehr damit machen. Zum Beispiel kann man ein Notizbuch als Dokumentation zum Java-Code erzeugen -- und das alles aus der Java-Datei heraus in der man programmiert, so wie beim originalen Clerk für Clojure.
 
@@ -98,13 +98,13 @@ jshell> /o logo.java    // /o ist Kurzform von /open
 
 > Ich weiß, dass Dokument im Browser sieht nicht besonders schön aus. Das ist dem aktuellen Status des Prototypen geschuldet. Auch kenne ich mich mit CSS nicht wirklich aus. Hilfe ist gerne willkommen.
 
-Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in `logo.java` erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst. 🚀
+Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in `logo.java` erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
 
 Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Clerk in der Datei `logo.java` mit einem Editor Ihrer Wahl an.
 
 > Wie ich feststellen musste, wird das Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Template durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
 
-# Skizze zur Arbeitsweise des Clerk-Prototypen
+# 📝 Skizze zur Arbeitsweise des Clerk-Prototypen
 
 Wenn Sie sich den Inhalt der `index.html`-Datei anschauen, werden Sie vielleicht sofort verstehen, wie Clerk (siehe `clerk.java`) arbeitet und wie die Klasse `Turtle` (ebenfalls in `clerk.java`) sich Clerk zunutze macht:
 
@@ -116,15 +116,15 @@ Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Das ist für eine
 
 > Wenn Sie bei der Umsetzung eines HTTP-Servers einspringen, mithelfen und mitdenken wollen: Meine Idealvorstellung ist, dass Clerk ohne Abhängigkeiten von anderen Libraries auskommt und sich nur der Boardmittel des JDK bedient. In dem API `com.sun.net.httpserver` sind drei neue Klassen dazu gekommen, die eine Realisierung vielleicht etwas einfacher machen, siehe [JEP 408](https://openjdk.org/jeps/408).
 
-# Der Prototyp ist erst der Anfang
+# 🚀 Der Prototyp ist erst der Anfang
 
-## Vision
+## 🌴 Vision
 
 Meine Vision ist, Clerk in der Programmierausbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen. Wenn einmal ein HTTP-Server realisiert ist, wird Clerk ein schönes Beispiel für webbasierte Client/Server-Programmierung abgeben, und es kann in seinen Fähigkeiten kontinuierlich erweitert werden. Mit Clerk wäre damit auch ein Rahmenwerk gegeben für die Programmierung von Web-Anwendungen.
 
 Besonders geignet scheint mir Clerk für Programmier-Anfänger:innen zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert. Gerne würde ich auch Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline). Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen.
 
-## Mitmach-Aufruf
+## 💃🕺 Mitmach-Aufruf
 
 > Sie sind gerne willkommen, sich an der Entwicklung der Clerk-Idee, eines _Live View Programming with Java's JShell_, zu beteiligen.
 
