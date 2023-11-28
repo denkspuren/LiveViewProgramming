@@ -19,7 +19,7 @@ Turtle cmd(String methodName, Object... args) {
 
 Die Idee kann man im Hinterkopf behalten.
 
-#### ✅ 🔍 String Templates besser ausnutzen
+#### ✅ String Templates besser ausnutzen
 
 Derzeit benutze ich ein `preIndex.html` und ein `postIndex.html`. Vermutlich täte es auch ein `indexTemplate.html` mit einem Template-Ausdruck (_template expression_) `\{content}`, was die Gesamtkomposition der `index.html` erleichtern würde.
 
@@ -44,13 +44,13 @@ Konsequenterweise ist es überflüssig, `preIndexHTML` und `postIndexHTML` und w
 
 > Das habe ich umgesetzt; der Code ist lesbarer und gleichzeitig geschrumpt.
 
-#### ✅ 🔍 `setUp` und `refresh` "doppelt"
+#### ✅ `setUp` und `refresh` "doppelt"
 
 Die `refresh`-Methode ist eigentlich überflüssig, `setUp` genügt. Ob man die Methode dann noch einmal umbenennt, ist zu überlegen.
 
 > Umgesetzt; es gibt nur noch die Methode `setUp`.
 
-#### ✅ 🔍 `cutOut` erweitern
+#### ✅ `cutOut` erweitern
 
 Die Methode `cutOut` gefällt mir, sie kann sehr flexibel Zeilen aus einer Textdatei ausschneiden. Wenn die Zeile mit einem Label nicht per default übersprungen, sondern mit ausgeschnitten werden soll, benötigt es eines boolschen Flags. Mir scheint es zu genügen, wenn es zwei boolsche Flags gibt: eines für den Anfang eines Ausschneidevorgangs (`includeStartLabel`), eines für das Ende eines Ausschneidevorgangs (`includeEndLabel`). Der Methodenkopf sähe dann wie folgt aus:
 
@@ -72,7 +72,7 @@ static String readFile(String fileName) {
 }
 ```
 
-#### 🤷 🔍 `script`-Methode überflüssig
+#### 🤷 `script`-Methode überflüssig
 
 Die Kasse `Turtle` nutzt die `script`-Methode noch nicht, was den Code verkürzen würde. Aber sinnvoller wäre eine `write`-Methode, die ein Tag selber schließt und so für _balanced tags_ sorgt:
 
@@ -110,13 +110,13 @@ static String htmlTag(String openingTag, String content) {
 
 > Die Idee hat sich in einem ersten Versuch als nicht notwendig ergeben.
 
-#### 🤷 🔍 Markdown als Klasse ausgliedern
+#### 🤷 Markdown als Klasse ausgliedern
 
 Die `markdown`-Methode sollte wie Turtle als eigenständiger Aspekt ausgelagert werden, ebenso wie es mit der Klasse `Turtle` geschehen ist.
 
 > Im Moment stelle ich das zurück. Die Auslagerung als Aspekt macht eher dann Sinn, wenn man die Markdown-Verarbeitung irgendwie konfigurieren können möchte.
 
-#### 🤷 🔍 Mit `Clerk`-Instanzen oder Targets arbeiten
+#### 🤷 Mit `Clerk`-Instanzen oder Targets arbeiten
 
 Wie ich schon im [README.md](README.md) erwähne, macht es eventuell Sinn, mehrere Instanzen von Clerk anlegen zu können oder verschiedene Targets angeben zu können: Was soll über den HTTP-Server raus, was in eine Datei geschrieben werden.
 
