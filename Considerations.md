@@ -1,5 +1,9 @@
 # 🤔 Überlegungen zur Überarbeitung
 
+#### 🔍 Realisierung eines HTTP-Servers
+
+Das Entscheidenste bleibt die Realisierung eines HTTP-Server.
+
 #### ✅ 🔍 String Templates besser ausnutzen
 
 Derzeit benutze ich ein `preIndex.html` und ein `postIndex.html`. Vermutlich täte es auch ein `indexTemplate.html` mit einem Template-Ausdruck (_template expression_) `\{content}`, was die Gesamtkomposition der `index.html` erleichtern würde.
@@ -31,7 +35,7 @@ Die `refresh`-Methode ist eigentlich überflüssig, `setUp` genügt. Ob man die 
 
 > Umgesetzt; es gibt nur noch die Methode `setUp`.
 
-#### 🔍 `cutOut` erweitern
+#### ✅ 🔍 `cutOut` erweitern
 
 Die Methode `cutOut` gefällt mir, sie kann sehr flexibel Zeilen aus einer Textdatei ausschneiden. Wenn die Zeile mit einem Label nicht per default übersprungen, sondern mit ausgeschnitten werden soll, benötigt es eines boolschen Flags. Mir scheint es zu genügen, wenn es zwei boolsche Flags gibt: eines für den Anfang eines Ausschneidevorgangs (`includeStartLabel`), eines für das Ende eines Ausschneidevorgangs (`includeEndLabel`). Der Methodenkopf sähe dann wie folgt aus:
 
@@ -43,6 +47,14 @@ Nützlich ist das z.B., wenn man einen Methodenkopf als StartLabel und am Ende d
 
 ```
 Clerk.cutOut("clerk.java", true, false, "static String cutOut(", "// end");
+```
+
+> Die Erweiterung ist umgesetzt und funktioniert. Sie hat sogar die Implementierung der Methode `readFile` obsolet gemacht, sie ist jetzt nur noch ein Sonderfall der `cutOut`-Methode.
+
+```java
+static String readFile(String fileName) {
+    return cutOut(fileName, true, true, "");
+}
 ```
 
 #### 🤷 🔍 `script`-Methode überflüssig
@@ -83,11 +95,13 @@ static String htmlTag(String openingTag, String content) {
 
 > Die Idee hat sich in einem ersten Versuch als nicht notwendig ergeben.
 
-#### 🔍 Markdown als Klasse ausgliedern
+#### 🤷 🔍 Markdown als Klasse ausgliedern
 
 Die `markdown`-Methode sollte wie Turtle als eigenständiger Aspekt ausgelagert werden, ebenso wie es mit der Klasse `Turtle` geschehen ist.
 
-#### 🔍 Mit `Clerk`-Instanzen oder Targets arbeiten
+> Im Moment stelle ich das zurück. Die Auslagerung als Aspekt macht eher dann Sinn, wenn man die Markdown-Verarbeitung irgendwie konfigurieren können möchte.
+
+#### 🤷 🔍 Mit `Clerk`-Instanzen oder Targets arbeiten
 
 Wie ich schon im [README.md](README.md) erwähne, macht es eventuell Sinn, mehrere Instanzen von Clerk anlegen zu können oder verschiedene Targets angeben zu können: Was soll über den HTTP-Server raus, was in eine Datei geschrieben werden.
 
@@ -95,6 +109,5 @@ Zum Beispiel könnte man eine Markdown-Datei `text.md` erzeugen und gleichzeitig
 
 Die Idee der Targets gefällt mir im Moment etwas besser. Clerk könnte auch Abhängigkeiten der Targets berücksichtigen: Targets, in die gleichzeitig geschrieben wird. Target-Aktivitäten, die die gleiche oder eine andere Aktivität bei einem anderen Target auslösen.
 
-#### 🔍 Realisierung eines HTTP-Servers
+> Ohne HTTP-Server im Angebot kann ich im Moment nicht einschätzen, wieviel Sinn das macht.
 
-Das Entscheidenste bleibt die Realisierung eines HTTP-Server.

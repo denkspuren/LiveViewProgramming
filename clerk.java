@@ -19,18 +19,6 @@ class Clerk {
     static {
         setUp();
     }
-    // not necessary; functionality delivered by something similar to call `cutOut(String fileName)`
-    /*
-    static String readFile(String fileName) { 
-        try {
-            return new String(Files.readAllBytes(Path.of(fileName)), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            System.err.printf("Error reading %s\n", e.getMessage());
-            System.exit(1);
-        }
-        return null; // dummy return to make compiler happy
-    }
-    */
     static void writeToFile(String fileName, String text) {
         try {
             Files.writeString(Path.of(fileName), text);
@@ -47,7 +35,7 @@ class Clerk {
             \{postContent}
             """);
     }
-    static String cutOut(String fileName, String... labels) {
+    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
         List<String> snippet = new ArrayList<>();
         boolean skipLines = true;
         boolean isInLabels;
@@ -56,6 +44,10 @@ class Clerk {
             for (String line : lines) {
                 isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
                 if (isInLabels) { 
+                    if (skipLines && includeStartLabel)
+                        snippet.add(line);
+                    if (!skipLines && includeEndLabel)
+                        snippet.add(line);
                     skipLines = !skipLines;
                     continue;
                 }
@@ -67,6 +59,12 @@ class Clerk {
             System.exit(1);
         }
         return snippet.stream().collect(Collectors.joining("\n")) + "\n";
+    }
+    static String cutOut(String fileName, String... labels) {
+        return cutOut(fileName, false, false, labels);
+    }
+    static String readFile(String fileName) {
+        return cutOut(fileName, true, true, "");
     }
     static void setUp() {
         preContent = cutOut(templateFileName, "<!DOCTYPE html>", "<!-- begin include content -->");
