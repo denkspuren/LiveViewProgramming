@@ -11,31 +11,41 @@ import java.util.stream.*;
 // jshell -R-ea --enable-preview
 
 class Clerk {
-    static String preFileName = "./preIndex.html",
-                  postFileName = "./postIndex.html",
+    static String templateFileName = "./indexTemplate.html",
                   resultFileName = "./index.html";
-    static List<String> preIndexHTML;
-    static List<String> postIndexHTML;
-    static List<String> contentHTML = new ArrayList<>();
+    static String preContent = "",
+                  content = "",
+                  postContent = "";
     static {
         setUp();
     }
-    static void readPrePost() {
+    // not necessary; functionality delivered by something similar to call `cutOut(String fileName)`
+    /*
+    static String readFile(String fileName) { 
         try {
-            preIndexHTML = Files.readAllLines(Path.of(preFileName));
-            postIndexHTML = Files.readAllLines(Path.of(postFileName));
+            return new String(Files.readAllBytes(Path.of(fileName)), StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.err.printf("Error reading %s\n", e.getMessage());
+            System.exit(1);
         }
+        return null; // dummy return to make compiler happy
     }
-    static void writeResult() {
-        List<String> resultHTML = List.of(preIndexHTML, contentHTML, postIndexHTML).
-                                       stream().flatMap(List::stream).toList();
+    */
+    static void writeToFile(String fileName, String text) {
         try {
-            Files.write(Path.of(resultFileName), resultHTML);
+            Files.writeString(Path.of(fileName), text);
         } catch (IOException e) {
             System.err.printf("Error writing %s\n", e.getMessage());
+            System.exit(1);
         }
+    }
+    static void writeResult(String fileName) {
+        writeToFile(fileName, STR.
+            """
+            \{preContent}
+            \{content}
+            \{postContent}
+            """);
     }
     static String cutOut(String fileName, String... labels) {
         List<String> snippet = new ArrayList<>();
@@ -54,23 +64,26 @@ class Clerk {
             }
         } catch (IOException e) {
             System.err.printf("Error reading %s\n", e.getMessage());
+            System.exit(1);
         }
         return snippet.stream().collect(Collectors.joining("\n")) + "\n";
     }
-    static void refresh() {
-        contentHTML = new ArrayList<>();
-        writeResult();
-    }
     static void setUp() {
-        readPrePost();
-        refresh();
+        preContent = cutOut(templateFileName, "<!DOCTYPE html>", "<!-- begin include content -->");
+        postContent = cutOut(templateFileName, "<!-- end include content -->");
+        content = "";
+        writeResult(resultFileName); 
     }
-    static void write(String html) {
-        contentHTML.add(html);
-        writeResult();
+    static void write(String text) {
+        content = STR.
+        """
+        \{content}
+        \{text}
+        """;
+        writeResult(resultFileName);
     }
     static void write(Object obj) {
-        write("<code><pre>" + String.valueOf(obj) + "</pre></code>");
+        write(STR."<code><pre>\{obj}</pre></code>");
     }
     static void script(String code) {
         write(STR.
@@ -105,8 +118,8 @@ class Clerk {
 }
 
 class Turtle {
-    String ID;
-    int width, height;
+    final String ID;
+    final int width, height;
     Turtle(int width, int height) {
         this.width = width;
         this.height = height;
@@ -116,7 +129,6 @@ class Turtle {
         <canvas id="turtleCanvas\{ID}" width="\{width}" height="\{height}" style="border:1px solid #000;"></canvas>
         <script src="./Turtle/turtle.js"></script>
         <script>
-            // const canvas = document.getElementById('turtleCanvas');
             const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));
         </script>
         """);
@@ -125,57 +137,27 @@ class Turtle {
         this(500, 500);
     }
     Turtle penDown() {
-        Clerk.write(STR.
-        """
-        <script>
-            turtle\{ID}.penDown();
-        </script>
-        """);
+        Clerk.script(STR."turtle\{ID}.penDown();");
         return this;
     }
     Turtle penUp() {
-        Clerk.write(STR.
-        """
-        <script>
-            turtle\{ID}.penUp();
-        </script>
-        """);
+        Clerk.script(STR."turtle\{ID}.penUp();");
         return this;
     }
     Turtle forward(double distance) {
-        Clerk.write(STR.
-        """
-        <script>
-            turtle\{ID}.forward(\{String.valueOf(distance)});
-        </script>
-        """);
+        Clerk.script(STR."turtle\{ID}.forward(\{distance});");
         return this;
     }
     Turtle backward(double distance) {
-        Clerk.write(STR.
-        """
-        <script>
-            turtle\{ID}.backward(\{String.valueOf(distance)});
-        </script>
-        """);
+        Clerk.script(STR."turtle\{ID}.backward(\{distance});");
         return this;
     }
     Turtle left(double degrees) {
-        Clerk.write(STR.
-        """
-        <script>
-            turtle\{ID}.left(\{String.valueOf(degrees)});
-        </script>
-        """);
+        Clerk.script(STR."turtle\{ID}.left(\{degrees});");
         return this;
     }
     Turtle right(double degrees) {
-        Clerk.write(STR.
-        """
-        <script>
-            turtle\{ID}.right(\{String.valueOf(degrees)});
-        </script>
-        """);
+        Clerk.script(STR."turtle\{ID}.right(\{degrees});");
         return this;
     }
 }

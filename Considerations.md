@@ -1,6 +1,6 @@
 # 🤔 Überlegungen zur Überarbeitung
 
-#### 🔍 String Templates besser ausnutzen
+#### ✅ 🔍 String Templates besser ausnutzen
 
 Derzeit benutze ich ein `preIndex.html` und ein `postIndex.html`. Vermutlich täte es auch ein `indexTemplate.html` mit einem Template-Ausdruck (_template expression_) `\{content}`, was die Gesamtkomposition der `index.html` erleichtern würde.
 
@@ -23,9 +23,13 @@ Derzeit benutze ich ein `preIndex.html` und ein `postIndex.html`. Vermutlich tä
 
 Konsequenterweise ist es überflüssig, `preIndexHTML` und `postIndexHTML` und wohl auch `contentHTML` vom Typ `List<String>` vorzuhalten. Es genügt dann ein `String indexHTML` zu haben und ein `contentHTML` vom Typ `StringBuilder`, da hier beständig HTML ergänzt wird; aber auch da kann man vielleicht auch gut mit einem Template-Ausdruck arbeiten. Vielleicht gibt es auch einen netten Trick, die `indexHTML` mit einem Template-Ausdruck "offen" für Ergänzungen zu halten.
 
-#### 🔍 `setUp` und `refresh` "doppelt"
+> Das habe ich umgesetzt; der Code ist lesbarer und gleichzeitig geschrumpt.
+
+#### ✅ 🔍 `setUp` und `refresh` "doppelt"
 
 Die `refresh`-Methode ist eigentlich überflüssig, `setUp` genügt. Ob man die Methode dann noch einmal umbenennt, ist zu überlegen.
+
+> Umgesetzt; es gibt nur noch die Methode `setUp`.
 
 #### 🔍 `cutOut` erweitern
 
@@ -41,7 +45,7 @@ Nützlich ist das z.B., wenn man einen Methodenkopf als StartLabel und am Ende d
 Clerk.cutOut("clerk.java", true, false, "static String cutOut(", "// end");
 ```
 
-#### 🔍 `script`-Methode überflüssig
+#### 🤷 🔍 `script`-Methode überflüssig
 
 Die Kasse `Turtle` nutzt die `script`-Methode noch nicht, was den Code verkürzen würde. Aber sinnvoller wäre eine `write`-Methode, die ein Tag selber schließt und so für _balanced tags_ sorgt:
 
@@ -62,6 +66,23 @@ static void write(String openingTag, String content) {
 
 Damit lassen sich keine verschachtelten Tags realisieren, da direkt `write` aufgerufen wird. Sinnvoller könnte eine `tag`-Methode sein, die einen String zurückgibt und innerhalb eines `write` verwendet werden kann.
 
+```java
+static String htmlTag(String openingTag, String content) {
+    Pattern pattern = Pattern.compile("<(\\w+).*>");
+    Matcher matcher = pattern.matcher(openingTag);
+    if (!matcher.matches())
+        System.err.printf("Invalid opening tag: %s\n", openingTag);
+    return STR.
+    """
+    \{openingTag}
+    \{content}
+    \{matcher.matches() ? "</" + matcher.group(1) + ">" : "</???>"}
+    """;
+}
+```
+
+> Die Idee hat sich in einem ersten Versuch als nicht notwendig ergeben.
+
 #### 🔍 Markdown als Klasse ausgliedern
 
 Die `markdown`-Methode sollte wie Turtle als eigenständiger Aspekt ausgelagert werden, ebenso wie es mit der Klasse `Turtle` geschehen ist.
@@ -74,6 +95,6 @@ Zum Beispiel könnte man eine Markdown-Datei `text.md` erzeugen und gleichzeitig
 
 Die Idee der Targets gefällt mir im Moment etwas besser. Clerk könnte auch Abhängigkeiten der Targets berücksichtigen: Targets, in die gleichzeitig geschrieben wird. Target-Aktivitäten, die die gleiche oder eine andere Aktivität bei einem anderen Target auslösen.
 
-#### 🔍 Mit `Clerk`-Instanzen oder Targets arbeiten
+#### 🔍 Realisierung eines HTTP-Servers
 
-Das Entscheidenste bleibt die Realisierung eines Webservers.
+Das Entscheidenste bleibt die Realisierung eines HTTP-Server.
