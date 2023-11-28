@@ -1,6 +1,6 @@
 # Clerk: Live View Programming with Java's JShell
 
-Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
+Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
 
 ## 💟 Motivation: Clerk, das will ich auch haben!
 
@@ -91,7 +91,7 @@ Obwohl der Clerk-Prototyp einfach und kurz gehalten ist, kann man noch mehr dami
 In dem git-Repository findet sich die Datei `logo.java`. Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
 
 ```java
-jshell> Clerk.refresh() // Clerk.setUp() geht auch
+jshell> Clerk.setUp()
 
 jshell> /o logo.java    // /o ist Kurzform von /open
 ```
@@ -108,7 +108,7 @@ Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Cler
 
 Wenn Sie sich den Inhalt der `index.html`-Datei anschauen, werden Sie vielleicht sofort verstehen, wie Clerk (siehe `clerk.java`) arbeitet und wie die Klasse `Turtle` (ebenfalls in `clerk.java`) sich Clerk zunutze macht:
 
-Clerk nutzt HTML und JavaScript im Hintergrund -- anders ist eine Browser-Ansicht nicht zu erzeugen --, und macht das, indem die entsprechenden Clerk-Methoden die `index.html`-Datei mit HTML- bzw. JavaScript-Anteilen vollschreibt. Die `index.html`-Datei wächst mit jedem weiteren Clerk-Methodenaufruf an. Nach der Abarbeitung von `logo.java` zählt `index.html` fast 10.000 Zeilen HTML-Code.
+Clerk nutzt HTML und JavaScript im Hintergrund -- anders ist eine Browser-Ansicht nicht zu erzeugen --, und macht das, indem die entsprechenden Clerk-Methoden die `index.html`-Datei mit HTML- bzw. JavaScript-Anteilen vollschreibt. Die `index.html`-Datei wächst mit jedem weiteren Clerk-Methodenaufruf an. Nach der Abarbeitung von `logo.java` zählt `index.html` über 10.000 Zeilen HTML-Code.
 
 > Der Trick: Der Kopf der `index.html`-Datei weist den Browser an, diese Datei alle zwei Sekunden neu zu lesen und die Darstellung zu aktualisieren. Wenn `index.html` mit den Clerk-Methodenaufrufen wächst und wächst entsteht der Eindruck einer Interaktion.
 
