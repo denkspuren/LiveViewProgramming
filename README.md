@@ -139,7 +139,7 @@ Dazu ein paar Punkte, die mir in den Sinn kommen:
 
 * Sobald es Clerk mit einem HTTP-Server gibt, wäre eine interaktive Anwendung eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet in Clerk statt.
 
-* So behelfsmäßig mein Prototyp mit `index.html` und einem kontinuierlichen Browserrefresh arbeitet: Dennoch könnte das Beschreiben und Erweitern z.B. einer statischen Dokumentationsdatei etwa im Markdown-Format genau auf diese Weise erfolgen. Dafür braucht es keinen HTTP-Server. Clerk könnte Dateiformate wie auch Formate unterstützen, die über den Webserver ausgeliefert werden.
+* So behelfsmäßig mein Prototyp mit `index.html` und einem kontinuierlichen Browserrefresh arbeitet: Dennoch könnte das Beschreiben und Erweitern z.B. einer statischen Dokumentationsdatei etwa im Markdown-Format genau auf diese Weise erfolgen. Dafür braucht es keinen HTTP-Server. Clerk könnte Dateiformate und weitere Formate unterstützen, die über den Webserver ausgeliefert werden.
 
 * Tatsächlich wäre ein Object-Inspektor, der über Reflection ein Object-Diagramm z.B. mit Hilfe von Graphviz erzeugt, eine großartige Sache. Das ist aber ein Problem für sich und kann, wenn gelöst, in Clerk als Dienst eingearbeitet werden.
 
