@@ -62,6 +62,10 @@ static void write(String openingTag, String content) {
 
 Damit lassen sich keine verschachtelten Tags realisieren, da direkt `write` aufgerufen wird. Sinnvoller könnte eine `tag`-Methode sein, die einen String zurückgibt und innerhalb eines `write` verwendet werden kann.
 
+#### 🔍 Markdown als Klasse ausgliedern
+
+Die `markdown`-Methode sollte wie Turtle als eigenständiger Aspekt ausgelagert werden, ebenso wie es mit der Klasse `Turtle` geschehen ist.
+
 #### 🔍 Mit `Clerk`-Instanzen oder Targets arbeiten
 
 Wie ich schon im [README.md](README.md) erwähne, macht es eventuell Sinn, mehrere Instanzen von Clerk anlegen zu können oder verschiedene Targets angeben zu können: Was soll über den HTTP-Server raus, was in eine Datei geschrieben werden.
