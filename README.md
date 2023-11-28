@@ -102,7 +102,7 @@ Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder w
 
 Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Clerk in der Datei `logo.java` mit einem Editor Ihrer Wahl an.
 
-> Wie ich feststellen musste, wird das Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Template durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
+> Wie ich feststellen musste, wird das Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
 
 # 📝 Skizze zur Arbeitsweise des Clerk-Prototypen
 
@@ -112,7 +112,7 @@ Clerk nutzt HTML und JavaScript im Hintergrund -- anders ist eine Browser-Ansich
 
 > Der Trick: Der Kopf der `index.html`-Datei weist den Browser an, diese Datei alle zwei Sekunden neu zu lesen und die Darstellung zu aktualisieren. Wenn `index.html` mit den Clerk-Methodenaufrufen wächst und wächst entsteht der Eindruck einer Interaktion.
 
-Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Das ist für einen _Proof of Concept_ akzeptabel, ist aber die entscheidende Baustelle, die man als nächstes angehen muss. Die Lösung mit einer anwachsenden `index.html` zeigt jedoch, wie inkrementelle Anteile im Wechselspiel von Browser und Server übertragen werden müssen. Mit einem HTTP-Server steigen die Möglichkeiten noch einmal: Dann kann der Client-Code aus dem Browser, Funktionalität aus dem Java/JShell-Programm abrufen -- damit sind dann interaktive Anwendungen möglich.
+Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Der regelmäßige Browser-Refresh ist so etwas wie ein allgemeiner Request, die `index.html`-Datei ein allgemeiner Reply. Das ist für einen _Proof of Concept_ akzeptabel, ist aber die entscheidende Baustelle, die man als nächstes angehen muss. Die Lösung mit einer anwachsenden `index.html` zeigt jedoch, wie inkrementelle Anteile im Wechselspiel von Browser und Server übertragen werden müssen. Mit einem HTTP-Server steigen die Möglichkeiten noch einmal: Dann kann der Client-Code aus dem Browser, Funktionalität aus dem Java/JShell-Programm abrufen -- damit sind dann interaktive Anwendungen möglich.
 
 > Wenn Sie bei der Umsetzung eines HTTP-Servers einspringen, mithelfen und mitdenken wollen: Meine Idealvorstellung ist, dass Clerk ohne Abhängigkeiten von anderen Libraries auskommt und sich nur der Boardmittel des JDK bedient. In dem API `com.sun.net.httpserver` sind drei neue Klassen dazu gekommen, die eine Realisierung vielleicht etwas einfacher machen, siehe [JEP 408](https://openjdk.org/jeps/408).
 
