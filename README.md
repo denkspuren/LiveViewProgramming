@@ -122,8 +122,7 @@ Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Der regelmäßige
 
 Meine Vision ist, Clerk in der Programmierausbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen. Wenn einmal ein HTTP-Server realisiert ist, wird Clerk ein schönes Beispiel für webbasierte Client/Server-Programmierung abgeben, und es kann in seinen Fähigkeiten kontinuierlich erweitert werden. Mit Clerk wäre damit auch ein Rahmenwerk gegeben für die Programmierung von Web-Anwendungen. Generell ist der hier vorgestellte Ansatz für jede andere Programmiersprache ebenso umsetzbar.
 
-Besonders geignet scheint mir Clerk für Programmier-Anfänger:innen zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert. Gerne würde ich Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline). Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen.
-
+Besonders geignet scheint mir Clerk für Programmier-Anfänger:innen zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert. Gerne würde ich Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline). Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen. Mit solchen Erweiterungen kann Clerk Teil der Entwicklungswerkzeuge beim Programmieren werden.
 
 ## 💃🕺 Mitmach-Aufruf
 
