@@ -7,15 +7,22 @@ import java.nio.charset.StandardCharsets;
 public final class TextMessage extends Message {
 
     public final String message;
+    private final byte[] payload;
 
     public TextMessage(final String string) {
-        super(1);
+        super(Type.Text);
         this.message = string;
+        this.payload = this.message.getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
     protected byte[] getPayloadData() {
-        return this.message.getBytes(StandardCharsets.UTF_8);
+        return this.payload;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("TextMessage(message := %s)", message);
     }
 
 }
