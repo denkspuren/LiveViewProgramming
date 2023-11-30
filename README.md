@@ -2,7 +2,7 @@
 
 Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
 
-> @kuchenkruste ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis `/src` [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681). Danke! Wenn es die Zeit hergibt, werde ich Clerk entsprechend überarbeiten.
+> [@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis `/src` [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681). Danke! Wenn es die Zeit hergibt, werde ich Clerk entsprechend überarbeiten.
 
 ## 💟 Motivation: Clerk, das will ich auch haben!
 
