@@ -1,0 +1,73 @@
+
+@font-face {
+    font-family: Raleway;
+    src: url('/font/Raleway-Light.ttf');
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: Raleway;
+    src: url('/font/Raleway-Regular.ttf');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: Raleway;
+    src: url('/font/Raleway-Bold.ttf');
+    font-weight: bold;
+}
+
+* {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 100;
+    color: #333333;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+body, html {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    flex-direction: column;
+}
+
+.error-title {
+    font-size: 6em;
+}
+
+.error-smiley {
+    font-size: 10em;
+}
+
+#main {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    align-content: center;
+    flex-direction: column;
+}
+
+#main h1 {
+    font-size: 4em;
+    margin: 40px;
+}
+
+#main #container {
+    flex-grow: 1;
+    display: block;
+    overflow: hidden;
+}
