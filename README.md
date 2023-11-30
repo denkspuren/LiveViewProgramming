@@ -2,6 +2,8 @@
 
 Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
 
+> @kuchenkruste ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis `/src` beigesteuert. Danke! Wenn es die Zeit hergibt, werde ich Clerk entsprechend überarbeiten.
+
 ## 💟 Motivation: Clerk, das will ich auch haben!
 
 In der Kalenderwoche 47/2023 bin ich per Zufall auf [Clerk](https://clerk.vision/) gestoßen. Clerk erweitert das Programmieren mit Clojure im Stil der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface), wie man das z.B. von [Jupyter bzw. JupyterLab](https://jupyter.org/) her kennt. Der Witz ist jedoch: Während man in Jupyter im Browser ein webbasiertes Notizbuch für die interaktive Programmierung anlegt und mit Notizen und Code befüllt, bleibt man bei Clerk vollständig in der lieb gewordenen Entwicklungsumgebung und programmiert von dort aus eine Notizbuchsicht, die man sich im Webbrowser anschauen kann.
