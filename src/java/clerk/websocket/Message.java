@@ -8,6 +8,9 @@ import java.security.SecureRandom;
 
 public abstract class Message {
 
+    /** According to the RFC 6455 standard, a server MUST NOT mask any frames sent to the client. */
+    private static final boolean serverSideMasking = false;
+
     private static final SecureRandom generator = new SecureRandom();
 
     public final Type type;
@@ -22,33 +25,36 @@ public abstract class Message {
         // We try to write anything with a single fragment ...
         stream.write(0b10000000 | (this.type.id & 0b1111));
 
-        // Write the length
+        // Write the length and mask-bit
+        final byte mask = serverSideMasking ? 0b10000000 : 0;
         if (payload.length > 126) {
             if ((payload.length & 0xFFFFFFFFFFFF0000L) != 0) {
                 // We use the full 8 bytes to encode the length
-                stream.write(0b10000000 | (byte) 127);
+                stream.write(mask | (byte) 127);
                 for (int i = 0; i < 8; ++i) {
                     stream.write((byte) (payload.length >> (56 - i * 8)));
                 }
             } else {
                 // We just use 2 bytes here to encode the length
-                stream.write(0b10000000 | (byte) 126);
+                stream.write(mask | (byte) 126);
                 stream.write((byte) ((payload.length & 0xFF00) >> 8));
                 stream.write((byte) (payload.length & 0xFF));
             }
         } else {
-            stream.write(0b10000000 | (byte) (payload.length & 0b01111111));
+            stream.write(mask | (byte) (payload.length & 0b01111111));
         }
 
-        // Write the masking key
-        final int maskingKey = generator.nextInt();
-        for (int i = 0; i < 4; ++i) {
-            stream.write((byte) (maskingKey >> (24 - i * 8)));
-        }
+        if (serverSideMasking) {
+            // Write the masking key if necessary
+            final int maskingKey = generator.nextInt();
+            for (int i = 0; i < 4; ++i) {
+                stream.write((byte) (maskingKey >> (24 - i * 8)));
+            }
 
-        // Encode the payload
-        for (int i = 0; i < payload.length; ++i) {
-            payload[i] = (byte) (payload[i] ^ (maskingKey >> (24 - (i & 0x3) * 8)));
+            // Encode the payload
+            for (int i = 0; i < payload.length; ++i) {
+                payload[i] = (byte) (payload[i] ^ (maskingKey >> (24 - (i & 0x3) * 8)));
+            }
         }
 
         stream.write(payload);
@@ -78,7 +84,12 @@ public abstract class Message {
 
         // Get the masking bit (indicates whether a mask was used to encode the data)
         if ((next = stream.read()) == -1) return null;
-        final boolean mask = (next & 0b10000000) == 0b10000000;
+        final boolean mask = (next & 0b10000000) != 0;
+
+        if (!mask) {
+            // According to the RFC 6455 standard a server MUST close the connection when the client sends unmasked data
+            return null;
+        }
 
         // Compute the length of the payload data
         final long length;
