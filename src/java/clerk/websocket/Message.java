@@ -84,7 +84,12 @@ public abstract class Message {
 
         // Get the masking bit (indicates whether a mask was used to encode the data)
         if ((next = stream.read()) == -1) return null;
-        final boolean mask = (next & 0b10000000) == 0b10000000;
+        final boolean mask = (next & 0b10000000) != 0;
+
+        if (!mask) {
+            // According to the RFC 6455 standard a server MUST close the connection when the client sends unmasked data
+            return null;
+        }
 
         // Compute the length of the payload data
         final long length;
