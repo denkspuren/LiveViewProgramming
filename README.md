@@ -4,7 +4,7 @@ Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JS
 
 > [@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis `/src` [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681); die `pom.xml`-Datei hilft beim Build mit Maven. Danke! Wenn es die Zeit hergibt, werde ich Clerk entsprechend überarbeiten.
 > 
-> @RamonDevPrivate hat schon mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen beeindruckenden ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank!
+> @RamonDevPrivate hat mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen beeindruckenden ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank!
 
 ## 💟 Motivation: Clerk, das will ich auch haben!
 
