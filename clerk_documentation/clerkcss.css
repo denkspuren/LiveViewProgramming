@@ -1,0 +1,47 @@
+body {
+    background-color: black;
+    color: white;
+    font-family:Garamond, Georgia, serif;
+    margin-left: 3px;
+}
+main {
+    max-width: 800px;
+    margin: auto;
+}
+table {
+    margin: 3em 0 3em 1em;
+}
+h1,h2,h3,h4,h5,h6 {
+    text-align: center;
+}
+.author {
+    text-align: center;
+}
+h1 {
+    color: skyblue;
+
+}
+h2 {
+    color: lightblue;
+}
+
+img {
+    text-align: center;
+    margin: auto; display: block;
+
+}
+a {
+    text-decoration: none; color: orange;
+}
+h2:hover {
+    text-shadow: 0 0 10px #008ae6, 0 0 20px #008ae6, 0 0 30px #007acc;
+
+}
+a:hover {
+    text-shadow: 0 0 10px #fa7115, 0 0 20px #fb8537;
+
+}
+blockquote {
+    border-left: 0.35rem solid #e66100;
+    padding: 0 1rem 0;
+}
