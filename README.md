@@ -134,7 +134,7 @@ Besonders geignet scheint mir Clerk für Programmier-Anfänger:innen zu sein: Es
 
 Dazu ein paar Punkte, die mir in den Sinn kommen:
 
-* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"?
+* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"? -- Vielen Dank an [ginschel](https://github.com/ginschel) für einen [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5), der [hier](/clerk_documentation_css_example/) zu finden ist!
 
 * Wie könnte man z.B. eine Bibliothek wie `https://www.chartjs.org/` in Clerk einbinden? Das würde die Einsatzmöglichkeiten für Clerk bereichern.
 
