@@ -134,13 +134,13 @@ Besonders geignet scheint mir Clerk für Programmier-Anfänger:innen zu sein: Es
 
 Dazu ein paar Punkte, die mir in den Sinn kommen:
 
-* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"? -- Vielen Dank an [ginschel](https://github.com/ginschel) für einen [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5), der [hier](/clerk_documentation_css_example/) zu finden ist!
+* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"? -- Vielen Dank an [ginschel](https://github.com/ginschel) für einen [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5), der [hier](proposals/clerk_documentation_css_example/) zu finden ist!
 
 * Wie könnte man z.B. eine Bibliothek wie `https://www.chartjs.org/` in Clerk einbinden? Das würde die Einsatzmöglichkeiten für Clerk bereichern.
 
-* Es wird ein Webserver, d.h. ein HTTP-Server benötigt. Hier würde mir schon eine beispielhafte Umsetzung für eine einfache Anwendung (also nicht gleich für Clerk) helfen, von der ich lernen kann. Wie oben beschrieben: am besten nur mit den Boardmitteln des JDK. Etwas, was in der JShell läuft und am besten nicht mehr als 100 LOC hat.
+* Es wird ein Webserver, d.h. ein HTTP-Server benötigt. Hier würde mir schon eine beispielhafte Umsetzung für eine einfache Anwendung (also nicht gleich für Clerk) helfen, von der ich lernen kann. Wie oben beschrieben: am besten nur mit den Boardmitteln des JDK. Etwas, was in der JShell läuft und am besten nicht mehr als 100 LOC hat. -- Mit @RamonDevPrivate (seit 4. März 2024 Colaborator in diesem Repo) entsteht derzeit ein einfacher HTTP-Server mit Server Sent Events (SSE). Das ist superschlank.
 
-* Sobald es Clerk mit einem HTTP-Server gibt, wäre eine interaktive Anwendung eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet in Clerk statt.
+* Sobald es Clerk mit einem HTTP-Server gibt, wäre eine interaktive Anwendung eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet in javaseitig statt.
 
 * So behelfsmäßig mein Prototyp mit `index.html` und einem kontinuierlichen Browserrefresh arbeitet: Dennoch könnte das Beschreiben und Erweitern z.B. einer statischen Dokumentationsdatei etwa im Markdown-Format genau auf diese Weise erfolgen. Dafür braucht es keinen HTTP-Server. Clerk könnte Dateiformate und weitere Formate unterstützen, die über den Webserver ausgeliefert werden.
 
