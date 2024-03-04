@@ -2,7 +2,7 @@
 
 #### 🔍 Realisierung eines HTTP-Servers
 
-Das Entscheidenste bleibt die Realisierung eines HTTP-Server. Hier hat @kuchenkruste eine Implementierung auf den Weg gebracht, was in Clerk noch eingebaut werden muss.
+Das Entscheidenste bleibt die Realisierung eines HTTP-Server. Hier hat @kuchenkruste eine Websocket-Implementierung auf den Weg gebracht (siehe [hier](proposals/src/)). Derzeit favorisiere ich eine wesentlich schlankere Lösung mit Server Sent Events (SSE), wozu @RamonDevPrivate einen ersten Entwurf vorgelegt hat.
 
 #### 🔍 Object Inspector
 
