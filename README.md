@@ -100,7 +100,7 @@ jshell> Clerk.setUp()
 jshell> /o logo.java    // /o ist Kurzform von /open
 ```
 
-> Ich weiß, dass Dokument im Browser sieht nicht besonders schön aus. Das ist dem aktuellen Status des Prototypen geschuldet. Auch kenne ich mich mit CSS nicht wirklich aus. Hilfe ist gerne willkommen.
+> Ich weiß, das Dokument im Browser sieht nicht besonders schön aus. Das ist dem aktuellen Status des Prototypen geschuldet. Auch kenne ich mich mit CSS nicht wirklich aus. Hilfe ist gerne willkommen.
 
 Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in `logo.java` erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
 
