@@ -91,12 +91,10 @@ class Clerk {
         </script>
         """);
     }
-    static String generateID(int n) {
-        String characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-        Random rand = new Random();
-        return IntStream.rangeClosed(1, n).
-                         mapToObj(i -> "" + characters.charAt(rand.nextInt(characters.length()))).
-                         collect(Collectors.joining());
+    static String generateID(int n) { // random alphanumeric string of size n
+        return new Random().ints(n, 0, 36).
+                            mapToObj(i -> Integer.toString(i, 36)).
+                            collect(Collectors.joining());
     }
     static void markdown(String markdown) {
         String ID = generateID(10);
