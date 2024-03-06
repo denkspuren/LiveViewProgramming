@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "strict": true,
+    "preserveConstEnums": true,
+    "module": "ES6",
+    "moduleResolution": "Node",
+    "isolatedModules": true,
+    "sourceMap": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+  },
+  "exclude": [],
+  "include": ["js/*"],
+  
+}
