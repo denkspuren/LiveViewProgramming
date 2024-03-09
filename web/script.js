@@ -31,7 +31,7 @@ function setUp() {
 
 function script(input) {
     eval(input);
-    new Function(input).apply(); // https://www.educative.io/answers/eval-vs-function-in-javascript
+    // new Function(input).apply(); // https://www.educative.io/answers/eval-vs-function-in-javascript
 }
 
 function write(input) {
