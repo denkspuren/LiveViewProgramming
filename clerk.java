@@ -79,12 +79,10 @@ class Clerk {
         return cutOut(fileName, true, true, "");
     }
 
-    static String generateID(int n) {
-        String characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-        Random rand = new Random();
-        return IntStream.rangeClosed(1, n)
-                .mapToObj(i -> "" + characters.charAt(rand.nextInt(characters.length())))
-                .collect(Collectors.joining());
+    static String generateID(int n) { // random alphanumeric string of size n
+        return new Random().ints(n, 0, 36).
+                            mapToObj(i -> Integer.toString(i, 36)).
+                            collect(Collectors.joining());
     }
 
     // Open Server at default port
@@ -114,10 +112,9 @@ class Clerk {
     // Send Javascript code
     static void script(String code) {
         // bind declarations to this to make them accessible between calls
-        String evalCode = code
-                .replaceAll("(var |const |let )", "this.")
-                .replaceAll("function\\s+(\\S+)\\s*\\((.*)\\)\\s*\\{", "this.$1 = ($2) => {");
-
+        String evalCode = code;
+                //.replaceAll("(var |const |let )", "this.")
+                //.replaceAll("function\\s+(\\S+)\\s*\\((.*)\\)\\s*\\{", "this.$1 = ($2) => {");
         view.send(STR."script:\{evalCode}");
     }
 
@@ -249,7 +246,8 @@ class Turtle {
         Clerk.write(STR."""
         <canvas id="turtleCanvas\{ID}" width="\{width}" height="\{height}" style="border:1px solid #000;"></canvas>
         """);
-        Clerk.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+        // Clerk.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+        Clerk.script(STR."turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
     }
 
     Turtle() {
