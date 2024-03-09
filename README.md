@@ -1,24 +1,20 @@
 # Clerk: Live View Programming with Java's JShell
 
-Ich stelle Ihnen hier die Idee von Clerk und meinen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
-
-> [@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis `/src` [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681); die `pom.xml`-Datei hilft beim Build mit Maven. Danke! Wenn es die Zeit hergibt, werde ich Clerk entsprechend überarbeiten.
-> 
-> @RamonDevPrivate hat mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen beeindruckenden ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank!
+Ich stelle Ihnen hier die Idee von Clerk und einen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
 
 ## 💟 Motivation: Clerk, das will ich auch haben!
 
-In der Kalenderwoche 47/2023 bin ich per Zufall auf [Clerk](https://clerk.vision/) gestoßen. Clerk erweitert das Programmieren mit Clojure im Stil der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface), wie man das z.B. von [Jupyter bzw. JupyterLab](https://jupyter.org/) her kennt. Der Witz ist jedoch: Während man in Jupyter im Browser ein webbasiertes Notizbuch für die interaktive Programmierung anlegt und mit Notizen und Code befüllt, bleibt man bei Clerk vollständig in der lieb gewordenen Entwicklungsumgebung und programmiert von dort aus eine Notizbuchsicht, die man sich im Webbrowser anschauen kann.
+In der Kalenderwoche 47/2023 bin ich per Zufall auf [Clerk](https://clerk.vision/) gestoßen, die Inspiration der hier umgesetzten Variante von Clerk. Das originale Clerk erweitert das Programmieren mit Clojure im Stil der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface), wie man das z.B. von [Jupyter bzw. JupyterLab](https://jupyter.org/) her kennt. Der Witz ist jedoch: Während man in Jupyter im Browser ein webbasiertes Notizbuch für die interaktive Programmierung anlegt und mit Notizen und Code befüllt, bleibt man bei Clerk vollständig in der vertrauten Entwicklungsumgebung und programmiert von dort aus eine Notizbuchansicht, die man sich im Webbrowser anschauen kann.
 
-Auf der Clerk-Webseite läuft diese Art der Notizbuch-Programmierung unter dem Motto "Moldable Live Programming for Clojure". Die Idee von Clerk und der Umgang damit werden ausführlich in dem Dokument https://px23.clerk.vision/ beschrieben. Noch netter ist vielleicht dieses YouTube-Video, um schnell einen Zugang zu bekommen: https://youtu.be/3ANS2NTNgig
+Auf der originalen Clerk-Webseite läuft diese Art der Notizbuch-Programmierung unter dem Motto "Moldable Live Programming for Clojure". Die Idee von Clerk und der Umgang damit werden ausführlich in dem Dokument https://px23.clerk.vision/ beschrieben. Noch netter ist vielleicht dieses YouTube-Video, um schnell einen Zugang zu bekommen: https://youtu.be/3ANS2NTNgig
 
 Die Idee von Clerk finde ich überaus bestechend: Das hätte ich auch gerne für die Java-Programmierung, vor allem mit der JShell. Die Idee hat das Potenzial, die Programmierausbildung mit meinen Studierenden grundlegend zu verändern.
 
 > Ich kann mit dem Begriff _moldable_ nicht ganz soviel anfangen und ziehe es vor, die Idee des "Moldable Live Programming" eher als "Live View Programming" (LVP) zu bezeichnen.
 
-Weil mich die Idee von Clerk derart angefixt hat, grübelte ich über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Aber mir ließ das keine Ruhe! Also habe ich mich am Samstag und Sonntag der Kalenderwoche 47 an einen Prototypen gemacht, um herauszufinden, ob ich nicht was ähnliches für die JShell mit wenigen Zeilen Code hinbekomme.
+Weil mich die Idee von Clerk derart angefixt hat, grübelte ich über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Aber mir ließ das keine Ruhe! Also habe ich mich am Samstag und Sonntag der Kalenderwoche 47 an einen Prototypen gemacht, um herauszufinden, ob ich nicht was ähnliches für die JShell mit wenigen Zeilen Code hinbekomme. Das Ergebnis finden Sie im Branch [initalversion](https://github.com/denkspuren/clerk/tree/initalversion).
 
-Der _Proof of Concept_ mit dem Prototypen ist geglückt! Man kann mit meiner Clerk-Variante aus der JShell heraus Markdown erzeugen, Code dokumentieren und Zeichnungen mit einer Logo-Schildkröte erstellen. Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
+Mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) gibt es ein _Proof of Concept_ mit einem ganz einfachen Werkserver! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Code dokumentieren und Zeichnungen mit einer Logo-Schildkröte erstellen. Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
 
 Wer mag, kann den Prototypen ausprobieren!
 
@@ -38,17 +34,16 @@ jshell -R-ea --enable-preview
 
 ### 🎹 Clerk zur interaktiven Live-View-Programmierung
 
-Die Datei `clerk.java` wird in die JShell geladen und Clerk frisch aufgesetzt.
+Die Datei `clerk.java` wird in die JShell geladen und Clerk gestartet.
 
 ```
 jshell> /open clerk.java
 
-jshell> Clerk.setUp()
+jshell> Clerk.serve()
+Open http://localhost:50001 in your browser
 ```
 
-Wenn nicht aus einer vorherigen Clerk-Sitzung eine `index.html`-Datei im `clerk`-Ordner zu finden ist, wird sie hiermit angelegt. Diese Datei öffnet man in einem Browser. Im Browser kann man mitverfolgen, was passiert, wenn man `Clerk` nutzt.
-
-> Bitte nicht wundern, wenn es bei der Darstellung im Browser zu einem Flickern kommt. Um den Prototypen einfach zu halten, habe ich das in Kauf genommen. Die Webseite aktualisiert sich automatisch alle zwei Sekunden.
+Öffnen Sie Ihren Browser (bei mir ist es Chrome) mit dieser Webadresse. Im Browser kann man mitverfolgen, was passiert, wenn man `Clerk` nutzt.
 
 Probieren wir einen einfachen Begrüßungstext im Markdown-Format:
 
@@ -149,6 +144,12 @@ Dazu ein paar Punkte, die mir in den Sinn kommen:
 Weitere Überlegungen zur Überarbeitung des aktuellen Prototypen sind unter [Considerations.md](Considerations.md) zu finden.
 
 Wie man Clerk modular gestalten könnte zum Zwecke der Erweiterung, ob man es doch als `jar`-Datei ausliefern sollte, ... diesen Fragen kann man sich widmen, wenn der Prototyp reift und mit einem HTTP-Server ausgestattet ist.
+
+## 🙏 Dank für Beiträge
+
+> [@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis `/src` [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681); die `pom.xml`-Datei hilft beim Build mit Maven. Danke! Wenn es die Zeit hergibt, werde ich Clerk entsprechend überarbeiten.
+> 
+> @RamonDevPrivate hat mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen beeindruckenden ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank!
 
 Herzlichst,<br>
 Dominikus Herzberg
