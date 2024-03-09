@@ -43,7 +43,7 @@ jshell> Clerk.serve()
 Open http://localhost:50001 in your browser
 ```
 
-Öffnen Sie Ihren Browser (bei mir ist es Chrome) mit dieser Webadresse. Im Browser kann man mitverfolgen, was passiert, wenn man `Clerk` nutzt.
+Öffnen Sie Ihren Browser (bei mir ist es Chrome) mit dieser Webadresse. Wenn es ein anderer Port sein soll, lautet der Aufruf beispielsweise `Clerk.serve(50000)`. Im Browser kann man mitverfolgen, was passiert, wenn man Clerk nutzt. 
 
 Probieren wir einen einfachen Begrüßungstext im Markdown-Format:
 
@@ -62,7 +62,7 @@ turtle ==> Turtle@5ef04b5
 
 Ein Kästchen, die Zeichenfläche, von 200 x 200 Punkten ist im Browser zu sehen. In der Mitte befindet sich eine unsichtbare Schildkröte, die nach Osten ausgerichtet und mit einem Zeichenstift ausgestattet ist und die wir mit ein paar Anweisungen so umherschicken, dass schrittweise ein Quadrat entsteht.
 
-Geben Sie nun 4x die folgende Anweisung für die Schildkröte ein. Warten Sie nach jeder Anweisung ein wenig, bis der Browser die Ansicht aktualisiert hat.
+Geben Sie nun 4x die folgende Anweisung für die Schildkröte ein.
 
 ```java
 turtle.forward(80).left(90)
@@ -90,30 +90,28 @@ Obwohl der Clerk-Prototyp einfach und kurz gehalten ist, kann man noch mehr dami
 In dem git-Repository findet sich die Datei `logo.java`. Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
 
 ```java
-jshell> Clerk.setUp()
+jshell> Clerk.serve() // Browser refreshen, um leere Seite zu sehen
 
-jshell> /o logo.java    // /o ist Kurzform von /open
+jshell> /o logo.java  // /o ist Kurzform von /open
 ```
 
-> Ich weiß, das Dokument im Browser sieht nicht besonders schön aus. Das ist dem aktuellen Status des Prototypen geschuldet. Auch kenne ich mich mit CSS nicht wirklich aus. Hilfe ist gerne willkommen.
+> Ich weiß, aktuell sieht das Dokument im Browser nicht besonders schön aus. Das liegt daran, dass es noch keine CSS-Datei gibt, die das Ergebnis visuell ansprechend darstellt. Hilfe ist gerne willkommen.
 
 Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in `logo.java` erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
 
 Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Clerk in der Datei `logo.java` mit einem Editor Ihrer Wahl an.
 
-> Wie ich feststellen musste, wird das Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
+> Offenbar wird das Java-Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates  möglicherweise durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
 
 # 📝 Skizze zur Arbeitsweise des Clerk-Prototypen
 
-Wenn Sie sich den Inhalt der `index.html`-Datei anschauen, werden Sie vielleicht sofort verstehen, wie Clerk (siehe `clerk.java`) arbeitet und wie die Klasse `Turtle` (ebenfalls in `clerk.java`) sich Clerk zunutze macht:
+Wenn Sie sich die Datei `clerk.java` anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist:
 
-Clerk nutzt HTML und JavaScript im Hintergrund -- anders ist eine Browser-Ansicht nicht zu erzeugen --, und macht das, indem die entsprechenden Clerk-Methoden die `index.html`-Datei mit HTML- bzw. JavaScript-Anteilen vollschreibt. Die `index.html`-Datei wächst mit jedem weiteren Clerk-Methodenaufruf an. Nach der Abarbeitung von `logo.java` zählt `index.html` über 10.000 Zeilen HTML-Code.
+* Die Klasse `LiveView` setzt mit den Boardmitteln von Java einen Webserver mit [Server Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) auf.
+* Die Klasse `Clerk` aktiviert den Server mit der Methode `serve` und schickt HTML-Code mit der Methode `write` an den Client (den Browser). Mit der Methode `script` wird JavaScript-Code und mit `markdown` Text in Markdown-Syntax an den Browser geschickt. Mit der Methode `cutOut` kann man markierte Textabschnitte aus einer Datei ausschneiden.
+* Die Klasse `Turtle` erlaubt die Verwendung der Turtle-Implementierung [`turtle.js`](/Turtle/turtle.js) durch Java. Die verschiedenen Turtle-Methoden rufen im Browser ihre Entsprechungen in `turtle.js` auf 
 
-> Der Trick: Der Kopf der `index.html`-Datei weist den Browser an, diese Datei alle zwei Sekunden neu zu lesen und die Darstellung zu aktualisieren. Wenn `index.html` mit den Clerk-Methodenaufrufen wächst und wächst entsteht der Eindruck einer Interaktion.
-
-Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Der regelmäßige Browser-Refresh ist so etwas wie ein allgemeiner Request, die `index.html`-Datei ein allgemeiner Reply. Das ist für einen _Proof of Concept_ akzeptabel, ist aber die entscheidende Baustelle, die man als nächstes angehen muss. Die Lösung mit einer anwachsenden `index.html` zeigt jedoch, wie inkrementelle Anteile im Wechselspiel von Browser und Server übertragen werden müssen. Mit einem HTTP-Server steigen die Möglichkeiten noch einmal: Dann kann der Client-Code aus dem Browser Funktionalität aus dem Java/JShell-Programm abrufen -- damit sind dann interaktive Anwendungen möglich.
-
-> Wenn Sie bei der Umsetzung eines HTTP-Servers einspringen, mithelfen und mitdenken wollen: Meine Idealvorstellung ist, dass Clerk ohne Abhängigkeiten von anderen Libraries auskommt und sich nur der Boardmittel des JDK bedient. In dem API `com.sun.net.httpserver` sind drei neue Klassen dazu gekommen, die eine Realisierung vielleicht etwas einfacher machen, siehe [JEP 408](https://openjdk.org/jeps/408). Vielleicht ist es aber auch deutlich einfacher, ein Web-Framework wie [Javalin](https://javalin.io/) einzusetzen, um sehr elegant Websockets nutzen zu können.
+In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser wenigen grundlegenden Fähigkeiten von Clerk. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert und zeigt.
 
 # 🚀 Der Prototyp ist erst der Anfang
 
@@ -121,7 +119,9 @@ Der Prototyp kommt auf diese Weise ohne einen HTTP-Server aus! Der regelmäßige
 
 Meine Vision ist, Clerk in der Programmierausbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen. Wenn einmal ein HTTP-Server realisiert ist, wird Clerk ein schönes Beispiel für webbasierte Client/Server-Programmierung abgeben, und es kann in seinen Fähigkeiten kontinuierlich erweitert werden. Mit Clerk wäre damit auch ein Rahmenwerk gegeben für die Programmierung von Web-Anwendungen. Generell ist der hier vorgestellte Ansatz für jede andere Programmiersprache ebenso umsetzbar.
 
-Besonders geignet scheint mir Clerk für Programmier-Anfänger:innen zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert. Gerne würde ich Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline); @RamonDevPrivate hat das bereits mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) vorbereitet. Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen. Mit solchen Erweiterungen kann Clerk Teil der Entwicklungswerkzeuge beim Programmieren werden.
+Zum einen scheint mir Clerk für Programmier-Anfänger:innen geeignet zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert. Gerne würde ich Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline); @RamonDevPrivate hat das bereits mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) vorbereitet. Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen. Mit solchen Erweiterungen kann Clerk Teil der Entwicklungswerkzeuge beim Programmieren werden.
+
+Zum anderen können auch erfahrene Entwickler:innen mit Clerk eine anschauliche und verständliche Dokumentation zu ihrem Code erstellen. Wenn visuelle Anteile das unterstützen können, umso besser. Man kann Clerk aber ebenso für Experimente, exploratives Programmieren und Notebook-basierte Programmierung verwenden. Sicher gibt es noch viele andere, denkbare Anwendungsszenarien.
 
 ## 💃🕺 Mitmach-Aufruf
 
@@ -129,15 +129,13 @@ Besonders geignet scheint mir Clerk für Programmier-Anfänger:innen zu sein: Es
 
 Dazu ein paar Punkte, die mir in den Sinn kommen:
 
-* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"? -- Vielen Dank an [ginschel](https://github.com/ginschel) für einen [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5), der [hier](proposals/clerk_documentation_css_example/) zu finden ist!
+* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"? -- Vielen Dank an [ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5), der [hier](proposals/clerk_documentation_css_example/) zu finden ist!
 
 * Wie könnte man z.B. eine Bibliothek wie `https://www.chartjs.org/` in Clerk einbinden? Das würde die Einsatzmöglichkeiten für Clerk bereichern.
 
-* Es wird ein Webserver, d.h. ein HTTP-Server benötigt. Hier würde mir schon eine beispielhafte Umsetzung für eine einfache Anwendung (also nicht gleich für Clerk) helfen, von der ich lernen kann. Wie oben beschrieben: am besten nur mit den Boardmitteln des JDK. Etwas, was in der JShell läuft und am besten nicht mehr als 100 LOC hat. -- Mit @RamonDevPrivate (seit 4. März 2024 Colaborator in diesem Repo) entsteht derzeit ein einfacher HTTP-Server mit Server Sent Events (SSE). Das ist superschlank.
+* Sobald es Clerk mit einem HTTP-Server gibt, wäre eine interaktive Anwendung eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet javaseitig statt. Dafür wird man Clerk ein wenig erweitern müssen.
 
-* Sobald es Clerk mit einem HTTP-Server gibt, wäre eine interaktive Anwendung eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet in javaseitig statt.
-
-* So behelfsmäßig mein Prototyp mit `index.html` und einem kontinuierlichen Browserrefresh arbeitet: Dennoch könnte das Beschreiben und Erweitern z.B. einer statischen Dokumentationsdatei etwa im Markdown-Format genau auf diese Weise erfolgen. Dafür braucht es keinen HTTP-Server. Clerk könnte Dateiformate und weitere Formate unterstützen, die über den Webserver ausgeliefert werden.
+* Der Einsatz von Clerk könnte auch sinnvoll ohne Browser sein, um eine Dokumentation in einer Dokumentationsdatei etwa im Markdown-Format vorzunehmen. Dafür braucht es keinen HTTP-Server. Wenn zudem der Browser verwendet wird, könnte Clerk Medien auslesen (z.B. eine erzeugte Turtle-Grafik als Bild exporteiren), abspeichern und in eine Dokumentation einfügen.
 
 * Tatsächlich wäre ein Object-Inspektor, der über Reflection ein Object-Diagramm z.B. mit Hilfe von Graphviz erzeugt, eine großartige Sache. Das ist aber ein Problem für sich und kann, wenn gelöst, in Clerk als Dienst eingearbeitet werden.
 
@@ -147,9 +145,9 @@ Wie man Clerk modular gestalten könnte zum Zwecke der Erweiterung, ob man es do
 
 ## 🙏 Dank für Beiträge
 
-> [@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis `/src` [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681); die `pom.xml`-Datei hilft beim Build mit Maven. Danke! Wenn es die Zeit hergibt, werde ich Clerk entsprechend überarbeiten.
-> 
-> @RamonDevPrivate hat mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen beeindruckenden ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank!
+[@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis [`proposals/src`](/proposals/src/) [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681), der Websockets realisiert; die `pom.xml`-Datei (in `proposals`) hilft beim Build mit Maven. Vielen Dank dafür! Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events.
+ 
+@RamonDevPrivate hat mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen beeindruckenden ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank! Ramon ist auch Mitentwickler von Clerk geworden, der vor allem am Webserver mit den Server Sent Events arbeitet.
 
 Herzlichst,<br>
 Dominikus Herzberg
