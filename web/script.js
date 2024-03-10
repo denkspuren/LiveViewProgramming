@@ -9,10 +9,12 @@ function setUp() {
             
             switch (action) {
                 case "script":
-                    script(data);
+                    eval(data); // https://www.educative.io/answers/eval-vs-function-in-javascript
                     break;
                 case "write":
-                    write(data);
+                    const newElement = document.createElement("p");
+                    newElement.innerHTML = data;
+                    document.getElementById("events").appendChild(newElement);
                     break;
                 default:
                     console.log("Unknown Action");
@@ -27,17 +29,6 @@ function setUp() {
     } else {
         document.getElementById("events").innerHTML = "Your browser does not support Server-Sent Events.";
     }
-}
-
-function script(input) {
-    eval(input);
-    // new Function(input).apply(); // https://www.educative.io/answers/eval-vs-function-in-javascript
-}
-
-function write(input) {
-    const newElement = document.createElement("p");
-    newElement.innerHTML = input;
-    document.getElementById("events").appendChild(newElement);
 }
 
 setUp();
