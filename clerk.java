@@ -215,7 +215,7 @@ class LiveView {
         for (HttpExchange exchange : activeConnections) {
             try {
                 exchange.getResponseBody()
-                        .write(("data: " + event.replaceAll("(\\r|\\n|\\r\\n)+", "\\\\n") + "\n\n")
+                        .write(("data: " + event.replaceAll("(\\r|\\n|\\r\\n)", "\\\\n") + "\n\n")
                                 .getBytes(StandardCharsets.UTF_8));
                 exchange.getResponseBody().flush();
             } catch (Exception e) {
