@@ -12,7 +12,7 @@ Die Idee von Clerk finde ich überaus bestechend: Das hätte ich auch gerne für
 
 > Ich kann mit dem Begriff _moldable_ nicht ganz soviel anfangen und ziehe es vor, die Idee des "Moldable Live Programming" eher als "Live View Programming" (LVP) zu bezeichnen.
 
-Weil mich die Idee von Clerk derart angefixt hat, grübelte ich über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Aber mir ließ das keine Ruhe! Also habe ich mich am Samstag und Sonntag der Kalenderwoche 47 an einen Prototypen gemacht, um herauszufinden, ob ich nicht was ähnliches für die JShell mit wenigen Zeilen Code hinbekomme. Das Ergebnis finden Sie im Branch [initalversion](https://github.com/denkspuren/clerk/tree/initalversion).
+Weil mich die Idee von Clerk derart angefixt hat, grübelte ich über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Aber mir ließ das keine Ruhe! Also habe ich mich am Samstag und Sonntag der Kalenderwoche 47 an einen Prototypen gemacht, um herauszufinden, ob ich nicht was ähnliches für die JShell mit wenigen Zeilen Code hinbekomme. Der allererste Release (Version 0.1.0) dokumentiert diesen [initalen Prototypen](https://github.com/denkspuren/clerk/releases/tag/0.1.0).
 
 Mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) gibt es ein _Proof of Concept_ mit einem ganz einfachen Werkserver! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Code dokumentieren und Zeichnungen mit einer Logo-Schildkröte erstellen. Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
 
@@ -129,7 +129,7 @@ Zum anderen können auch erfahrene Entwickler:innen mit Clerk eine anschauliche 
 
 Dazu ein paar Punkte, die mir in den Sinn kommen:
 
-* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"? -- Vielen Dank an [ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5), der [hier](proposals/clerk_documentation_css_example/) zu finden ist!
+* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"? -- Vielen Dank an [ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5), der [hier](proposals/CSSExample/) zu finden ist!
 
 * Wie könnte man z.B. eine Bibliothek wie `https://www.chartjs.org/` in Clerk einbinden? Das würde die Einsatzmöglichkeiten für Clerk bereichern.
 
@@ -145,9 +145,9 @@ Wie man Clerk modular gestalten könnte zum Zwecke der Erweiterung, ob man es do
 
 ## 🙏 Dank für Beiträge
 
-[@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis [`proposals/src`](/proposals/src/) [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681), der Websockets realisiert; die `pom.xml`-Datei (in `proposals`) hilft beim Build mit Maven. Vielen Dank dafür! Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events.
+[@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis [`proposals/`](/proposals) [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681), der Websockets realisiert; die `pom.xml`-Datei (in `proposals`) hilft beim Build mit Maven. Vielen Dank dafür! Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events.
  
-@RamonDevPrivate hat mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen beeindruckenden ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank! Ramon ist auch Mitentwickler von Clerk geworden, der vor allem am Webserver mit den Server Sent Events arbeitet.
+@RamonDevPrivate hat mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank! Ramon ist auch Mitentwickler von Clerk geworden, der vor allem den Webserver mit den Server Sent Events auf den Weg gebracht hat.
 
 Herzlichst,<br>
 Dominikus Herzberg

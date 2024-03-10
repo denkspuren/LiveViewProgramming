@@ -2,11 +2,11 @@
 
 #### ✅ Realisierung eines HTTP-Servers
 
-Das Entscheidenste bleibt die Realisierung eines HTTP-Server. Hier hat @kuchenkruste eine Websocket-Implementierung auf den Weg gebracht (siehe [hier](proposals/src/)). Derzeit favorisiere ich eine wesentlich schlankere Lösung mit Server Sent Events (SSE), wozu @RamonDevPrivate einen ersten Entwurf vorgelegt hat.
+Das Entscheidenste ist die Realisierung eines HTTP-Server. Hier hat @kuchenkruste eine Websocket-Implementierung auf den Weg gebracht (siehe [hier](proposals/ServerWithWebsockets/)). Derzeit favorisiere ich eine wesentlich schlankere Lösung mit Server Sent Events (SSE), wozu @RamonDevPrivate einen ersten Entwurf vorgelegt hat.
 
 #### 🔍 Object Inspector
 
-@RamonDevPrivate hat [hier](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) schon ganze Arbeit geleistet. Der Code wird ebenfalls in Clerk eingebaut werden. Mittlerweile frage ich mich allerdings, wie man Clerk modular erweitern kann, am besten zur Laufzeit.
+@RamonDevPrivate hat [hier](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) schon ganze Arbeit geleistet. Der Code wird ebenfalls in Clerk eingebaut werden. Mittlerweile frage ich mich allerdings, wie man Clerk dynamisch zur Laufzeit erweitern kann. Der Prototyp weist schon in die Richtung, wie das gehen könnte.
 
 #### 🔍 Testing Framework
 
