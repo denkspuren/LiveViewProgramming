@@ -1,21 +1,21 @@
-import java.io.Closeable;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import static java.lang.StringTemplate.STR;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-import java.util.stream.*;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
-import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpServer;
 
 // jshell -R-ea --enable-preview
 
@@ -125,7 +125,7 @@ class Clerk {
             <div id="\{ID}">
             \{markdown}
             </div>
-                """);
+            """);
         script(STR."""
             var markdownContent = document.getElementById("\{ID}").textContent;
             var renderedHTML = marked.parse(markdownContent);
@@ -135,20 +135,17 @@ class Clerk {
 }
 
 class LiveView {
-    static int defaultPort = 50001;
-    private static final Map<String, String> mimeTypes = new HashMap<>();
-
     final HttpServer server;
     final String index = "./web/index.html";
-    List<HttpExchange> activeConnections;
 
     int port;
+    static final int defaultPort = 50001;
+    List<HttpExchange> activeConnections;
 
-    static {
-        mimeTypes.put("html", "text/html");
-        mimeTypes.put("js", "text/javascript");
-        mimeTypes.put("css", "text/css");
-    }
+    private static final Map<String, String> mimeTypes = 
+        Map.of("html", "text/html",
+               "js", "text/javascript",
+               "css", "text/css");
 
     public static LiveView of() throws IOException {
         return of(defaultPort);
@@ -171,7 +168,6 @@ class LiveView {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
             }
-
             exchange.getResponseHeaders().add("Content-Type", "text/event-stream");
             exchange.getResponseHeaders().add("Cache-Control", "no-cache");
             exchange.getResponseHeaders().add("Connection", "keep-alive");
@@ -185,7 +181,6 @@ class LiveView {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
             }
-
             final String path = exchange.getRequestURI().getPath().equals("/") ? index
                     : "." + exchange.getRequestURI().getPath();
             try (final InputStream stream = new FileInputStream(path)) {
@@ -284,5 +279,3 @@ class Turtle {
         return this;
     }
 }
-
-
