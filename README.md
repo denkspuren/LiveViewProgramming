@@ -81,7 +81,7 @@ Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
 > Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen. 
 
-Das wirkt wie Spielerei und soll es auch sein. Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann.
+Das wirkt wie Spielerei und soll es auch sein. Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Nutzungsmöglichkeiten von Clerk gehen durchaus über die "Spielerei" hinaus.
 
 ### 📄 Clerk zur Code-Dokumentation
 
@@ -95,13 +95,15 @@ jshell> Clerk.serve() // Browser refreshen, um leere Seite zu sehen
 jshell> /o logo.java  // /o ist Kurzform von /open
 ```
 
-> Ich weiß, aktuell sieht das Dokument im Browser nicht besonders schön aus. Das liegt daran, dass es noch keine CSS-Datei gibt, die das Ergebnis visuell ansprechend darstellt. Hilfe ist gerne willkommen.
+Im Browser sieht das Ergebnis so aus:
+
+![Das Ergebnis von `logo.java`](logo.png)
 
 Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in `logo.java` erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
 
 Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Clerk in der Datei `logo.java` mit einem Editor Ihrer Wahl an.
 
-> Offenbar wird das Java-Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates  möglicherweise durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
+> Offenbar wird das Java-Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates möglicherweise durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
 
 # 📝 Skizze zur Arbeitsweise des Clerk-Prototypen
 
