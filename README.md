@@ -10,7 +10,7 @@ Auf der originalen Clerk-Webseite läuft diese Art der Notizbuch-Programmierung 
 
 > Ich kann mit dem Begriff _moldable_ nicht ganz soviel anfangen und ziehe es vor, die Idee des "Moldable Live Programming" eher als "Live View Programming" (LVP) zu bezeichnen.
 
-Die Idee von Clerk finde ich überaus bestechend. Sie hat mich derart angefixt, das hätte ich auch gerne für die Java-Programmierung, vor allem mit der JShell. Ich sehe das Potenzial, wie Clerk die Programmierausbildung mit meinen Studierenden grundlegend verändern kann.
+Die Idee von Clerk finde ich überaus bestechend. Sie hat mich derart angefixt: Das hätte ich auch gerne für die Java-Programmierung, vor allem mit der JShell. Ich sehe das Potenzial, wie Clerk die Programmierausbildung mit meinen Studierenden grundlegend verändern kann.
 
 Ich grübelte über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Und so entstand der Ansatz, Clerk auf die Essenz zu reduzieren und mit Clerk lediglich "Ausgaben" im Browser zu erzeugen. Man programmiert mit Clerk also _live_ ein Notizbuch -- darum _Live View Programming_.
 
