@@ -10,15 +10,15 @@ Auf der originalen Clerk-Webseite läuft diese Art der Notizbuch-Programmierung 
 
 > Ich kann mit dem Begriff _moldable_ nicht ganz soviel anfangen und ziehe es vor, die Idee des "Moldable Live Programming" eher als "Live View Programming" (LVP) zu bezeichnen.
 
-Die Idee von Clerk finde ich überaus bestechend: Das hätte ich auch gerne für die Java-Programmierung, vor allem mit der JShell. Die Idee hat das Potenzial, die Programmierausbildung mit meinen Studierenden grundlegend zu verändern.
+Die Idee von Clerk finde ich überaus bestechend. Sie hat mich derart angefixt, das hätte ich auch gerne für die Java-Programmierung, vor allem mit der JShell. Ich sehe das Potenzial, wie Clerk die Programmierausbildung mit meinen Studierenden grundlegend verändern kann.
 
-Weil mich die Idee von Clerk derart angefixt hat, grübelte ich über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Und so entstand der Ansatz, Clerk auf die Essenz zu reduzieren und mit Clerk lediglich "Ausgaben" im Browser zu erzeugen. Man programmiert mit Clerk also _live_ ein Notizbuch -- darum _Live View Programming_.
+Ich grübelte über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Und so entstand der Ansatz, Clerk auf die Essenz zu reduzieren und mit Clerk lediglich "Ausgaben" im Browser zu erzeugen. Man programmiert mit Clerk also _live_ ein Notizbuch -- darum _Live View Programming_.
 
-Nach einem [_Proof of Concept_](https://github.com/denkspuren/clerk/releases/tag/0.1.0) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung mit einem Webserver entstanden! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Abschnitte aus Code- und Textdateien herausschneiden (das ist ein sehr einfaches aber mächtiges Instrument zur Code-Dokumentation) und Zeichnungen mit einer Logo-Schildkröte erstellen.
+Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/clerk/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung mit einem Webserver entstanden! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Abschnitte aus Code- und Textdateien herausschneiden und Zeichnungen mit einer Logo-Schildkröte erstellen. Insbesondere das Herausschneiden von Text- bzw. Codeabschnitten ist ein sehr einfaches aber mächtiges Instrument zur Code-Dokumentation und zur Unterstützung des [_Literate Programming_](https://en.wikipedia.org/wiki/Literate_programming).
 
 Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
 
-Wer mag, kann den Prototypen ausprobieren!
+Wer mag, kann den entstandenen Prototypen ausprobieren!
 
 ## 💻 Ausprobiert: Clerk für die JShell
 
