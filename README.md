@@ -1,20 +1,22 @@
 # Clerk: Live View Programming with Java's JShell
 
-Ich stelle Ihnen hier die Idee von Clerk und einen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
+Ich stelle Ihnen hier Clerk, die daraus hervorgegangene Idee des _Live View Programming_ und einen Clerk-Prototypen für die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
 
 ## 💟 Motivation: Clerk, das will ich auch haben!
 
-In der Kalenderwoche 47/2023 bin ich per Zufall auf [Clerk](https://clerk.vision/) gestoßen, die Inspiration der hier umgesetzten Variante von Clerk. Das originale Clerk erweitert das Programmieren mit Clojure im Stil der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface), wie man das z.B. von [Jupyter bzw. JupyterLab](https://jupyter.org/) her kennt. Der Witz ist jedoch: Während man in Jupyter im Browser ein webbasiertes Notizbuch für die interaktive Programmierung anlegt und mit Notizen und Code befüllt, bleibt man bei Clerk vollständig in der vertrauten Entwicklungsumgebung und programmiert von dort aus eine Notizbuchansicht, die man sich im Webbrowser anschauen kann.
+In der Kalenderwoche 47/2023 bin ich per Zufall auf [Clerk](https://clerk.vision/) gestoßen, die Inspiration der hier umgesetzten Variante von Clerk. Das originale Clerk erweitert das Programmieren mit Clojure im Stil der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface), wie man das z.B. von [Jupyter bzw. JupyterLab](https://jupyter.org/) her kennt. Der Witz ist jedoch: Während man bei Jupyter im Browser ein webbasiertes Notizbuch für die interaktive Programmierung anlegt und mit Notizen und Code befüllt, bleibt man bei Clerk vollständig in der vertrauten Entwicklungsumgebung und programmiert von dort aus eine Notizbuchansicht, die man sich im Webbrowser anschauen kann.
 
 Auf der originalen Clerk-Webseite läuft diese Art der Notizbuch-Programmierung unter dem Motto "Moldable Live Programming for Clojure". Die Idee von Clerk und der Umgang damit werden ausführlich in dem Dokument https://px23.clerk.vision/ beschrieben. Noch netter ist vielleicht dieses YouTube-Video, um schnell einen Zugang zu bekommen: https://youtu.be/3ANS2NTNgig
 
-Die Idee von Clerk finde ich überaus bestechend: Das hätte ich auch gerne für die Java-Programmierung, vor allem mit der JShell. Die Idee hat das Potenzial, die Programmierausbildung mit meinen Studierenden grundlegend zu verändern.
-
 > Ich kann mit dem Begriff _moldable_ nicht ganz soviel anfangen und ziehe es vor, die Idee des "Moldable Live Programming" eher als "Live View Programming" (LVP) zu bezeichnen.
 
-Weil mich die Idee von Clerk derart angefixt hat, grübelte ich über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Aber mir ließ das keine Ruhe! Also habe ich mich am Samstag und Sonntag der Kalenderwoche 47 an einen Prototypen gemacht, um herauszufinden, ob ich nicht was ähnliches für die JShell mit wenigen Zeilen Code hinbekomme. Der allererste Release (Version 0.1.0) dokumentiert diesen [initalen Prototypen](https://github.com/denkspuren/clerk/releases/tag/0.1.0).
+Die Idee von Clerk finde ich überaus bestechend: Das hätte ich auch gerne für die Java-Programmierung, vor allem mit der JShell. Die Idee hat das Potenzial, die Programmierausbildung mit meinen Studierenden grundlegend zu verändern.
 
-Mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) gibt es ein _Proof of Concept_ mit einem ganz einfachen Werkserver! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Code dokumentieren und Zeichnungen mit einer Logo-Schildkröte erstellen. Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
+Weil mich die Idee von Clerk derart angefixt hat, grübelte ich über eine Umsetzung nach. Nun ist die JShell nicht Clojure, man kann das nicht einfach 1:1 umsetzen. Und so entstand der Ansatz, Clerk auf die Essenz zu reduzieren und mit Clerk lediglich "Ausgaben" im Browser zu erzeugen. Man programmiert mit Clerk also _live_ ein Notizbuch -- darum _Live View Programming_.
+
+Nach einem [_Proof of Concept_](https://github.com/denkspuren/clerk/releases/tag/0.1.0) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung mit einem Webserver entstanden! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Abschnitte aus Code- und Textdateien herausschneiden (das ist ein sehr einfaches aber mächtiges Instrument zur Code-Dokumentation) und Zeichnungen mit einer Logo-Schildkröte erstellen.
+
+Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
 
 Wer mag, kann den Prototypen ausprobieren!
 
@@ -65,7 +67,7 @@ Ein Kästchen, die Zeichenfläche, von 200 x 200 Punkten ist im Browser zu sehen
 Geben Sie nun 4x die folgende Anweisung für die Schildkröte ein.
 
 ```java
-turtle.forward(80).left(90)
+turtle.forward(80).left(90); // 4x eingeben
 ```
 
 Sie sollten nun ein Quadrat im Zeichenfeld sehen. Die Schildkröte blickt am Schluss ihres Wegs wieder gen Osten. Ergänzen wir einen "Kreis", den wir aus 12 Strichen zusammensetzen.
@@ -81,7 +83,7 @@ Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
 > Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen. 
 
-Das wirkt wie Spielerei und soll es auch sein. Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Nutzungsmöglichkeiten von Clerk gehen durchaus über die "Spielerei" hinaus.
+Das wirkt wie Spielerei und soll es auch sein. Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Nutzungsmöglichkeiten von Clerk gehen jedoch über die "Spielerei" hinaus.
 
 ### 📄 Live View Programming zur Dokumentation
 
