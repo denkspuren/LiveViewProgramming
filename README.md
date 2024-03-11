@@ -83,11 +83,11 @@ Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
 Das wirkt wie Spielerei und soll es auch sein. Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Nutzungsmöglichkeiten von Clerk gehen durchaus über die "Spielerei" hinaus.
 
-### 📄 Clerk zur Code-Dokumentation
+### 📄 Live View Programming zur Dokumentation
 
 Obwohl der Clerk-Prototyp einfach und kurz gehalten ist, kann man noch mehr damit machen. Zum Beispiel kann man ein Notizbuch als Dokumentation zum Java-Code erzeugen -- und das alles aus der Java-Datei heraus in der man programmiert, so wie beim originalen Clerk für Clojure.
 
-In dem git-Repository findet sich die Datei `logo.java`. Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
+In dem git-Repository findet sich die Datei [`logo.java`](/logo.java). Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
 
 ```java
 jshell> Clerk.serve() // Browser refreshen, um leere Seite zu sehen
@@ -95,11 +95,11 @@ jshell> Clerk.serve() // Browser refreshen, um leere Seite zu sehen
 jshell> /o logo.java  // /o ist Kurzform von /open
 ```
 
-Im Browser sieht das Ergebnis so aus:
+Im Browser sieht das Ergebnis so aus (Sie sehen hier nur einen Teil der Seite):
 
 ![Das Ergebnis von `logo.java`](logo.png)
 
-Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in `logo.java` erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
+Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in [`logo.java`](/logo.java) erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
 
 Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Clerk in der Datei `logo.java` mit einem Editor Ihrer Wahl an.
 
@@ -107,7 +107,7 @@ Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Cler
 
 # 📝 Skizze zur Arbeitsweise des Clerk-Prototypen
 
-Wenn Sie sich die Datei `clerk.java` anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist:
+Wenn Sie sich die Datei [`clerk.java`](/clerk.java) anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist:
 
 * Die Klasse `LiveView` setzt mit den Boardmitteln von Java einen Webserver mit [Server Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) auf.
 * Die Klasse `Clerk` aktiviert den Server mit der Methode `serve` und schickt HTML-Code mit der Methode `write` an den Client (den Browser). Mit der Methode `script` wird JavaScript-Code und mit `markdown` Text in Markdown-Syntax an den Browser geschickt. Mit der Methode `cutOut` kann man markierte Textabschnitte aus einer Datei ausschneiden.
