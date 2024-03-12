@@ -111,11 +111,19 @@ class Clerk {
 
     // Send Javascript code
     static void script(String code) {
-        // bind declarations to this to make them accessible between calls
-        String evalCode = code;
-                //.replaceAll("(var |const |let )", "this.")
-                //.replaceAll("function\\s+(\\S+)\\s*\\((.*)\\)\\s*\\{", "this.$1 = ($2) => {");
-        view.send(STR."script:\{evalCode}");
+        view.send(STR."script:\{code}");
+    }
+
+    static void scriptV2(String code) {
+        view.send(STR."scriptV2:\{code}");
+    }
+
+    // Load External Scripts
+    static void load(String path) {
+        view.send(STR."load:\{path}");
+        try{
+            Thread.sleep(10);
+        }catch(Exception e){}
     }
 
     // Markdown as example on how to use write() and script()
@@ -163,7 +171,7 @@ class LiveView {
         System.out.println("Open http://localhost:" + port + " in your browser");
 
         // SSE context
-        server.createContext("/events", (exchange) -> {
+        server.createContext("/events", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
@@ -234,15 +242,20 @@ class Turtle {
     final String ID;
     final int width, height;
 
+    static {
+        Clerk.load("Turtle/turtle.js");
+    }
+
     Turtle(int width, int height) {
         this.width = width;
         this.height = height;
         ID = Clerk.generateID(6);
+
         Clerk.write(STR."""
         <canvas id="turtleCanvas\{ID}" width="\{width}" height="\{height}" style="border:1px solid #000;"></canvas>
         """);
-        // Clerk.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
-        Clerk.script(STR."turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+
+        Clerk.scriptV2(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
     }
 
     Turtle() {
@@ -250,32 +263,32 @@ class Turtle {
     }
 
     Turtle penDown() {
-        Clerk.script(STR."turtle\{ID}.penDown();");
+        Clerk.scriptV2(STR."turtle\{ID}.penDown();");
         return this;
     }
 
     Turtle penUp() {
-        Clerk.script(STR."turtle\{ID}.penUp();");
+        Clerk.scriptV2(STR."turtle\{ID}.penUp();");
         return this;
     }
 
     Turtle forward(double distance) {
-        Clerk.script(STR."turtle\{ID}.forward(\{distance});");
+        Clerk.scriptV2(STR."turtle\{ID}.forward(\{distance});");
         return this;
     }
 
     Turtle backward(double distance) {
-        Clerk.script(STR."turtle\{ID}.backward(\{distance});");
+        Clerk.scriptV2(STR."turtle\{ID}.backward(\{distance});");
         return this;
     }
 
     Turtle left(double degrees) {
-        Clerk.script(STR."turtle\{ID}.left(\{degrees});");
+        Clerk.scriptV2(STR."turtle\{ID}.left(\{degrees});");
         return this;
     }
 
     Turtle right(double degrees) {
-        Clerk.script(STR."turtle\{ID}.right(\{degrees});");
+        Clerk.scriptV2(STR."turtle\{ID}.right(\{degrees});");
         return this;
     }
 }
