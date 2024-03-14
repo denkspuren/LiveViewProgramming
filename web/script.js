@@ -23,12 +23,6 @@ function setUp() {
           document.getElementById("events").appendChild(newElement);
           break;
         }
-        case "load": {
-          const newElement = document.createElement("script");
-          newElement.src = data;
-          document.body.appendChild(newElement);
-          break;
-        }
         default:
           console.log("Unknown Action");
           break;

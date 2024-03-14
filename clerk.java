@@ -120,10 +120,11 @@ class Clerk {
 
     // Load External Scripts
     static void load(String path) {
-        view.send(STR."load:\{path}");
-        try{
-            Thread.sleep(10);
-        }catch(Exception e){}
+        try {
+            scriptV2(Files.readString(Path.of(path)));
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     // Markdown as example on how to use write() and script()
@@ -242,15 +243,12 @@ class Turtle {
     final String ID;
     final int width, height;
 
-    static {
-        Clerk.load("Turtle/turtle.js");
-    }
-
     Turtle(int width, int height) {
         this.width = width;
         this.height = height;
         ID = Clerk.generateID(6);
 
+        Clerk.load("Turtle/turtle.js");
         Clerk.write(STR."""
         <canvas id="turtleCanvas\{ID}" width="\{width}" height="\{height}" style="border:1px solid #000;"></canvas>
         """);
