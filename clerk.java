@@ -121,9 +121,9 @@ class Clerk {
     // Load External Scripts
     static void load(String path) {
         try {
-            scriptV2(Files.readString(Path.of(path)));
+            view.sendAndWait(STR."load:\{path}");
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.err.println(STR."Error while loading script: \{e.getMessage()}");
         }
     }
 
@@ -146,6 +146,8 @@ class Clerk {
 class LiveView {
     final HttpServer server;
     final String index = "./web/index.html";
+
+    private volatile boolean isBlocking = false;
 
     int port;
     static final int defaultPort = 50001;
@@ -170,6 +172,16 @@ class LiveView {
 
         server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
+
+        server.createContext("/loaded", exchange -> {
+            if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
+                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                return;
+            }
+            isBlocking = false;
+            exchange.sendResponseHeaders(200, 0);
+            exchange.close();
+        });
 
         // SSE context
         server.createContext("/events", exchange -> {
@@ -232,6 +244,18 @@ class LiveView {
             }
         }
         activeConnections.removeAll(deadConnections);
+    }
+
+    void sendAndWait(String event) throws InterruptedException, Exception{
+        isBlocking = true;
+        send(event);
+        int times = 0;
+        while (isBlocking) {
+            if (times > 30000) //30000ms = 30s
+                throw new Exception("Timout!");
+            times++;
+            Thread.sleep(1);
+        }
     }
 
     public void stop() {
