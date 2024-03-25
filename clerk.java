@@ -148,7 +148,7 @@ class LiveView {
         System.out.println("Open http://localhost:" + port + " in your browser");
 
         server.createContext("/loaded", exchange -> {
-            System.out.println("loaded: " + exchange.toString());
+            // System.out.println("loaded: " + exchange.toString());
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
@@ -158,7 +158,7 @@ class LiveView {
             try {
                 barrier.await(30L, TimeUnit.SECONDS);
             } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
-                System.out.print(e);
+                System.err.print(e);
                 System.exit(1);
             }
         });
@@ -173,7 +173,7 @@ class LiveView {
             exchange.getResponseHeaders().add("Cache-Control", "no-cache");
             exchange.getResponseHeaders().add("Connection", "keep-alive");
             exchange.sendResponseHeaders(200, 0);
-            System.out.println("Added exchange " + exchange);
+            // System.out.println("Added exchange " + exchange);
             sseClientConnections.add(exchange);
         });
 
