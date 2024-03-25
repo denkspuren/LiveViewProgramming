@@ -11,7 +11,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -95,7 +99,6 @@ class Clerk {
         if (view != null) {
             view.stop();
         }
-
         try {
             view = LiveView.of(port);
         } catch (Exception e) {
@@ -109,13 +112,9 @@ class Clerk {
         view.send(STR."write:\{text}");
     }
 
-    // Send Javascript code
+    // Send JavaScript code
     static void script(String code) {
         view.send(STR."script:\{code}");
-    }
-
-    static void scriptV2(String code) {
-        view.send(STR."scriptV2:\{code}");
     }
 
     // Load External Scripts
@@ -147,7 +146,8 @@ class LiveView {
     final HttpServer server;
     final String index = "./web/index.html";
 
-    private volatile boolean isBlocking = false;
+    // barrier required to block a `send` and wait for a `loaded` event, see `sendAndWait`
+    private final CyclicBarrier barrier = new CyclicBarrier(2);
 
     int port;
     static final int defaultPort = 50001;
@@ -174,13 +174,19 @@ class LiveView {
         System.out.println("Open http://localhost:" + port + " in your browser");
 
         server.createContext("/loaded", exchange -> {
+            System.out.println("loaded: " + exchange.toString());
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
             }
-            isBlocking = false;
             exchange.sendResponseHeaders(200, 0);
             exchange.close();
+            try {
+                barrier.await(30L, TimeUnit.SECONDS);
+            } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
+                System.out.print(e);
+                System.exit(1);
+            }
         });
 
         // SSE context
@@ -246,15 +252,13 @@ class LiveView {
         activeConnections.removeAll(deadConnections);
     }
 
-    void sendAndWait(String event) throws InterruptedException, Exception{
-        isBlocking = true;
+    void sendAndWait(String event) throws InterruptedException, Exception {
         send(event);
-        int times = 0;
-        while (isBlocking) {
-            if (times > 30000) //30000ms = 30s
-                throw new Exception("Timout!");
-            times++;
-            Thread.sleep(1);
+        try {
+            barrier.await(30L, TimeUnit.SECONDS);
+        } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
+            System.out.print(e);
+            System.exit(1);
         }
     }
 
@@ -277,7 +281,7 @@ class Turtle {
         <canvas id="turtleCanvas\{ID}" width="\{width}" height="\{height}" style="border:1px solid #000;"></canvas>
         """);
 
-        Clerk.scriptV2(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+        Clerk.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
     }
 
     Turtle() {
@@ -285,32 +289,32 @@ class Turtle {
     }
 
     Turtle penDown() {
-        Clerk.scriptV2(STR."turtle\{ID}.penDown();");
+        Clerk.script(STR."turtle\{ID}.penDown();");
         return this;
     }
 
     Turtle penUp() {
-        Clerk.scriptV2(STR."turtle\{ID}.penUp();");
+        Clerk.script(STR."turtle\{ID}.penUp();");
         return this;
     }
 
     Turtle forward(double distance) {
-        Clerk.scriptV2(STR."turtle\{ID}.forward(\{distance});");
+        Clerk.script(STR."turtle\{ID}.forward(\{distance});");
         return this;
     }
 
     Turtle backward(double distance) {
-        Clerk.scriptV2(STR."turtle\{ID}.backward(\{distance});");
+        Clerk.script(STR."turtle\{ID}.backward(\{distance});");
         return this;
     }
 
     Turtle left(double degrees) {
-        Clerk.scriptV2(STR."turtle\{ID}.left(\{degrees});");
+        Clerk.script(STR."turtle\{ID}.left(\{degrees});");
         return this;
     }
 
     Turtle right(double degrees) {
-        Clerk.scriptV2(STR."turtle\{ID}.right(\{degrees});");
+        Clerk.script(STR."turtle\{ID}.right(\{degrees});");
         return this;
     }
 }
