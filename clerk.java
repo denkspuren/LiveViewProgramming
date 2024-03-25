@@ -109,7 +109,7 @@ class Clerk {
 
     // Send HTML Elements
     static void write(String text) {
-        view.sendServerEvent(sseType.WRITE, text);
+        view.sendServerEvent(SSEType.WRITE, text);
     }
 
     // Send JavaScript code
@@ -119,7 +119,7 @@ class Clerk {
 
     // Load External Scripts
     static void load(String path) {
-        view.sendServerEvent(sseType.LOAD, path);
+        view.sendServerEvent(SSEType.LOAD, path);
     }
 
     // Markdown as example on how to use write() and script()
@@ -231,7 +231,7 @@ class LiveView {
         for (HttpExchange connection : sseClientConnections) {
             try {
                 connection.getResponseBody()
-                          .write((sseType + ": " + data.replaceAll("(\\r|\\n|\\r\\n)", "\\\\n") + "\n\n")
+                          .write(("data: " + (sseType + ":" + data).replaceAll("(\\r|\\n|\\r\\n)", "\\\\n") + "\n\n")
                                   .getBytes(StandardCharsets.UTF_8));
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD) {
@@ -250,6 +250,7 @@ class LiveView {
     }
 
     public void stop() {
+        sseClientConnections = null;
         server.stop(0);
     }
 }
