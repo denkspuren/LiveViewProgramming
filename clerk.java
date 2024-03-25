@@ -111,11 +111,20 @@ class Clerk {
 
     // Send Javascript code
     static void script(String code) {
-        // bind declarations to this to make them accessible between calls
-        String evalCode = code;
-                //.replaceAll("(var |const |let )", "this.")
-                //.replaceAll("function\\s+(\\S+)\\s*\\((.*)\\)\\s*\\{", "this.$1 = ($2) => {");
-        view.send(STR."script:\{evalCode}");
+        view.send(STR."script:\{code}");
+    }
+
+    static void scriptV2(String code) {
+        view.send(STR."scriptV2:\{code}");
+    }
+
+    // Load External Scripts
+    static void load(String path) {
+        try {
+            view.sendAndWait(STR."load:\{path}");
+        } catch (Exception e) {
+            System.err.println(STR."Error while loading script: \{e.getMessage()}");
+        }
     }
 
     // Markdown as example on how to use write() and script()
@@ -137,6 +146,8 @@ class Clerk {
 class LiveView {
     final HttpServer server;
     final String index = "./web/index.html";
+
+    private volatile boolean isBlocking = false;
 
     int port;
     static final int defaultPort = 50001;
@@ -162,8 +173,18 @@ class LiveView {
         server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
 
+        server.createContext("/loaded", exchange -> {
+            if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
+                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                return;
+            }
+            isBlocking = false;
+            exchange.sendResponseHeaders(200, 0);
+            exchange.close();
+        });
+
         // SSE context
-        server.createContext("/events", (exchange) -> {
+        server.createContext("/events", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
@@ -225,6 +246,18 @@ class LiveView {
         activeConnections.removeAll(deadConnections);
     }
 
+    void sendAndWait(String event) throws InterruptedException, Exception{
+        isBlocking = true;
+        send(event);
+        int times = 0;
+        while (isBlocking) {
+            if (times > 30000) //30000ms = 30s
+                throw new Exception("Timout!");
+            times++;
+            Thread.sleep(1);
+        }
+    }
+
     public void stop() {
         server.stop(0);
     }
@@ -238,11 +271,13 @@ class Turtle {
         this.width = width;
         this.height = height;
         ID = Clerk.generateID(6);
+
+        Clerk.load("Turtle/turtle.js");
         Clerk.write(STR."""
         <canvas id="turtleCanvas\{ID}" width="\{width}" height="\{height}" style="border:1px solid #000;"></canvas>
         """);
-        // Clerk.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
-        Clerk.script(STR."turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+
+        Clerk.scriptV2(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
     }
 
     Turtle() {
@@ -250,32 +285,32 @@ class Turtle {
     }
 
     Turtle penDown() {
-        Clerk.script(STR."turtle\{ID}.penDown();");
+        Clerk.scriptV2(STR."turtle\{ID}.penDown();");
         return this;
     }
 
     Turtle penUp() {
-        Clerk.script(STR."turtle\{ID}.penUp();");
+        Clerk.scriptV2(STR."turtle\{ID}.penUp();");
         return this;
     }
 
     Turtle forward(double distance) {
-        Clerk.script(STR."turtle\{ID}.forward(\{distance});");
+        Clerk.scriptV2(STR."turtle\{ID}.forward(\{distance});");
         return this;
     }
 
     Turtle backward(double distance) {
-        Clerk.script(STR."turtle\{ID}.backward(\{distance});");
+        Clerk.scriptV2(STR."turtle\{ID}.backward(\{distance});");
         return this;
     }
 
     Turtle left(double degrees) {
-        Clerk.script(STR."turtle\{ID}.left(\{degrees});");
+        Clerk.scriptV2(STR."turtle\{ID}.left(\{degrees});");
         return this;
     }
 
     Turtle right(double degrees) {
-        Clerk.script(STR."turtle\{ID}.right(\{degrees});");
+        Clerk.scriptV2(STR."turtle\{ID}.right(\{degrees});");
         return this;
     }
 }
