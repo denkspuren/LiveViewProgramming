@@ -24,11 +24,6 @@ import com.sun.net.httpserver.HttpServer;
 // jshell -R-ea --enable-preview
 
 class Clerk {
-    static String templateFileName = "./web/indexTemplate.html";
-    static String preContent = "",
-                  content = "",
-                  postContent = "";
-
     static LiveView view;
 
     static void writeToFile(String fileName, String text) {
@@ -38,14 +33,6 @@ class Clerk {
             System.err.printf("Error writing %s\n", e.getMessage());
             System.exit(1);
         }
-    }
-    static void writeResult(String fileName) {
-        writeToFile(fileName, STR.
-            """
-            \{preContent}
-            \{content}
-            \{postContent}
-            """);
     }
 
     static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
@@ -107,22 +94,19 @@ class Clerk {
         }
     }
 
-    // Send HTML Elements
-    static void write(String text) {
-        view.sendServerEvent(SSEType.WRITE, text);
+    static void write(String html) {
+        view.sendServerEvent(SSEType.WRITE, html);
     }
 
-    // Send JavaScript code
-    static void script(String code) {
-        view.sendServerEvent(SSEType.SCRIPT, code);
+    static void script(String javascript) {
+        view.sendServerEvent(SSEType.SCRIPT, javascript);
     }
 
-    // Load External Scripts
     static void load(String path) {
         view.sendServerEvent(SSEType.LOAD, path);
     }
 
-    // Markdown as example on how to use write() and script()
+    // Markdown as an example on how to use write() and script()
     static void markdown(String markdown) {
         String ID = generateID(10);
         write(STR."""
