@@ -69,3 +69,18 @@ th, td {
 th {
     background-color: #f2f2f2;
 }
+ 
+.load-message {
+    position: fixed;
+    bottom: 10px; /* Adjust spacing from the bottom */
+    right: 10px; /* Adjust spacing from the right */
+    background-color: rgba(144, 238, 144, 0.7); /* Light green background */
+    color: rgba(0, 0, 0); /* Black font color */
+    padding: 0px; /* Reduced padding */
+    font-family: 'Courier New', Courier, monospace; /* Typewriter-style font */
+    font-size: 10px; /* Smaller font size */
+    display: none; /* Initially hidden */
+    z-index: 1000; /* Ensure it stays on top */
+    border-radius: 5px; /* rounded corners */
+}
+  
