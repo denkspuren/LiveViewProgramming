@@ -100,7 +100,7 @@ class Clerk {
             view.stop();
         }
         try {
-            view = LiveView.of(port);
+            view = new LiveView(port);
         } catch (Exception e) {
             System.err.printf("Error starting Server: %s\n", e.getMessage());
             e.printStackTrace();
@@ -109,21 +109,17 @@ class Clerk {
 
     // Send HTML Elements
     static void write(String text) {
-        view.send(STR."write:\{text}");
+        view.sendServerEvent(sseType.WRITE, text);
     }
 
     // Send JavaScript code
     static void script(String code) {
-        view.send(STR."script:\{code}");
+        view.sendServerEvent(SSEType.SCRIPT, code);
     }
 
     // Load External Scripts
     static void load(String path) {
-        try {
-            view.sendAndWait(STR."load:\{path}");
-        } catch (Exception e) {
-            System.err.println(STR."Error while loading script: \{e.getMessage()}");
-        }
+        view.sendServerEvent(sseType.LOAD, path);
     }
 
     // Markdown as example on how to use write() and script()
@@ -142,33 +138,27 @@ class Clerk {
     }
 }
 
+enum SSEType { WRITE, SCRIPT, LOAD; }
+
 class LiveView {
     final HttpServer server;
-    final String index = "./web/index.html";
+    final int port;
+    static final int defaultPort = 50001;
+    static final String index = "./web/index.html";
+
+    List<HttpExchange> sseClientConnections;
 
     // barrier required to block a `send` and wait for a `loaded` event, see `sendAndWait`
     private final CyclicBarrier barrier = new CyclicBarrier(2);
-
-    int port;
-    static final int defaultPort = 50001;
-    List<HttpExchange> activeConnections;
 
     private static final Map<String, String> mimeTypes = 
         Map.of("html", "text/html",
                "js", "text/javascript",
                "css", "text/css");
 
-    public static LiveView of() throws IOException {
-        return of(defaultPort);
-    }
-
-    public static LiveView of(int port) throws IOException {
-        return new LiveView(port);
-    }
-
     public LiveView(int port) throws IOException {
         this.port = port;
-        activeConnections = new ArrayList<>();
+        sseClientConnections = new ArrayList<>();
 
         server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
@@ -199,7 +189,8 @@ class LiveView {
             exchange.getResponseHeaders().add("Cache-Control", "no-cache");
             exchange.getResponseHeaders().add("Connection", "keep-alive");
             exchange.sendResponseHeaders(200, 0);
-            activeConnections.add(exchange);
+            System.out.println("Added exchange " + exchange);
+            sseClientConnections.add(exchange);
         });
 
         // initial html site
@@ -235,31 +226,27 @@ class LiveView {
         }
     }
 
-    // event = "action:data"
-    void send(String event) {
+    void sendServerEvent(SSEType sseType, String data) {
         List<HttpExchange> deadConnections = new ArrayList<>();
-
-        for (HttpExchange exchange : activeConnections) {
+        for (HttpExchange connection : sseClientConnections) {
             try {
-                exchange.getResponseBody()
-                        .write(("data: " + event.replaceAll("(\\r|\\n|\\r\\n)", "\\\\n") + "\n\n")
-                                .getBytes(StandardCharsets.UTF_8));
-                exchange.getResponseBody().flush();
-            } catch (Exception e) {
-                deadConnections.add(exchange);
+                connection.getResponseBody()
+                          .write((sseType + ": " + data.replaceAll("(\\r|\\n|\\r\\n)", "\\\\n") + "\n\n")
+                                  .getBytes(StandardCharsets.UTF_8));
+                connection.getResponseBody().flush();
+                if (sseType == SSEType.LOAD) {
+                    try {
+                        barrier.await(30L, TimeUnit.SECONDS);
+                    } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
+                        System.err.print(SSEType.LOAD + " missed confirmation: " + e);
+                        deadConnections.add(connection); // connection is assumed to be dead
+                    }                    
+                }
+            } catch (IOException e) {
+                deadConnections.add(connection);
             }
         }
-        activeConnections.removeAll(deadConnections);
-    }
-
-    void sendAndWait(String event) throws InterruptedException, Exception {
-        send(event);
-        try {
-            barrier.await(30L, TimeUnit.SECONDS);
-        } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
-            System.out.print(e);
-            System.exit(1);
-        }
+        sseClientConnections.removeAll(deadConnections);
     }
 
     public void stop() {

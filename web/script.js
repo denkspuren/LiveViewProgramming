@@ -10,19 +10,19 @@ function setUp() {
       const data = event.data.slice(splitPos + 1).replaceAll("\\n", "\n");
 
       switch (action) {
-        case "script": {
+        case "SCRIPT": {
           const newElement = document.createElement("script");
           newElement.innerHTML = data;
           document.body.appendChild(newElement);
           break;
         }
-        case "write": {
+        case "WRITE": {
           const newElement = document.createElement("p");
           newElement.innerHTML = data;
           document.getElementById("events").appendChild(newElement);
           break;
         }
-        case "load": {
+        case "LOAD": {
           loadedDiv.style.display = 'block';
           const newElement = document.createElement("script");
           newElement.src = data;
