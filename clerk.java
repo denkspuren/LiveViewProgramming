@@ -118,7 +118,8 @@ class LiveView {
     private static final Map<String, String> mimeTypes = 
         Map.of("html", "text/html",
                "js", "text/javascript",
-               "css", "text/css");
+               "css", "text/css",
+               "ico", "image/x-icon");
 
     public LiveView(int port) throws IOException {
         this.port = port;
