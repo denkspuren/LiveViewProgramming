@@ -25,6 +25,7 @@ import com.sun.net.httpserver.HttpServer;
 
 class Clerk {
     static LiveView view;
+    static Markdown markdown;
 
     static void writeToFile(String fileName, String text) {
         try {
@@ -94,19 +95,9 @@ class Clerk {
         }
     }
 
-    // Markdown as an example on how to use write() and script()
-    static void markdown(String markdown) {
-        String ID = generateID(10);
-        view.write(STR."""
-            <div id="\{ID}">
-            \{markdown}
-            </div>
-            """);
-        view.script(STR."""
-            var markdownContent = document.getElementById("\{ID}").textContent;
-            var renderedHTML = marked.parse(markdownContent);
-            document.getElementById("\{ID}").innerHTML = renderedHTML;
-            """);
+    static Markdown markdown(String markdownText) {
+        if (markdown == null) markdown = new Markdown(Clerk.view);
+        return markdown.show(markdownText);
     }
 }
 
@@ -120,7 +111,7 @@ class LiveView {
 
     List<HttpExchange> sseClientConnections;
 
-    // barrier required to block a `send` and wait for a `loaded` event, see `sendAndWait`
+    // barrier required to temporarily block SSE event of type `SSEType.LOAD`
     private final CyclicBarrier barrier = new CyclicBarrier(2);
 
     private static final Map<String, String> mimeTypes = 
@@ -231,9 +222,14 @@ class LiveView {
     }
 }
 
+
 class Turtle {
     final String ID;
     final int width, height;
+
+    Turtle(LiveView view) {
+        
+    }
 
     Turtle(int width, int height) {
         this.width = width;
@@ -279,6 +275,29 @@ class Turtle {
 
     Turtle right(double degrees) {
         Clerk.view.script(STR."turtle\{ID}.right(\{degrees});");
+        return this;
+    }
+}
+
+
+class Markdown {
+    LiveView view;
+    public Markdown(LiveView view) {
+        this.view = view;
+        view.load("https://cdn.jsdelivr.net/npm/marked/marked.min.js");
+    }
+    Markdown show(String markdownText) {
+        String ID = Clerk.generateID(10);
+        view.write(STR."""
+            <div id="\{ID}">
+            \{markdownText}
+            </div>
+            """);
+        view.script(STR."""
+            var markdownContent = document.getElementById("\{ID}").textContent;
+            var renderedHTML = marked.parse(markdownContent);
+            document.getElementById("\{ID}").innerHTML = renderedHTML;
+            """);
         return this;
     }
 }
