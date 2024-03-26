@@ -29,49 +29,6 @@ class Clerk {
     static LiveView view;
     static Markdown markdown;
 
-    static void writeToFile(String fileName, String text) {
-        try {
-            Files.writeString(Path.of(fileName), text);
-        } catch (IOException e) {
-            System.err.printf("Error writing %s\n", e.getMessage());
-            System.exit(1);
-        }
-    }
-
-    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
-        List<String> snippet = new ArrayList<>();
-        boolean skipLines = true;
-        boolean isInLabels;
-        try {
-            List<String> lines = Files.readAllLines(Path.of(fileName));
-            for (String line : lines) {
-                isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
-                if (isInLabels) {
-                    if (skipLines && includeStartLabel)
-                        snippet.add(line);
-                    if (!skipLines && includeEndLabel)
-                        snippet.add(line);
-                    skipLines = !skipLines;
-                    continue;
-                }
-                if (skipLines)
-                    continue;
-                snippet.add(line);
-            }
-        } catch (IOException e) {
-            System.err.printf("Error reading %s\n", e.getMessage());
-            System.exit(1);
-        }
-        return snippet.stream().collect(Collectors.joining("\n")) + "\n";
-    }
-
-    static String cutOut(String fileName, String... labels) {
-        return cutOut(fileName, false, false, labels);
-    }
-
-    static String readFile(String fileName) {
-        return cutOut(fileName, true, true, "");
-    }
 
     static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
@@ -223,6 +180,52 @@ class LiveView {
     public void stop() {
         sseClientConnections = null;
         server.stop(0);
+    }
+}
+
+class File { // Class with static methods for file operations
+    static void write(String fileName, String text) {
+        try {
+            Files.writeString(Path.of(fileName), text);
+        } catch (IOException e) {
+            System.err.printf("Error writing %s\n", e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
+        List<String> snippet = new ArrayList<>();
+        boolean skipLines = true;
+        boolean isInLabels;
+        try {
+            List<String> lines = Files.readAllLines(Path.of(fileName));
+            for (String line : lines) {
+                isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
+                if (isInLabels) {
+                    if (skipLines && includeStartLabel)
+                        snippet.add(line);
+                    if (!skipLines && includeEndLabel)
+                        snippet.add(line);
+                    skipLines = !skipLines;
+                    continue;
+                }
+                if (skipLines)
+                    continue;
+                snippet.add(line);
+            }
+        } catch (IOException e) {
+            System.err.printf("Error reading %s\n", e.getMessage());
+            System.exit(1);
+        }
+        return snippet.stream().collect(Collectors.joining("\n")) + "\n";
+    }
+
+    static String cutOut(String fileName, String... labels) {
+        return cutOut(fileName, false, false, labels);
+    }
+
+    static String read(String fileName) {
+        return cutOut(fileName, true, true, "");
     }
 }
 

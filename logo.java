@@ -28,7 +28,7 @@ Mit `new Turtle(300,300)` wird eine neue Schildkröte mittig auf eine Zeichenfl�
 Die folgende Logo-Anwendung demonstriert, wie man mittels Methoden schrittweise graphische Einheiten erstellen und zusammensetzen kann.
 
 ```java
-\{Clerk.cutOut("./logo.java", "// myFirstTurtle")}
+\{File.cutOut("./logo.java", "// myFirstTurtle")}
 ```
 
 Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich kleine Zwischenräume gelassen wurden.
@@ -78,13 +78,13 @@ tree 150
 Die Java-Methode `tree` bildet das obige Logo-Programm nach; lediglich aus praktischen Überlegungen lasse ich den Rekursionsabbruch etwas früher greifen.
 
 ```java
-\{Clerk.cutOut("./logo.java", "// turtle tree")}
+\{File.cutOut("./logo.java", "// turtle tree")}
 ```
 
 Der Aufruf der Methode `tree` erzeugt etwas, was einem "Baum" ähnelt.
 
 ```java
-\{Clerk.cutOut("./logo.java", "// tree")}
+\{File.cutOut("./logo.java", "// tree")}
 ```
 
 """);
