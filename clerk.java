@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -123,7 +124,7 @@ class LiveView {
 
     public LiveView(int port) throws IOException {
         this.port = port;
-        sseClientConnections = new ArrayList<>();
+        sseClientConnections = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
         server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
