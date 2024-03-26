@@ -47,15 +47,16 @@ Probieren wir einen einfachen Begrüßungstext im Markdown-Format:
 
 ```java
 jshell> Clerk.markdown("Hello, _this_ is **Clerk**!")
+$33 ==> Markdown[view=LiveView@20fa23c1]
 ```
 
 Im Browser ist "Hello, _this_ is **Clerk**!" zu sehen. 😀
 
-Als nächstes erzeugen wir eine kleine Logo-Zeichnung. Mehr zu Logo erfahren Sie im nächsten Abschnitt.
+Als nächstes erzeugen wir eine kleine Logo-Zeichnung. Mehr zu Logo erfahren Sie im nächsten Abschnitt. (Mindestens einmal ist die Angabe der `Clerk.view` wichtig. Wenn man Clerk nur mit einer LiveView laufen lässt, kann man nachfolgende Instanziierungen von `Turtle` auch ohne `Clerk.view` z.B. mit `new Turtle(200, 200)` erzeugen.)
 
 ```java
-jshell> Turtle turtle = new Turtle(200,200)
-turtle ==> Turtle@5ef04b5
+jshell> Turtle turtle = new Turtle(Clerk.view, 200, 200)
+turtle ==> Turtle@3b764bce
 ```
 
 Ein Kästchen, die Zeichenfläche, von 200 x 200 Punkten ist im Browser zu sehen. In der Mitte befindet sich eine unsichtbare Schildkröte, die nach Osten ausgerichtet und mit einem Zeichenstift ausgestattet ist und die wir mit ein paar Anweisungen so umherschicken, dass schrittweise ein Quadrat entsteht.
