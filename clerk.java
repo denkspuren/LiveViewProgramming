@@ -29,7 +29,6 @@ class Clerk {
     static LiveView view;
     static Markdown markdown;
 
-
     static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
                             mapToObj(i -> Integer.toString(i, 36)).
@@ -178,7 +177,7 @@ class LiveView {
     void load(String path)         { sendServerEvent(SSEType.LOAD, path); }
 
     public void stop() {
-        sseClientConnections = null;
+        sseClientConnections.clear();
         server.stop(0);
     }
 }
@@ -193,12 +192,12 @@ class File { // Class with static methods for file operations
         }
     }
 
-    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
+    static String cutOut(Path path, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
         List<String> snippet = new ArrayList<>();
         boolean skipLines = true;
         boolean isInLabels;
         try {
-            List<String> lines = Files.readAllLines(Path.of(fileName));
+            List<String> lines = Files.readAllLines(path);
             for (String line : lines) {
                 isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
                 if (isInLabels) {
@@ -220,10 +219,15 @@ class File { // Class with static methods for file operations
         return snippet.stream().collect(Collectors.joining("\n")) + "\n";
     }
 
+    static String cutOut(Path path, String... labels) { return cutOut(path, false, false, labels); }
+    static String read(Path path) { return cutOut(path, true, true, ""); }
+
+    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
+        return cutOut(Path.of(fileName), includeStartLabel, includeEndLabel, labels);
+    }
     static String cutOut(String fileName, String... labels) {
         return cutOut(fileName, false, false, labels);
     }
-
     static String read(String fileName) {
         return cutOut(fileName, true, true, "");
     }
