@@ -10,6 +10,10 @@ function setUp() {
       const data = event.data.slice(splitPos + 1).replaceAll("\\n", "\n");
 
       switch (action) {
+        case "CALL": {
+          Function(data).apply(); // https://www.educative.io/answers/eval-vs-function-in-javascript
+          break;
+        }
         case "SCRIPT": {
           const newElement = document.createElement("script");
           newElement.innerHTML = data;

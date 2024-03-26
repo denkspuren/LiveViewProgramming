@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,50 +27,7 @@ import com.sun.net.httpserver.HttpServer;
 
 class Clerk {
     static LiveView view;
-
-    static void writeToFile(String fileName, String text) {
-        try {
-            Files.writeString(Path.of(fileName), text);
-        } catch (IOException e) {
-            System.err.printf("Error writing %s\n", e.getMessage());
-            System.exit(1);
-        }
-    }
-
-    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
-        List<String> snippet = new ArrayList<>();
-        boolean skipLines = true;
-        boolean isInLabels;
-        try {
-            List<String> lines = Files.readAllLines(Path.of(fileName));
-            for (String line : lines) {
-                isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
-                if (isInLabels) {
-                    if (skipLines && includeStartLabel)
-                        snippet.add(line);
-                    if (!skipLines && includeEndLabel)
-                        snippet.add(line);
-                    skipLines = !skipLines;
-                    continue;
-                }
-                if (skipLines)
-                    continue;
-                snippet.add(line);
-            }
-        } catch (IOException e) {
-            System.err.printf("Error reading %s\n", e.getMessage());
-            System.exit(1);
-        }
-        return snippet.stream().collect(Collectors.joining("\n")) + "\n";
-    }
-
-    static String cutOut(String fileName, String... labels) {
-        return cutOut(fileName, false, false, labels);
-    }
-
-    static String readFile(String fileName) {
-        return cutOut(fileName, true, true, "");
-    }
+    static Markdown markdown;
 
     static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
@@ -94,35 +53,13 @@ class Clerk {
         }
     }
 
-    static void write(String html) {
-        view.sendServerEvent(SSEType.WRITE, html);
-    }
-
-    static void script(String javascript) {
-        view.sendServerEvent(SSEType.SCRIPT, javascript);
-    }
-
-    static void load(String path) {
-        view.sendServerEvent(SSEType.LOAD, path);
-    }
-
-    // Markdown as an example on how to use write() and script()
-    static void markdown(String markdown) {
-        String ID = generateID(10);
-        write(STR."""
-            <div id="\{ID}">
-            \{markdown}
-            </div>
-            """);
-        script(STR."""
-            var markdownContent = document.getElementById("\{ID}").textContent;
-            var renderedHTML = marked.parse(markdownContent);
-            document.getElementById("\{ID}").innerHTML = renderedHTML;
-            """);
+    static Markdown markdown(String markdownText) {
+        if (markdown == null) markdown = new Markdown(Clerk.view);
+        return markdown.markdown(markdownText);
     }
 }
 
-enum SSEType { WRITE, SCRIPT, LOAD; }
+enum SSEType { WRITE, CALL, SCRIPT, LOAD; }
 
 class LiveView {
     final HttpServer server;
@@ -132,17 +69,18 @@ class LiveView {
 
     List<HttpExchange> sseClientConnections;
 
-    // barrier required to block a `send` and wait for a `loaded` event, see `sendAndWait`
+    // barrier required to temporarily block SSE event of type `SSEType.LOAD`
     private final CyclicBarrier barrier = new CyclicBarrier(2);
 
     private static final Map<String, String> mimeTypes = 
         Map.of("html", "text/html",
                "js", "text/javascript",
-               "css", "text/css");
+               "css", "text/css",
+               "ico", "image/x-icon");
 
     public LiveView(int port) throws IOException {
         this.port = port;
-        sseClientConnections = new ArrayList<>();
+        sseClientConnections = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
         server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
@@ -233,60 +171,150 @@ class LiveView {
         sseClientConnections.removeAll(deadConnections);
     }
 
+    void write(String html)        { sendServerEvent(SSEType.WRITE, html); }
+    void call(String javascript)   { sendServerEvent(SSEType.CALL, javascript); }
+    void script(String javascript) { sendServerEvent(SSEType.SCRIPT, javascript); }
+    void load(String path)         { sendServerEvent(SSEType.LOAD, path); }
+
     public void stop() {
-        sseClientConnections = null;
+        sseClientConnections.clear();
         server.stop(0);
     }
 }
 
-class Turtle {
+class File { // Class with static methods for file operations
+    static void write(String fileName, String text) {
+        try {
+            Files.writeString(Path.of(fileName), text);
+        } catch (IOException e) {
+            System.err.printf("Error writing %s\n", e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    static String cutOut(Path path, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
+        List<String> snippet = new ArrayList<>();
+        boolean skipLines = true;
+        boolean isInLabels;
+        try {
+            List<String> lines = Files.readAllLines(path);
+            for (String line : lines) {
+                isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
+                if (isInLabels) {
+                    if (skipLines && includeStartLabel)
+                        snippet.add(line);
+                    if (!skipLines && includeEndLabel)
+                        snippet.add(line);
+                    skipLines = !skipLines;
+                    continue;
+                }
+                if (skipLines)
+                    continue;
+                snippet.add(line);
+            }
+        } catch (IOException e) {
+            System.err.printf("Error reading %s\n", e.getMessage());
+            System.exit(1);
+        }
+        return snippet.stream().collect(Collectors.joining("\n")) + "\n";
+    }
+
+    static String cutOut(Path path, String... labels) { return cutOut(path, false, false, labels); }
+    static String read(Path path) { return cutOut(path, true, true, ""); }
+
+    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
+        return cutOut(Path.of(fileName), includeStartLabel, includeEndLabel, labels);
+    }
+    static String cutOut(String fileName, String... labels) {
+        return cutOut(fileName, false, false, labels);
+    }
+    static String read(String fileName) {
+        return cutOut(fileName, true, true, "");
+    }
+}
+
+interface ViewManagement {
+    default LiveView checkViewAndLoadOnce(LiveView view, List<LiveView> views, String path) {
+        if (Objects.isNull(view)) view = !views.isEmpty() ? views.getFirst() : null;
+        if (Objects.isNull(view)) throw new IllegalArgumentException("No view given or existing");
+        if (!views.contains(view)) {
+            view.load(path);
+            views.add(view);
+        }
+        return view;
+    }
+}
+
+abstract class ViewManager implements ViewManagement {
+    static List<LiveView> views = new ArrayList<>();
+    LiveView view;
+}
+
+class Turtle extends ViewManager {
     final String ID;
     final int width, height;
 
-    Turtle(int width, int height) {
-        this.width = width;
-        this.height = height;
+    Turtle(LiveView view, int width, int height) {
+        this.view = checkViewAndLoadOnce(view, Turtle.views, "Turtle/turtle.js");
+        this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
+        this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
         ID = Clerk.generateID(6);
-
-        Clerk.load("Turtle/turtle.js");
-        Clerk.write(STR."""
-        <canvas id="turtleCanvas\{ID}" width="\{width}" height="\{height}" style="border:1px solid #000;"></canvas>
-        """);
-
-        Clerk.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+        this.view.write(STR."""
+            <canvas id="turtleCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
+            </canvas>
+            """);
+        this.view.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
     }
 
-    Turtle() {
-        this(500, 500);
-    }
+    Turtle(LiveView view) { this(view, 500, 500); }
+    Turtle(int width, int height) { this(null, width, height); }
+    Turtle() { this(null); }
 
     Turtle penDown() {
-        Clerk.script(STR."turtle\{ID}.penDown();");
+        view.call(STR."turtle\{ID}.penDown();");
         return this;
     }
 
     Turtle penUp() {
-        Clerk.script(STR."turtle\{ID}.penUp();");
+        view.call(STR."turtle\{ID}.penUp();");
         return this;
     }
 
     Turtle forward(double distance) {
-        Clerk.script(STR."turtle\{ID}.forward(\{distance});");
+        view.call(STR."turtle\{ID}.forward(\{distance});");
         return this;
     }
 
     Turtle backward(double distance) {
-        Clerk.script(STR."turtle\{ID}.backward(\{distance});");
+        view.call(STR."turtle\{ID}.backward(\{distance});");
         return this;
     }
 
     Turtle left(double degrees) {
-        Clerk.script(STR."turtle\{ID}.left(\{degrees});");
+        view.call(STR."turtle\{ID}.left(\{degrees});");
         return this;
     }
 
     Turtle right(double degrees) {
-        Clerk.script(STR."turtle\{ID}.right(\{degrees});");
+        view.call(STR."turtle\{ID}.right(\{degrees});");
         return this;
     }
+}
+
+record Markdown(LiveView view) {
+    public Markdown { view.load("https://cdn.jsdelivr.net/npm/marked/marked.min.js"); }
+    public Markdown markdown(String markdownText) {
+        String ID = Clerk.generateID(10);
+        view.write(STR."""
+            <div id="\{ID}">
+            \{markdownText}
+            </div>
+            """);
+        view.script(STR."""
+            var markdownContent = document.getElementById("\{ID}").textContent;
+            var renderedHTML = marked.parse(markdownContent);
+            document.getElementById("\{ID}").innerHTML = renderedHTML;
+            """);
+        return this;
+    }    
 }
