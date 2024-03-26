@@ -102,7 +102,7 @@ class Clerk {
     }
 }
 
-enum SSEType { WRITE, SCRIPT, LOAD; }
+enum SSEType { WRITE, CALL, SCRIPT, LOAD; }
 
 class LiveView {
     final HttpServer server;
@@ -215,6 +215,7 @@ class LiveView {
     }
 
     void write(String html)        { sendServerEvent(SSEType.WRITE, html); }
+    void call(String javascript)   { sendServerEvent(SSEType.CALL, javascript); }
     void script(String javascript) { sendServerEvent(SSEType.SCRIPT, javascript); }
     void load(String path)         { sendServerEvent(SSEType.LOAD, path); }
 
@@ -253,32 +254,32 @@ class Turtle {
     Turtle() { this(null); }
 
     Turtle penDown() {
-        view.script(STR."turtle\{ID}.penDown();");
+        view.call(STR."turtle\{ID}.penDown();");
         return this;
     }
 
     Turtle penUp() {
-        view.script(STR."turtle\{ID}.penUp();");
+        view.call(STR."turtle\{ID}.penUp();");
         return this;
     }
 
     Turtle forward(double distance) {
-        view.script(STR."turtle\{ID}.forward(\{distance});");
+        view.call(STR."turtle\{ID}.forward(\{distance});");
         return this;
     }
 
     Turtle backward(double distance) {
-        view.script(STR."turtle\{ID}.backward(\{distance});");
+        view.call(STR."turtle\{ID}.backward(\{distance});");
         return this;
     }
 
     Turtle left(double degrees) {
-        view.script(STR."turtle\{ID}.left(\{degrees});");
+        view.call(STR."turtle\{ID}.left(\{degrees});");
         return this;
     }
 
     Turtle right(double degrees) {
-        view.script(STR."turtle\{ID}.right(\{degrees});");
+        view.call(STR."turtle\{ID}.right(\{degrees});");
         return this;
     }
 }
@@ -300,27 +301,3 @@ record Markdown(LiveView view) {
         return this;
     }    
 }
-
-/*
-class Markdown {
-    LiveView view;
-    public Markdown(LiveView view) {
-        this.view = view;
-        view.load("https://cdn.jsdelivr.net/npm/marked/marked.min.js");
-    }
-    Markdown show(String markdownText) {
-        String ID = Clerk.generateID(10);
-        view.write(STR."""
-            <div id="\{ID}">
-            \{markdownText}
-            </div>
-            """);
-        view.script(STR."""
-            var markdownContent = document.getElementById("\{ID}").textContent;
-            var renderedHTML = marked.parse(markdownContent);
-            document.getElementById("\{ID}").innerHTML = renderedHTML;
-            """);
-        return this;
-    }
-}
-*/
