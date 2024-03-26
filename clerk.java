@@ -233,28 +233,37 @@ class File { // Class with static methods for file operations
     }
 }
 
-class Turtle {
+interface ViewManagement {
+    default LiveView checkViewAndLoadOnce(LiveView view, List<LiveView> views, String path) {
+        if (Objects.isNull(view)) view = !views.isEmpty() ? views.getFirst() : null;
+        if (Objects.isNull(view)) throw new IllegalArgumentException("No view given or existing");
+        if (!views.contains(view)) {
+            view.load(path);
+            views.add(view);
+        }
+        return view;
+    }
+}
+
+abstract class ViewManager implements ViewManagement {
     static List<LiveView> views = new ArrayList<>();
-    final LiveView view;
+    LiveView view;
+}
+
+class Turtle extends ViewManager {
     final String ID;
     final int width, height;
 
     Turtle(LiveView view, int width, int height) {
-        if (Objects.isNull(view)) view = !views.isEmpty() ? views.getFirst() : null;
-        if (Objects.isNull(view)) throw new IllegalArgumentException("No view defined");
-        if (!views.contains(view)) {
-            view.load("Turtle/turtle.js");
-            views.add(view);
-        }
-        this.view = view;
+        this.view = checkViewAndLoadOnce(view, Turtle.views, "Turtle/turtle.js");
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
         ID = Clerk.generateID(6);
-        view.write(STR."""
+        this.view.write(STR."""
             <canvas id="turtleCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
             </canvas>
-        """);
-        view.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+            """);
+        this.view.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
     }
 
     Turtle(LiveView view) { this(view, 500, 500); }
