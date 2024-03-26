@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -97,7 +98,7 @@ class Clerk {
 
     static Markdown markdown(String markdownText) {
         if (markdown == null) markdown = new Markdown(Clerk.view);
-        return markdown.show(markdownText);
+        return markdown.markdown(markdownText);
     }
 }
 
@@ -222,64 +223,84 @@ class LiveView {
     }
 }
 
-
 class Turtle {
+    static List<LiveView> views = new ArrayList<>();
+    final LiveView view;
     final String ID;
     final int width, height;
 
-    Turtle(LiveView view) {
-        
-    }
-
-    Turtle(int width, int height) {
-        this.width = width;
-        this.height = height;
+    Turtle(LiveView view, int width, int height) {
+        if (Objects.isNull(view)) view = !views.isEmpty() ? views.getFirst() : null;
+        if (Objects.isNull(view)) throw new IllegalArgumentException("No view defined");
+        if (!views.contains(view)) {
+            view.load("Turtle/turtle.js");
+            views.add(view);
+        }
+        this.view = view;
+        this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
+        this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
         ID = Clerk.generateID(6);
-
-        Clerk.view.load("Turtle/turtle.js");
-        Clerk.view.write(STR."""
-        <canvas id="turtleCanvas\{ID}" width="\{width}" height="\{height}" style="border:1px solid #000;"></canvas>
+        view.write(STR."""
+            <canvas id="turtleCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
+            </canvas>
         """);
-
-        Clerk.view.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+        view.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
     }
 
-    Turtle() {
-        this(500, 500);
-    }
+    Turtle(LiveView view) { this(view, 500, 500); }
+    Turtle(int width, int height) { this(null, width, height); }
+    Turtle() { this(null); }
 
     Turtle penDown() {
-        Clerk.view.script(STR."turtle\{ID}.penDown();");
+        view.script(STR."turtle\{ID}.penDown();");
         return this;
     }
 
     Turtle penUp() {
-        Clerk.view.script(STR."turtle\{ID}.penUp();");
+        view.script(STR."turtle\{ID}.penUp();");
         return this;
     }
 
     Turtle forward(double distance) {
-        Clerk.view.script(STR."turtle\{ID}.forward(\{distance});");
+        view.script(STR."turtle\{ID}.forward(\{distance});");
         return this;
     }
 
     Turtle backward(double distance) {
-        Clerk.view.script(STR."turtle\{ID}.backward(\{distance});");
+        view.script(STR."turtle\{ID}.backward(\{distance});");
         return this;
     }
 
     Turtle left(double degrees) {
-        Clerk.view.script(STR."turtle\{ID}.left(\{degrees});");
+        view.script(STR."turtle\{ID}.left(\{degrees});");
         return this;
     }
 
     Turtle right(double degrees) {
-        Clerk.view.script(STR."turtle\{ID}.right(\{degrees});");
+        view.script(STR."turtle\{ID}.right(\{degrees});");
         return this;
     }
 }
 
+record Markdown(LiveView view) {
+    public Markdown { view.load("https://cdn.jsdelivr.net/npm/marked/marked.min.js"); }
+    public Markdown markdown(String markdownText) {
+        String ID = Clerk.generateID(10);
+        view.write(STR."""
+            <div id="\{ID}">
+            \{markdownText}
+            </div>
+            """);
+        view.script(STR."""
+            var markdownContent = document.getElementById("\{ID}").textContent;
+            var renderedHTML = marked.parse(markdownContent);
+            document.getElementById("\{ID}").innerHTML = renderedHTML;
+            """);
+        return this;
+    }    
+}
 
+/*
 class Markdown {
     LiveView view;
     public Markdown(LiveView view) {
@@ -301,3 +322,4 @@ class Markdown {
         return this;
     }
 }
+*/
