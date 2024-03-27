@@ -1,13 +1,9 @@
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import static java.lang.StringTemplate.STR;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -211,57 +207,6 @@ class LiveView {
     }
 }
 
-class File { // Class with static methods for file operations
-    static void write(String fileName, String text) {
-        try {
-            Files.writeString(Path.of(fileName), text);
-        } catch (IOException e) {
-            System.err.printf("Error writing %s\n", e.getMessage());
-            System.exit(1);
-        }
-    }
-
-    static String cutOut(Path path, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
-        List<String> snippet = new ArrayList<>();
-        boolean skipLines = true;
-        boolean isInLabels;
-        try {
-            List<String> lines = Files.readAllLines(path);
-            for (String line : lines) {
-                isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
-                if (isInLabels) {
-                    if (skipLines && includeStartLabel)
-                        snippet.add(line);
-                    if (!skipLines && includeEndLabel)
-                        snippet.add(line);
-                    skipLines = !skipLines;
-                    continue;
-                }
-                if (skipLines)
-                    continue;
-                snippet.add(line);
-            }
-        } catch (IOException e) {
-            System.err.printf("Error reading %s\n", e.getMessage());
-            System.exit(1);
-        }
-        return snippet.stream().collect(Collectors.joining("\n")) + "\n";
-    }
-
-    static String cutOut(Path path, String... labels) { return cutOut(path, false, false, labels); }
-    static String read(Path path) { return cutOut(path, true, true, ""); }
-
-    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
-        return cutOut(Path.of(fileName), includeStartLabel, includeEndLabel, labels);
-    }
-    static String cutOut(String fileName, String... labels) {
-        return cutOut(fileName, false, false, labels);
-    }
-    static String read(String fileName) {
-        return cutOut(fileName, true, true, "");
-    }
-}
-
 interface ViewManagement {
     default LiveView checkViewAndLoadOnce(LiveView view, List<LiveView> views, String path) {
         if (Objects.isNull(view)) view = !views.isEmpty() ? views.getFirst() : null;
@@ -279,71 +224,7 @@ abstract class ViewManager implements ViewManagement {
     LiveView view;
 }
 
-class Turtle extends ViewManager {
-    final String ID;
-    final int width, height;
+/open skills/File/File.java
+/open skills/Turtle/Turtle.java
+/open skills/Markdown/Markdown.java
 
-    Turtle(LiveView view, int width, int height) {
-        this.view = checkViewAndLoadOnce(view, Turtle.views, "Turtle/turtle.js");
-        this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
-        this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
-        ID = Clerk.generateID(6);
-        this.view.write(STR."""
-            <canvas id="turtleCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
-            </canvas>
-            """);
-        this.view.script(STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
-    }
-
-    Turtle(LiveView view) { this(view, 500, 500); }
-    Turtle(int width, int height) { this(null, width, height); }
-    Turtle() { this(null); }
-
-    Turtle penDown() {
-        view.call(STR."turtle\{ID}.penDown();");
-        return this;
-    }
-
-    Turtle penUp() {
-        view.call(STR."turtle\{ID}.penUp();");
-        return this;
-    }
-
-    Turtle forward(double distance) {
-        view.call(STR."turtle\{ID}.forward(\{distance});");
-        return this;
-    }
-
-    Turtle backward(double distance) {
-        view.call(STR."turtle\{ID}.backward(\{distance});");
-        return this;
-    }
-
-    Turtle left(double degrees) {
-        view.call(STR."turtle\{ID}.left(\{degrees});");
-        return this;
-    }
-
-    Turtle right(double degrees) {
-        view.call(STR."turtle\{ID}.right(\{degrees});");
-        return this;
-    }
-}
-
-record Markdown(LiveView view) {
-    public Markdown { view.load("https://cdn.jsdelivr.net/npm/marked/marked.min.js"); }
-    public Markdown markdown(String markdownText) {
-        String ID = Clerk.generateID(10);
-        view.write(STR."""
-            <div id="\{ID}">
-            \{markdownText}
-            </div>
-            """);
-        view.script(STR."""
-            var markdownContent = document.getElementById("\{ID}").textContent;
-            var renderedHTML = marked.parse(markdownContent);
-            document.getElementById("\{ID}").innerHTML = renderedHTML;
-            """);
-        return this;
-    }    
-}
