@@ -18,6 +18,7 @@ import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -169,6 +170,34 @@ class LiveView {
             }
         }
         sseClientConnections.removeAll(deadConnections);
+    }
+
+    void createResponseContext(String path, Consumer<String> delegate) throws IOException {
+        server.createContext(path, exchange -> {
+            if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
+                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                return;
+            }
+
+            String content_length = exchange.getRequestHeaders().getFirst("Content-length");
+            if (content_length == null) {
+                exchange.sendResponseHeaders(400, -1);
+                return;
+            }
+
+            try {
+                int length = Integer.parseInt(content_length);
+                byte[] data = new byte[length];
+                exchange.getRequestBody().read(data);
+                delegate.accept(new String(data));
+            } catch (NumberFormatException e) {
+                exchange.sendResponseHeaders(400, -1);
+                return;
+            }
+
+            exchange.sendResponseHeaders(200, 0);
+            exchange.close();
+        });
     }
 
     void write(String html)        { sendServerEvent(SSEType.WRITE, html); }
