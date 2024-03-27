@@ -53,7 +53,7 @@ static String readFile(String fileName) {
 }
 ```
 
-#### 🤷 Markdown als Klasse ausgliedern
+#### ✅ Markdown als Klasse ausgliedern
 
 Die `markdown`-Methode sollte wie Turtle als eigenständiger Aspekt ausgelagert werden, ebenso wie es mit der Klasse `Turtle` geschehen ist.
 

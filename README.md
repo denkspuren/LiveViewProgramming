@@ -132,15 +132,13 @@ Zum anderen können auch erfahrene Entwickler:innen mit Clerk eine anschauliche 
 
 Dazu ein paar Punkte, die mir in den Sinn kommen:
 
-* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Mag jemand ein CSS beitragen, damit der Prototyp besser aussieht? Macht es Sinn, das z.B. mit einem Framework wie [Bootstrap](https://getbootstrap.com/) zu tun, Stichwort "Responsive Design"? -- Vielen Dank an [ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5), der [hier](proposals/CSSExample/) zu finden ist!
+* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Allerdings hat sich mein Verständnis von Web-Technologien durch die Arbeit an Clerk deutlich verbessert bzw. eine Auffrischung erfahren. Dennoch gibt es sicher welche, die Verbesserungsvorschläge zur Umsetzung von Clerk haben.
 
 * Wie könnte man z.B. eine Bibliothek wie `https://www.chartjs.org/` in Clerk einbinden? Das würde die Einsatzmöglichkeiten für Clerk bereichern.
 
-* Sobald es Clerk mit einem HTTP-Server gibt, wäre eine interaktive Anwendung eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet javaseitig statt. Dafür wird man Clerk ein wenig erweitern müssen.
+* Eine interaktive Anwendung wäre eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet javaseitig statt. Dafür wird man Clerk ein wenig erweitern müssen.
 
 * Der Einsatz von Clerk könnte auch sinnvoll ohne Browser sein, um eine Dokumentation in einer Dokumentationsdatei etwa im Markdown-Format vorzunehmen. Dafür braucht es keinen HTTP-Server. Wenn zudem der Browser verwendet wird, könnte Clerk Medien auslesen (z.B. eine erzeugte Turtle-Grafik als Bild exporteiren), abspeichern und in eine Dokumentation einfügen.
-
-* Tatsächlich wäre ein Object-Inspektor, der über Reflection ein Object-Diagramm z.B. mit Hilfe von Graphviz erzeugt, eine großartige Sache. Das ist aber ein Problem für sich und kann, wenn gelöst, in Clerk als Dienst eingearbeitet werden.
 
 Weitere Überlegungen zur Überarbeitung des aktuellen Prototypen sind unter [Considerations.md](Considerations.md) zu finden.
 
@@ -148,9 +146,11 @@ Wie man Clerk modular gestalten könnte zum Zwecke der Erweiterung, ob man es do
 
 ## 🙏 Dank für Beiträge
 
-[@kuchenkruste](https://github.com/kuchenkruste) ist von Clerk ebenso angefixt wie ich und hat spontan einen beeindruckenden Server-Entwurf im Verzeichnis [`proposals/`](/proposals) [beigesteuert](https://github.com/denkspuren/clerk/pull/2#issue-2019021681), der Websockets realisiert; die `pom.xml`-Datei (in `proposals`) hilft beim Build mit Maven. Vielen Dank dafür! Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events.
- 
-@RamonDevPrivate hat mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) einen ObjectInspector auf den Weg gebracht, der ebenso Teil von Clerk werden wird. Auch dafür einen großen Dank! Ramon ist auch Mitentwickler von Clerk geworden, der vor allem den Webserver mit den Server Sent Events auf den Weg gebracht hat.
+[@BjoernLoetters](https://github.com/kuchenkruste) war von Clerk ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Vielen Dank dafür! Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/clerk/tree/websockets) hinterlegt.
+
+Vielen Dank an [@ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5)!
+
+[@RamonDevPrivate](https://github.com/RamonDevPrivate) ist nach seinen entscheidenden Beiträgen zur Umsetzung eines Webservers mit Server Sent Events (SSE) zum Mitentwickler von Clerk geworden. Von ihm gibt es auch die Umsetzung eines ObjectInspectors (siehe dieses [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee)), der sicher auch noch Eingang in die Skills von Clerk finden wird.
 
 Herzlichst,<br>
 Dominikus Herzberg
