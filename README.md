@@ -110,8 +110,11 @@ Wenn Sie sich die Datei [`clerk.java`](/clerk.java) anschauen, werden Sie festst
 
 * Die Klasse `LiveView` setzt mit den Boardmitteln von Java einen Webserver mit [Server Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) auf, der die in `SSEType` kodierten Events kennt. Hier verbirgt sich die entscheidende Infrastruktur.
 * Die Klasse `Clerk` aktiviert die LiveView mit der Methode `serve` und schickt Text in Markdown-Syntax mit `markdown` an den Browser.
+
+Daneben gibt es eine Reihe von Skills, die Clerk erst interessant und nützlich machen:
+
 * Die Klasse `File` bietet Methoden für die Verarbeitung von Dateien an. Mit der Methode `cutOut` kann man markierte Textabschnitte aus einer Datei ausschneiden. Das ist ein entscheidendes Feature, um Code zu dokumentieren.
-* Die Klasse `Turtle` erweitert Clerk und erlaubt die Verwendung der Turtle-Implementierung [`turtle.js`](/Turtle/turtle.js) durch Java. Die verschiedenen Turtle-Methoden rufen im Browser ihre Entsprechungen in `turtle.js` auf.
+* Die Klasse `Turtle` erweitert Clerk und erlaubt die Verwendung der Turtle-Implementierung [`turtle.js`](skills/Turtle/turtle.js) durch Java. Die verschiedenen Turtle-Methoden rufen im Browser ihre Entsprechungen in `turtle.js` auf.
 * Die Klasse `Markdown` ist eine weitere Erweiterung, um mit Markdown arbeiten zu können.
 
 In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser wenigen grundlegenden Fähigkeiten von Clerk. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert und zeigt.
