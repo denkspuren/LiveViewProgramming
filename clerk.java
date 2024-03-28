@@ -208,21 +208,24 @@ class LiveView {
 }
 
 interface ViewManagement {
-    default LiveView checkViewAndLoadOnce(LiveView view, List<LiveView> views, String path) {
-        if (Objects.isNull(view)) view = !views.isEmpty() ? views.getFirst() : null;
-        if (Objects.isNull(view)) throw new IllegalArgumentException("No view given or existing");
-        if (!views.contains(view)) {
-            view.load(path);
-            views.add(view);
-        }
+    default LiveView view() {
+        if (view == null) throw new NullPointerException("No view is set");
         return view;
     }
 }
 
 abstract class ViewManager implements ViewManagement {
-    static List<LiveView> views = new ArrayList<>();
+    static LiveView lastView;
     LiveView view;
+    ViewManager(LiveView view, String path) {
+        if (view == null) view = lastView;
+        if (view == null) throw new NullPointerException("No view is given and default view is not set");
+        if (view != lastView) lastView = view;
+        (this.view = view).load(path);
+    }
+    ViewManager(String path) { this(null, path); }
 }
+
 
 /open skills/File/File.java
 /open skills/Turtle/Turtle.java

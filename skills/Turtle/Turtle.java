@@ -5,7 +5,7 @@ class Turtle extends ViewManager {
     final int width, height;
 
     Turtle(LiveView view, int width, int height) {
-        this.view = checkViewAndLoadOnce(view, Turtle.views, "skills/Turtle/turtle.js");
+        super(view, "skills/Turtle/turtle.js");
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
         ID = Clerk.generateID(6);
