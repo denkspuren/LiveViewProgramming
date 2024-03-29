@@ -1,14 +1,15 @@
 import static java.lang.StringTemplate.STR;
 
-class Turtle extends ClerkManager {
+class Turtle implements Clerk {
     final String ID;
+    LiveView view;
     final int width, height;
 
     Turtle(LiveView view, int width, int height) {
-        super(view, "skills/Turtle/turtle.js");
+        this.view = Clerk.loadPath(view, "skills/Turtle/turtle.js");
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
-        ID = Clerk.generateID(6);
+        ID = Clerk.getHashID(this);
         this.view.write(STR."""
             <canvas id="turtleCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
             </canvas>
@@ -17,8 +18,8 @@ class Turtle extends ClerkManager {
     }
 
     Turtle(LiveView view) { this(view, 500, 500); }
-    Turtle(int width, int height) { this(null, width, height); }
-    Turtle() { this(null); }
+    Turtle(int width, int height) { this(Clerk.view(), width, height); }
+    Turtle() { this(Clerk.view()); }
 
     Turtle penDown() {
         view.call(STR."turtle\{ID}.penDown();");

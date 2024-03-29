@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -28,13 +29,26 @@ enum SSEType { WRITE, CALL, SCRIPT, LOAD; }
 class LiveView {
     final HttpServer server;
     final int port;
-    static final int defaultPort = 50001;
     static final String index = "./web/index.html";
+    static Map<Integer,LiveView> views = new HashMap<>();
+    List<String> paths = new ArrayList<>();
 
     List<HttpExchange> sseClientConnections;
 
     // barrier required to temporarily block SSE event of type `SSEType.LOAD`
     private final CyclicBarrier barrier = new CyclicBarrier(2);
+
+    static LiveView onPort(int port) {
+        try {
+            if (!views.containsKey(port))
+                views.put(port, new LiveView(port));
+            return views.get(port);
+        } catch (IOException e) {
+            System.err.printf("Error starting Server: %s\n", e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     private static final Map<String, String> mimeTypes = 
         Map.of("html", "text/html",
@@ -42,7 +56,7 @@ class LiveView {
                "css", "text/css",
                "ico", "image/x-icon");
 
-    public LiveView(int port) throws IOException {
+    private LiveView(int port) throws IOException {
         this.port = port;
         sseClientConnections = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
@@ -166,19 +180,21 @@ class LiveView {
     void write(String html)        { sendServerEvent(SSEType.WRITE, html); }
     void call(String javascript)   { sendServerEvent(SSEType.CALL, javascript); }
     void script(String javascript) { sendServerEvent(SSEType.SCRIPT, javascript); }
-    void load(String path)         { sendServerEvent(SSEType.LOAD, path); } // improve: don't load if path is known
+    void load(String path) { 
+        if (!paths.contains(path)) {
+            sendServerEvent(SSEType.LOAD, path);
+            paths.add(path);
+        }
+    } 
 
     public void stop() {
         sseClientConnections.clear();
+        views.remove(port);
         server.stop(0);
     }
 }
 
-interface ClerkManagement {
-    LiveView view();
-    default LiveView lastView() { return null; };
-    default LiveView setLastView(LiveView view) { throw new UnsupportedOperationException("to be implemented"); }
-
+interface Clerk {
     static final int DEFAULT_PORT = 50_001;
 
     static String generateID(int n) { // random alphanumeric string of size n
@@ -187,77 +203,29 @@ interface ClerkManagement {
                             collect(Collectors.joining());
     }
 
-    default LiveView checkView(LiveView view) {
-        if (view == null) view = lastView();
-        if (view == null) throw new NullPointerException("No view given and no prior view existent");
+    static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
+
+    static LiveView checkView(LiveView view) {
+        if (view == null) throw new NullPointerException("view must not be null");
         return view;
     }
-
-    default LiveView checkViewAndUpdateLast(LiveView view) { return setLastView(checkView(view)); }
 
     static LiveView loadPath(LiveView view, String path) {
-        if (view == null) throw new NullPointerException("No view is given");
-        if (path != null && !path.isEmpty() && !path.isBlank())
-            view.load(path);
-        return view;
-    }
-
-    static LiveView serve(int port) {
-        try {
-            return new LiveView(port);
-        } catch (IOException e) {
-            System.err.printf("Error starting Server: %s\n", e.getMessage());
-            e.printStackTrace();
-            return null;
+        if (path != null && !path.isEmpty() && !path.isBlank()) {
+            checkView(view).load(path);
+            return view;
         }
+        return null;
     }
 
-    static LiveView serve() { return serve(DEFAULT_PORT); }
+    static LiveView view(int port) { return LiveView.onPort(port); }
+    static LiveView view() { return view(DEFAULT_PORT); }
 
-}
-
-abstract class ClerkManager implements ClerkManagement {
-    static LiveView lastView;
-    LiveView view;
-
-    ClerkManager(LiveView view, String path) {
-        ClerkManagement.loadPath(this.view = checkViewAndUpdateLast(view), path);
-    }
-
-    ClerkManager(LiveView view) { this(view, null); }
-    ClerkManager(String path) { this(lastView, path); }
-    ClerkManager() { this(lastView, null); }
-    
-    public LiveView view() { return view; }
-    public LiveView lastView() { return lastView; }
-    public LiveView setLastView(LiveView view) { return lastView = view; }
-}
-
-class Clerk extends ClerkManager implements ClerkManagement {
-    static Clerk instance;
-    static Markdown markdown;
-
-    Clerk() {
-       super(ClerkManagement.serve());
-       instance = this;
-    }
-
-    // static LiveView serve(int port) { return ClerkManagement.serve(port); }
-    // static LiveView serve() { return ClerkManagement.serve(); }
-
-
-    static LiveView actualView() { return instance.view(); }
-
-    // static String generateID(int n) { return ClerkManagement.generateID(n); }
-
-    static Markdown markdown(String markdownText) {
-        if (markdown == null) markdown = new Markdown(Clerk.actualView());
-        return markdown.markdown(markdownText);
-    }
+    static void markdown(String text) { new Markdown(Clerk.view()).write(text); }
 }
 
 /open skills/File/File.java
 /open skills/Turtle/Turtle.java
 /open skills/Markdown/Markdown.java
 
-// Clerk.serve()
+LiveView view = Clerk.view();

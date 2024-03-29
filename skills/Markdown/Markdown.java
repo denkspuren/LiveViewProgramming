@@ -1,8 +1,10 @@
 import static java.lang.StringTemplate.STR;
 
-record Markdown(LiveView view) {
-    public Markdown { view.load("https://cdn.jsdelivr.net/npm/marked/marked.min.js"); }
-    public Markdown markdown(String markdownText) {
+record Markdown(LiveView view) implements Clerk {
+    public Markdown { 
+        Clerk.loadPath(view, "https://cdn.jsdelivr.net/npm/marked/marked.min.js");
+    }
+    public Markdown write(String markdownText) {
         String ID = Clerk.generateID(10);
         view.write(STR."""
             <div id="\{ID}">
@@ -15,5 +17,5 @@ record Markdown(LiveView view) {
             document.getElementById("\{ID}").innerHTML = renderedHTML;
             """);
         return this;
-    }    
+    }
 }
