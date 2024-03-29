@@ -6,7 +6,7 @@ class Turtle implements Clerk {
     final int width, height;
 
     Turtle(LiveView view, int width, int height) {
-        this.view = Clerk.loadPath(view, "skills/Turtle/turtle.js");
+        this.view = Clerk.loadPath(view, "clerks/Turtle/turtle.js");
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
         ID = Clerk.getHashID(this);

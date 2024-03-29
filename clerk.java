@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import javax.naming.OperationNotSupportedException;
@@ -29,9 +30,13 @@ enum SSEType { WRITE, CALL, SCRIPT, LOAD; }
 class LiveView {
     final HttpServer server;
     final int port;
+    static int defaultPort = 50_001;
     static final String index = "./web/index.html";
     static Map<Integer,LiveView> views = new HashMap<>();
     List<String> paths = new ArrayList<>();
+
+    static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
+    static int getDefaultPort() { return defaultPort; }
 
     List<HttpExchange> sseClientConnections;
 
@@ -39,6 +44,7 @@ class LiveView {
     private final CyclicBarrier barrier = new CyclicBarrier(2);
 
     static LiveView onPort(int port) {
+        port = Math.abs(port);
         try {
             if (!views.containsKey(port))
                 views.put(port, new LiveView(port));
@@ -49,6 +55,8 @@ class LiveView {
             return null;
         }
     }
+
+    static LiveView onPort() { return onPort(defaultPort); }
 
     private static final Map<String, String> mimeTypes = 
         Map.of("html", "text/html",
@@ -195,8 +203,6 @@ class LiveView {
 }
 
 interface Clerk {
-    static final int DEFAULT_PORT = 50_001;
-
     static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
                             mapToObj(i -> Integer.toString(i, 36)).
@@ -219,13 +225,13 @@ interface Clerk {
     }
 
     static LiveView view(int port) { return LiveView.onPort(port); }
-    static LiveView view() { return view(DEFAULT_PORT); }
+    static LiveView view() { return view(LiveView.getDefaultPort()); }
 
     static void markdown(String text) { new Markdown(Clerk.view()).write(text); }
 }
 
 /open skills/File/File.java
-/open skills/Turtle/Turtle.java
-/open skills/Markdown/Markdown.java
+/open clerks/Turtle/Turtle.java
+/open clerks/Markdown/Markdown.java
 
 LiveView view = Clerk.view();
