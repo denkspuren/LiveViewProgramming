@@ -37,17 +37,17 @@ Die Datei `clerk.java` wird in die JShell geladen und Clerk gestartet.
 ```
 jshell> /open clerk.java
 
-jshell> Clerk.serve()
+jshell> Clerk.view()
 Open http://localhost:50001 in your browser
+$38 ==> LiveView@2d38eb89
 ```
 
-Öffnen Sie Ihren Browser (bei mir ist es Chrome) mit dieser Webadresse. Wenn es ein anderer Port sein soll, lautet der Aufruf beispielsweise `Clerk.serve(50000)`. Im Browser kann man mitverfolgen, was passiert, wenn man Clerk nutzt. 
+Öffnen Sie Ihren Browser (bei mir ist es Chrome) mit dieser Webadresse. Im Browser kann man nun mitverfolgen, was passiert, wenn man Clerk nutzt. 
 
 Probieren wir einen einfachen Begrüßungstext im Markdown-Format:
 
 ```java
 jshell> Clerk.markdown("Hello, _this_ is **Clerk**!")
-$33 ==> Markdown[view=LiveView@20fa23c1]
 ```
 
 Im Browser ist "Hello, _this_ is **Clerk**!" zu sehen. 😀
@@ -55,7 +55,7 @@ Im Browser ist "Hello, _this_ is **Clerk**!" zu sehen. 😀
 Als nächstes erzeugen wir eine kleine Logo-Zeichnung. Mehr zu Logo erfahren Sie im nächsten Abschnitt. (Mindestens einmal ist die Angabe der `Clerk.view` wichtig. Wenn man Clerk nur mit einer LiveView laufen lässt, kann man nachfolgende Instanziierungen von `Turtle` auch ohne `Clerk.view` z.B. mit `new Turtle(200, 200)` erzeugen.)
 
 ```java
-jshell> Turtle turtle = new Turtle(Clerk.view, 200, 200)
+jshell> Turtle turtle = new Turtle(200, 200)
 turtle ==> Turtle@3b764bce
 ```
 
@@ -89,8 +89,16 @@ Obwohl der Clerk-Prototyp einfach und kurz gehalten ist, kann man noch mehr dami
 In dem git-Repository findet sich die Datei [`logo.java`](/logo.java). Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
 
 ```java
-jshell> Clerk.serve() // Browser refreshen, um leere Seite zu sehen
+jshell> Clerk.view().stop()
 
+jshell> Clerk.view()
+Open http://localhost:50001 in your browser
+$76 ==> LiveView@dcf3e99
+```
+
+Refreshen Sie die Seite im Browser oder laden Sie sie neu, um eine leere Seite zu sehen
+
+```java
 jshell> /o logo.java  // /o ist Kurzform von /open
 ```
 
@@ -108,6 +116,8 @@ Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Cler
 
 Wenn Sie sich die Datei [`clerk.java`](/clerk.java) anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist:
 
+**TEXT IN ÜBERARBEITUNG**
+<!--
 * Die Klasse `LiveView` setzt mit den Boardmitteln von Java einen Webserver mit [Server Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) auf, der die in `SSEType` kodierten Events kennt. Hier verbirgt sich die entscheidende Infrastruktur.
 * Die Klasse `Clerk` aktiviert die LiveView mit der Methode `serve` und schickt Text in Markdown-Syntax mit `markdown` an den Browser.
 
@@ -116,6 +126,7 @@ Daneben gibt es eine Reihe von Skills, die Clerk erst interessant und nützlich 
 * Die Klasse `File` bietet Methoden für die Verarbeitung von Dateien an. Mit der Methode `cutOut` kann man markierte Textabschnitte aus einer Datei ausschneiden. Das ist ein entscheidendes Feature, um Code zu dokumentieren.
 * Die Klasse `Turtle` erweitert Clerk und erlaubt die Verwendung der Turtle-Implementierung [`turtle.js`](skills/Turtle/turtle.js) durch Java. Die verschiedenen Turtle-Methoden rufen im Browser ihre Entsprechungen in `turtle.js` auf.
 * Die Klasse `Markdown` ist eine weitere Erweiterung, um mit Markdown arbeiten zu können.
+-->
 
 In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser wenigen grundlegenden Fähigkeiten von Clerk. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert und zeigt.
 

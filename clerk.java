@@ -200,6 +200,10 @@ class LiveView {
         views.remove(port);
         server.stop(0);
     }
+
+    static void shutdown() {
+        views.forEach((k, v) -> v.stop());
+    }
 }
 
 interface Clerk {
@@ -234,4 +238,4 @@ interface Clerk {
 /open clerks/Turtle/Turtle.java
 /open clerks/Markdown/Markdown.java
 
-LiveView view = Clerk.view();
+// LiveView view = Clerk.view();
