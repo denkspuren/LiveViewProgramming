@@ -16,6 +16,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.naming.OperationNotSupportedException;
+
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -164,7 +166,7 @@ class LiveView {
     void write(String html)        { sendServerEvent(SSEType.WRITE, html); }
     void call(String javascript)   { sendServerEvent(SSEType.CALL, javascript); }
     void script(String javascript) { sendServerEvent(SSEType.SCRIPT, javascript); }
-    void load(String path)         { sendServerEvent(SSEType.LOAD, path); }
+    void load(String path)         { sendServerEvent(SSEType.LOAD, path); } // improve: don't load if path is known
 
     public void stop() {
         sseClientConnections.clear();
@@ -175,8 +177,7 @@ class LiveView {
 interface ClerkManagement {
     LiveView view();
     default LiveView lastView() { return null; };
-    LiveView setLastView(LiveView view);
-    List<LiveView> views();
+    default LiveView setLastView(LiveView view) { throw new UnsupportedOperationException("to be implemented"); }
 
     static final int DEFAULT_PORT = 50_001;
 
@@ -188,18 +189,16 @@ interface ClerkManagement {
 
     default LiveView checkView(LiveView view) {
         if (view == null) view = lastView();
-        if (view == null) throw new NullPointerException("No view given and no prior view set");
+        if (view == null) throw new NullPointerException("No view given and no prior view existent");
         return view;
     }
 
     default LiveView checkViewAndUpdateLast(LiveView view) { return setLastView(checkView(view)); }
 
-    default LiveView loadPath(LiveView view, String path) {
+    static LiveView loadPath(LiveView view, String path) {
         if (view == null) throw new NullPointerException("No view is given");
-        if (!views().contains(view) && path != null && !path.isEmpty() && !path.isBlank()) {
+        if (path != null && !path.isEmpty() && !path.isBlank())
             view.load(path);
-            views().add(view);   
-        }
         return view;
     }
 
@@ -218,12 +217,11 @@ interface ClerkManagement {
 }
 
 abstract class ClerkManager implements ClerkManagement {
-    static List<LiveView> views = new ArrayList<>();
     static LiveView lastView;
     LiveView view;
 
     ClerkManager(LiveView view, String path) {
-        loadPath(this.view = checkViewAndUpdateLast(view), path);
+        ClerkManagement.loadPath(this.view = checkViewAndUpdateLast(view), path);
     }
 
     ClerkManager(LiveView view) { this(view, null); }
@@ -233,10 +231,9 @@ abstract class ClerkManager implements ClerkManagement {
     public LiveView view() { return view; }
     public LiveView lastView() { return lastView; }
     public LiveView setLastView(LiveView view) { return lastView = view; }
-    public List<LiveView> views() { return views; }
 }
 
-class Clerk extends ClerkManager {
+class Clerk extends ClerkManager implements ClerkManagement {
     static Clerk instance;
     static Markdown markdown;
 
@@ -245,13 +242,13 @@ class Clerk extends ClerkManager {
        instance = this;
     }
 
-    static LiveView serve(int port) { return ClerkManagement.serve(port); }
-    static LiveView serve() { return ClerkManagement.serve(); }
+    // static LiveView serve(int port) { return ClerkManagement.serve(port); }
+    // static LiveView serve() { return ClerkManagement.serve(); }
 
 
     static LiveView actualView() { return instance.view(); }
 
-    static String generateID(int n) { return ClerkManagement.generateID(n); }
+    // static String generateID(int n) { return ClerkManagement.generateID(n); }
 
     static Markdown markdown(String markdownText) {
         if (markdown == null) markdown = new Markdown(Clerk.actualView());
