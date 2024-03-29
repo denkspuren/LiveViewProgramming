@@ -1,6 +1,6 @@
 import static java.lang.StringTemplate.STR;
 
-class Turtle extends ViewManager {
+class Turtle extends ClerkManager {
     final String ID;
     final int width, height;
 

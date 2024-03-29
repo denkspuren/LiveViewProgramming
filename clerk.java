@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,41 +19,7 @@ import java.util.stream.Collectors;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
-// jshell -R-ea --enable-preview
-
-class Clerk {
-    static LiveView view;
-    static Markdown markdown;
-
-    static String generateID(int n) { // random alphanumeric string of size n
-        return new Random().ints(n, 0, 36).
-                            mapToObj(i -> Integer.toString(i, 36)).
-                            collect(Collectors.joining());
-    }
-
-    // Open Server at default port
-    static void serve() {
-        serve(LiveView.defaultPort);
-    }
-
-    // Open Server at custom port
-    static void serve(int port) {
-        if (view != null) {
-            view.stop();
-        }
-        try {
-            view = new LiveView(port);
-        } catch (Exception e) {
-            System.err.printf("Error starting Server: %s\n", e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    static Markdown markdown(String markdownText) {
-        if (markdown == null) markdown = new Markdown(Clerk.view);
-        return markdown.markdown(markdownText);
-    }
-}
+// To run this code type `jshell -R-ea --enable-preview`
 
 enum SSEType { WRITE, CALL, SCRIPT, LOAD; }
 
@@ -207,27 +172,95 @@ class LiveView {
     }
 }
 
-interface ViewManagement {
-    default LiveView view() {
-        if (view == null) throw new NullPointerException("No view is set");
+interface ClerkManagement {
+    LiveView view();
+    default LiveView lastView() { return null; };
+    LiveView setLastView(LiveView view);
+    List<LiveView> views();
+
+    static final int DEFAULT_PORT = 50_001;
+
+    static String generateID(int n) { // random alphanumeric string of size n
+        return new Random().ints(n, 0, 36).
+                            mapToObj(i -> Integer.toString(i, 36)).
+                            collect(Collectors.joining());
+    }
+
+    default LiveView checkView(LiveView view) {
+        if (view == null) view = lastView();
+        if (view == null) throw new NullPointerException("No view given and no prior view set");
         return view;
     }
+
+    default LiveView checkViewAndUpdateLast(LiveView view) { return setLastView(checkView(view)); }
+
+    default LiveView loadPath(LiveView view, String path) {
+        if (view == null) throw new NullPointerException("No view is given");
+        if (!views().contains(view) && path != null && !path.isEmpty() && !path.isBlank()) {
+            view.load(path);
+            views().add(view);   
+        }
+        return view;
+    }
+
+    static LiveView serve(int port) {
+        try {
+            return new LiveView(port);
+        } catch (IOException e) {
+            System.err.printf("Error starting Server: %s\n", e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    static LiveView serve() { return serve(DEFAULT_PORT); }
+
 }
 
-abstract class ViewManager implements ViewManagement {
+abstract class ClerkManager implements ClerkManagement {
+    static List<LiveView> views = new ArrayList<>();
     static LiveView lastView;
     LiveView view;
-    ViewManager(LiveView view, String path) {
-        if (view == null) view = lastView;
-        if (view == null) throw new NullPointerException("No view is given and default view is not set");
-        if (view != lastView) lastView = view;
-        (this.view = view).load(path);
+
+    ClerkManager(LiveView view, String path) {
+        loadPath(this.view = checkViewAndUpdateLast(view), path);
     }
-    ViewManager(String path) { this(null, path); }
+
+    ClerkManager(LiveView view) { this(view, null); }
+    ClerkManager(String path) { this(lastView, path); }
+    ClerkManager() { this(lastView, null); }
+    
+    public LiveView view() { return view; }
+    public LiveView lastView() { return lastView; }
+    public LiveView setLastView(LiveView view) { return lastView = view; }
+    public List<LiveView> views() { return views; }
 }
 
+class Clerk extends ClerkManager {
+    static Clerk instance;
+    static Markdown markdown;
+
+    Clerk() {
+       super(ClerkManagement.serve());
+       instance = this;
+    }
+
+    static LiveView serve(int port) { return ClerkManagement.serve(port); }
+    static LiveView serve() { return ClerkManagement.serve(); }
+
+
+    static LiveView actualView() { return instance.view(); }
+
+    static String generateID(int n) { return ClerkManagement.generateID(n); }
+
+    static Markdown markdown(String markdownText) {
+        if (markdown == null) markdown = new Markdown(Clerk.actualView());
+        return markdown.markdown(markdownText);
+    }
+}
 
 /open skills/File/File.java
 /open skills/Turtle/Turtle.java
 /open skills/Markdown/Markdown.java
 
+// Clerk.serve()

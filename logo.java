@@ -35,7 +35,7 @@ Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich klein
 """);
 
 // myFirstTurtle
-Turtle myFirstTurtle = new Turtle(Clerk.view, 300, 300);
+Turtle myFirstTurtle = new Turtle(Clerk.actualView(), 300, 300);
 
 Turtle arrowhead(Turtle t) {
     return t.right(30).backward(10).forward(10).
