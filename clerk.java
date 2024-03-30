@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,12 +60,6 @@ class LiveView {
 
     static LiveView onPort() { return onPort(defaultPort); }
 
-    private static final Map<String, String> mimeTypes = 
-        Map.of("html", "text/html",
-               "js", "text/javascript",
-               "css", "text/css",
-               "ico", "image/x-icon");
-
     private LiveView(int port) throws IOException {
         this.port = port;
         sseClientConnections = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
@@ -111,7 +107,7 @@ class LiveView {
                     : "." + exchange.getRequestURI().getPath();
             try (final InputStream stream = new FileInputStream(path)) {
                 final byte[] bytes = stream.readAllBytes();
-                exchange.getResponseHeaders().add("Content-Type", guessMimeType(path) + "; charset=utf-8");
+                exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(path)) + "; charset=utf-8");
                 exchange.sendResponseHeaders(200, bytes.length);
                 exchange.getResponseBody().write(bytes);
                 exchange.getResponseBody().flush();
@@ -122,16 +118,6 @@ class LiveView {
 
         server.setExecutor(Executors.newFixedThreadPool(5));
         server.start();
-    }
-
-    String guessMimeType(final String path) {
-        final int index = path.lastIndexOf('.');
-        if (index >= 0) {
-            final String ending = path.substring(index + 1);
-            return mimeTypes.getOrDefault(ending, "text/plain");
-        } else {
-            return "text/plain";
-        }
     }
 
     void sendServerEvent(SSEType sseType, String data) {
@@ -157,7 +143,7 @@ class LiveView {
         sseClientConnections.removeAll(deadConnections);
     }
 
-    void createResponseContext(String path, Consumer<String> delegate) throws IOException {
+    void createResponseContext(String path, Consumer<String> delegate) {
         server.createContext(path, exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
@@ -237,5 +223,6 @@ interface Clerk {
 /open skills/File/File.java
 /open clerks/Turtle/Turtle.java
 /open clerks/Markdown/Markdown.java
+/open clerks/TicTacToe/TicTacToe.java
 
 // LiveView view = Clerk.view();
