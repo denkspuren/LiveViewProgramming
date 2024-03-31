@@ -108,7 +108,7 @@ jshell> /o logo.java  // /o ist Kurzform von /open
 
 Im Browser sieht das Ergebnis so aus (Sie sehen hier nur einen Teil der Seite):
 
-![Das Ergebnis von `logo.java`](logo.png)
+![Das Ergebnis von `logo.java`](/clerks/Turtle/TurtleExample.png)
 
 Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Mit der Skill namens `File` können Codeauszüge an geeigneten Stellen in die Dokumentation gesetzt werden. Der Code in [`logo.java`](/logo.java) erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
 
