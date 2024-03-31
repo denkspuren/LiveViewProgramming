@@ -14,7 +14,7 @@ Clerk für Clojure ist ein mächtiges und eindrucksvolles Werkzeug -- Hut ab vor
 
 Diese Grundidee wollte ich so einfach und unkompliziert wie möglich für Java und die JShell umsetzen. Ich nenne diese Idee _Live View Programming_ (LVP). Clerk als Namen habe ich beibehalten, allerdings arbeitet das _Live View Programming_ nicht mit einem Clerk (engl. für Sachbearbeiter, Büroangestellter, Schreibkraft), sondern mit vielen Clerks. Jeder Clerk ist für eine spezielle _Live View_ zuständig. Dazu kommen _Skills_, die generelle Fähigkeiten beisteuern, die nicht an eine _Live View_ gebunden sind.
 
-Das _Live View Programming_ mit seinen Clerks und Skills ist mit einem sehr schlanken _Live View_-Webserver umsetzbar. Es braucht nur wenige Mittel, um damit die Notizbuch-Programmierung umzusetzen. Aber es geht noch viel mehr! Ein Beispiel ist das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), das ganz andere Wege bei der Kombination von Code und Dokumentation geht. Ein anderes Beispiel ist ein Clerk für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik), was zur Grafik-Programmierung animiert. Ein weiteres Beispiel ist ein Clerk, der eine GUI für das Spiel [TicTacToe] bereitstellt. In all diesen Beispielen programmiert man wie gewohnt mit Java in der IDE oder mittels JShell-Skripten und einem Editor und instruiert den Browser, was er anzeigen soll. Das ist -- ehrlich gesagt -- ziemlich cool!
+Das _Live View Programming_ mit seinen Clerks und Skills ist mit einem sehr schlanken _Live View_-Webserver umsetzbar. Es braucht nur wenige Mittel, um damit die Notizbuch-Programmierung umzusetzen. Aber es geht noch viel mehr! Ein Beispiel ist das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), das ganz andere Wege bei der Kombination von Code und Dokumentation geht. Ein anderes Beispiel ist ein Clerk für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik), was zur Grafik-Programmierung animiert. Ein weiteres Beispiel ist ein Clerk, der eine GUI für das Spiel [TicTacToe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) bereitstellt. In all diesen Beispielen programmiert man wie gewohnt mit Java in der IDE oder mittels JShell-Skripten und einem Editor und instruiert den Browser, was er anzeigen soll. Das ist -- ehrlich gesagt -- ziemlich cool!
 
 ## 💻 Ein erster Kontakt: _Live View Programming_ für die JShell
 
@@ -118,66 +118,58 @@ Um das besser zu verstehen, schauen Sie sich den Code in der Datei [`logo.java`]
 
 # 📝 Skizze zur Arbeitsweise des Clerk-Prototypen
 
-Wenn Sie sich die Datei [`clerk.java`](/clerk.java) anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist:
+## 🪟 Live Views 
 
-**TEXT IN ÜBERARBEITUNG**
-<!--
-* Die Klasse `LiveView` setzt mit den Boardmitteln von Java einen Webserver mit [Server Sent Events](https://en.wikipedia.org/wiki/Server-sent_events) (SSE) auf, der die in `SSEType` kodierten Events kennt. Hier verbirgt sich die entscheidende Infrastruktur.
-* Die Klasse `Clerk` aktiviert die LiveView mit der Methode `serve` und schickt Text in Markdown-Syntax mit `markdown` an den Browser.
+Wenn Sie sich die Datei [`clerk.java`](/clerk.java) anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist, um eine Infrastruktur für das _Live View Programming_ aufzusetzen. In der Datei befindet sich im Wesentlichen eine Klasse und ein Interface:
 
-Daneben gibt es eine Reihe von Skills, die Clerk erst interessant und nützlich machen:
+* Die Klasse `LiveView` setzt mit der Methode `onPort` einen Server auf, der eine _Live View_ im Browser bedient. Diese _Live View_ zeigt die `index.html` aus dem `web`-Verzeichnis an und lädt das notwendige Stückchen Client-Code `script.js`.
 
-* Die Klasse `File` bietet Methoden für die Verarbeitung von Dateien an. Mit der Methode `cutOut` kann man markierte Textabschnitte aus einer Datei ausschneiden. Das ist ein entscheidendes Feature, um Code zu dokumentieren.
-* Die Klasse `Turtle` erweitert Clerk und erlaubt die Verwendung der Turtle-Implementierung [`turtle.js`](skills/Turtle/turtle.js) durch Java. Die verschiedenen Turtle-Methoden rufen im Browser ihre Entsprechungen in `turtle.js` auf.
-* Die Klasse `Markdown` ist eine weitere Erweiterung, um mit Markdown arbeiten zu können.
--->
+Der Webserver nutzt _Server Sent Events_ (SSE) als Mittel, um die _Live View_ im Browser beliebig zu erweitern. Man kann mit der Methode `sendServerEvent` entweder HTML-Code, `<script>`-Tags, JavaScript-Code senden oder JavaScript-Bibliotheken laden.
 
-In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser wenigen grundlegenden Fähigkeiten von Clerk. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert und zeigt.
+* Das Interface `Clerk` bietet ein paar statische Methode an, um die Programmierung von Clerks, siehe [`clerks`](/clerks/), zu erleichtern. Darunter sind die folgenden Wrapper für die Methode `sendServerEvent`:
+
+    - `write` schickt HTML-Code über eine View an den Browser, wo der HTML-Code gerendert wird
+    - `call` schickt JavaScript-Code über eine View zur Ausführung an den Browser
+    - `script` schickt JavaScript-Code über eine View an den Browser, der ihn in ein `<script>`-Tag einpackt, im DOM des Browsers hinzufügt und ausführt
+    - `load` fordert den Browser über eine View zum Laden einer JavaScript-Bibliothek auf. Eine JavaScript-Bibliothek wird nur genau einmal pro View geladen
+
+Interessant ist noch die statische Methode `markdown` von `Clerk`, mit der direkt Markdown-Text an den Browser der Standard View (default Port) geschickt und gerendet wird.
+
+## 🧑‍💼 Clerks
+
+Im Verzeichnis [`clerks`](/clerks/) finden sich ein paar Clerks, um _Views_ zu erzeugen und zu bedienen. Darunter sind Clerks für die Nutzung der Markdown-Notation, für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik) und für eine GUI für das Spiel [Tic-Tac-Toe](https://de.wikipedia.org/wiki/Tic-Tac-Toe).
+
+Clerks sind immer mit einer _Live View_ assoziiert und stellen zudem den Browser-seitig genötigten Code zur Verfügung, um die _View_ zu erzeugen. Als Programmierkonvention implementiert ein Clerk stets das Interface `Clerk`.
+
+## 🤹 Skills
+
+Skills sind im Verzeichnis [`skills`](/skills/) zu finden. Skills haben nichts mit einer _View_ zu tun, sie stellen spezielle oder generelle Fähigkeiten zur Verfügung, die man beim _Live View Programming_ oder im Zusammenspiel mit Clerks gebrauchen kann. `File.java` ist eine wichtige Skill, um Text oder Code aus einer Datei "ausschneiden" zu können, was elementar für die Erzeugung einer _Live View_ für die Code-Dokumentation ist.
+
+> Solange einzelne Clerks und Skills nicht weiter dokumentiert sind (das wird kommen), studieren Sie den Code der Clerks und Skills. In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser wenigen grundlegenden Fähigkeiten. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert und zeigt.
 
 # 🚀 Der Prototyp ist erst der Anfang
 
 ## 🌴 Vision
 
-Meine Vision ist, Clerk in der Programmierausbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen. Wenn einmal ein HTTP-Server realisiert ist, wird Clerk ein schönes Beispiel für webbasierte Client/Server-Programmierung abgeben, und es kann in seinen Fähigkeiten kontinuierlich erweitert werden. Mit Clerk wäre damit auch ein Rahmenwerk gegeben für die Programmierung von Web-Anwendungen. Generell ist der hier vorgestellte Ansatz für jede andere Programmiersprache ebenso umsetzbar.
+Meine Vision für das _Live View Programming_ ist zunächst, dieses Werkzeug in der Programmierungsbildung meiner Informatik-Studierenden an der THM zum Einsatz kommen zu lassen.
 
 Zum einen scheint mir Clerk für Programmier-Anfänger:innen geeignet zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert. Gerne würde ich Clerk erweitern um die Möglichkeit, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline); @RamonDevPrivate hat das bereits mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) vorbereitet. Clerk kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen. Mit solchen Erweiterungen kann Clerk Teil der Entwicklungswerkzeuge beim Programmieren werden.
 
 Zum anderen können auch erfahrene Entwickler:innen mit Clerk eine anschauliche und verständliche Dokumentation zu ihrem Code erstellen. Wenn visuelle Anteile das unterstützen können, umso besser. Man kann Clerk aber ebenso für Experimente, exploratives Programmieren und Notebook-basierte Programmierung verwenden. Sicher gibt es noch viele andere, denkbare Anwendungsszenarien.
 
+Und ich habe noch eine Vision: Das diese Umsetzung für Java als Blaupause für die Realisierung des _Live View Programming_ anderen Programmiersprachen dient. Die Idee ist so einfach, dass man sie in ein, zwei Tagen portieren kann für die Lieblingssprache der Wahl.
+
 ## 💃🕺 Mitmach-Aufruf
 
-> Sie sind gerne willkommen, sich an der Entwicklung der Clerk-Idee, eines _Live View Programming with Java's JShell_, zu beteiligen.
+> Sie sind gerne willkommen, sich an der Entwicklung des _Live View Programming with Java's JShell_ zu beteiligen. Schreiben Sie neue Clerks und Skills!
 
-Dazu ein paar Punkte, die mir in den Sinn kommen:
+Ein paar Beiträge hat es schon gegeben:
 
-* Ich habe wenig Ahnung von Web-Technologien, d.h. von HTML, CSS und JavaScript, z.B. hat ChatGPT 3.5 den Code für `turtle.js` beigesteuert. Allerdings hat sich mein Verständnis von Web-Technologien durch die Arbeit an Clerk deutlich verbessert bzw. eine Auffrischung erfahren. Dennoch gibt es sicher welche, die Verbesserungsvorschläge zur Umsetzung von Clerk haben.
+* Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/clerk/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung eines Webservers mit Server Sent Events (SSE) entstanden! Von Ramon stammt auch der Tic-Tac-Toe-Clerk.
 
-* Wie könnte man z.B. eine Bibliothek wie `https://www.chartjs.org/` in Clerk einbinden? Das würde die Einsatzmöglichkeiten für Clerk bereichern.
+* [@BjoernLoetters](https://github.com/kuchenkruste) war von Clerk ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/clerk/tree/websockets) hinterlegt. Ich empfehle das Studium seines Codes sehr!
 
-* Eine interaktive Anwendung wäre eine schöne Vorzeige-Demo. Wie wäre es mit Tic-Tac-Toe? Natürlich soll im Browser nur das Spielbrett dargestellt und das UI abgebildet werden, die Berechnung von Spielzügen etc. findet javaseitig statt. Dafür wird man Clerk ein wenig erweitern müssen.
-
-* Der Einsatz von Clerk könnte auch sinnvoll ohne Browser sein, um eine Dokumentation in einer Dokumentationsdatei etwa im Markdown-Format vorzunehmen. Dafür braucht es keinen HTTP-Server. Wenn zudem der Browser verwendet wird, könnte Clerk Medien auslesen (z.B. eine erzeugte Turtle-Grafik als Bild exporteiren), abspeichern und in eine Dokumentation einfügen.
-
-Weitere Überlegungen zur Überarbeitung des aktuellen Prototypen sind unter [Considerations.md](Considerations.md) zu finden.
-
-Wie man Clerk modular gestalten könnte zum Zwecke der Erweiterung, ob man es doch als `jar`-Datei ausliefern sollte, ... diesen Fragen kann man sich widmen, wenn der Prototyp reift und mit einem HTTP-Server ausgestattet ist.
-
-## 🙏 Dank für Beiträge
-
-
-Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/clerk/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung mit einem Webserver entstanden! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Abschnitte aus Code- und Textdateien herausschneiden und Zeichnungen mit einer Logo-Schildkröte erstellen. Insbesondere das Herausschneiden von Text- bzw. Codeabschnitten aus Dateien und das neue Java-Feature der String-Template (Preview-Feature in Java 21) sind sehr einfache aber mächtige Instrumente zur Code-Dokumentation und zur Unterstützung des [_Literate Programming_](https://en.wikipedia.org/wiki/Literate_programming).
-
-Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
-
-Wer mag, kann den entstandenen Prototypen ausprobieren!
-
--- und damit eine Blaupause für die Realisierung in jeder anderen Programmiersprache liefern. 
-
-[@BjoernLoetters](https://github.com/kuchenkruste) war von Clerk ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Vielen Dank dafür! Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/clerk/tree/websockets) hinterlegt.
-
-Vielen Dank an [@ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5)!
-
-[@RamonDevPrivate](https://github.com/RamonDevPrivate) ist nach seinen entscheidenden Beiträgen zur Umsetzung eines Webservers mit Server Sent Events (SSE) zum Mitentwickler von Clerk geworden. Von ihm gibt es auch die Umsetzung eines ObjectInspectors (siehe dieses [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee)), der sicher auch noch Eingang in die Skills von Clerk finden wird.
+* Vielen Dank an [@ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5)!
 
 Herzlichst,<br>
 Dominikus Herzberg
