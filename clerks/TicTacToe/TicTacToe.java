@@ -13,16 +13,17 @@ class TicTacToe implements Clerk {
     int turn = 1;
 
     TicTacToe(LiveView view, int width, int height) {
-        this.view = Clerk.loadPath(view, libPath);
+        this.view = view;
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
+        Clerk.load(view, libPath);
         ID = Clerk.getHashID(this);
 
-        this.view .write(STR."""
+        Clerk.write(view, STR."""
             <canvas id="tttCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
             </canvas>
                 """);
-        this.view.script(STR."const ttt\{ID} = new TicTacToe(document.getElementById('tttCanvas\{ID}'), 'ttt\{ID}');");
+        Clerk.script(view, STR."const ttt\{ID} = new TicTacToe(document.getElementById('tttCanvas\{ID}'), 'ttt\{ID}');");
         
         this.view.createResponseContext(STR."/ttt\{ID}", response -> {
             int i = Integer.parseInt(response);
@@ -48,14 +49,14 @@ class TicTacToe implements Clerk {
     }
 
     TicTacToe sendWinPosition(int start, int end) {
-        view.call(STR."ttt\{ID}.showWinner(\{start}, \{end})");
+        Clerk.call(view, STR."ttt\{ID}.showWinner(\{start}, \{end})");
         return this;
     }
 
     TicTacToe move(int position) {
         if (fields[position] == 0) {
             fields[position] = turn;
-            view.call(STR."ttt\{ID}.drawToken(\{turn == 1}, \{position})");
+            Clerk.call(view, STR."ttt\{ID}.drawToken(\{turn == 1}, \{position})");
             turn = -turn;            
         }
         return this;

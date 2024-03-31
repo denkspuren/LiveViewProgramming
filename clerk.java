@@ -65,7 +65,6 @@ class LiveView {
         System.out.println("Open http://localhost:" + port + " in your browser");
 
         server.createContext("/loaded", exchange -> {
-            // System.out.println("loaded: " + exchange.toString());
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
@@ -90,7 +89,6 @@ class LiveView {
             exchange.getResponseHeaders().add("Cache-Control", "no-cache");
             exchange.getResponseHeaders().add("Connection", "keep-alive");
             exchange.sendResponseHeaders(200, 0);
-            // System.out.println("Added exchange " + exchange);
             sseClientConnections.add(exchange);
         });
 
@@ -168,16 +166,6 @@ class LiveView {
         });
     }
 
-    void write(String html)        { sendServerEvent(SSEType.WRITE, html); }
-    void call(String javascript)   { sendServerEvent(SSEType.CALL, javascript); }
-    void script(String javascript) { sendServerEvent(SSEType.SCRIPT, javascript); }
-    void load(String path) { 
-        if (!paths.contains(path)) {
-            sendServerEvent(SSEType.LOAD, path);
-            paths.add(path);
-        }
-    } 
-
     public void stop() {
         sseClientConnections.clear();
         views.remove(port);
@@ -198,21 +186,18 @@ interface Clerk {
 
     static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
 
-    static LiveView checkView(LiveView view) {
-        if (view == null) throw new NullPointerException("view must not be null");
-        return view;
-    }
-
-    static LiveView loadPath(LiveView view, String path) {
-        if (path != null && !path.isEmpty() && !path.isBlank()) {
-            checkView(view).load(path);
-            return view;
-        }
-        return null;
-    }
-
     static LiveView view(int port) { return LiveView.onPort(port); }
     static LiveView view() { return view(LiveView.getDefaultPort()); }
+
+    static void write(LiveView view, String html)        { view.sendServerEvent(SSEType.WRITE, html); }
+    static void call(LiveView view, String javascript)   { view.sendServerEvent(SSEType.CALL, javascript); }
+    static void script(LiveView view, String javascript) { view.sendServerEvent(SSEType.SCRIPT, javascript); }
+    static void load(LiveView view, String path) {
+        if (!view.paths.contains(path.trim())) {
+            view.sendServerEvent(SSEType.LOAD, path);
+            view.paths.add(path);
+        }
+    }
 
     static void markdown(String text) { new Markdown(Clerk.view()).write(text); }
 }
