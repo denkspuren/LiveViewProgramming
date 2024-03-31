@@ -31,7 +31,7 @@ Da der Code mit [String Templates](https://docs.oracle.com/en/java/javase/21/lan
 jshell --enable-preview
 ```
 
-### 🎹 Clerk zur interaktiven Live-View-Programmierung
+### 🎹 Ein Beispiel zur Live-View-Programmierung
 
 Die Datei `lvp.java` (kurz für _Live View Programming_) wird in die JShell geladen und der Server für die _Live View_ gestartet.
 
