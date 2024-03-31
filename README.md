@@ -4,35 +4,36 @@ Ich stelle Ihnen hier Clerk, die daraus hervorgegangene Idee des _Live View Prog
 
 ## 💟 Motivation: Clerk, das will ich auch haben!
 
-Wer in Python programmiert, hat meist schon von der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface) mit [Jupyter bzw. JupyterLab](https://jupyter.org/) gehört oder sie sogar schon genutzt. Datenwissenschaftler:innen und KI-Entwickler:innen machen viel von der Notizbuch-Programmierung Gebrauch. Das programmierbare Notizbuch ist angelehnt an das sogenannte Laborbuch aus den Experimentalwissenschaften, in dem man den Aufbau eines Experiments beschreibt, die Schwierigkeiten und Lösungen während des Experimentierens dokumentiert, Messwerte und Ergebnisse festhält usw. 
+Wer in Python programmiert, hat meist schon von der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface) mit [Jupyter bzw. JupyterLab](https://jupyter.org/) gehört oder sie sogar schon genutzt. Man programmiert direkt im Browser, wo eine Notizbuch-Umgebung über einen Server bereitgestellt wird. Das Notizbuch ermöglicht die Kombination von Programmcode und Dokumentation in beliebiger Abfolge, wobei die Programmentwicklung inkrementell und explorativ, d.h. in kleinen Schritten und im Stil einer Erkundung verläuft. Das Notizbuch zeigt Zwischenausgaben der Programmausführung an und Datenplots und andere visuelle und teils interaktive Darstellungen können erzeugt und angezeigt werden. Die Notizbuch-Programmierung ist z.B. in den Datenwissenschaften, im Quantencomputing und in der KI-Entwicklung weit verbreitet.[^1]
 
-Als ich eine besondere Variante der Notizbuch-Programmierung für die Programmiersprache Clojure entdeckte, war es um mich geschehen: Statt im Browser, d.h. im Notizbuch zu programmieren, bleibt man bei der Notizbuch-Programmierung mit Clojure in der Entwicklungsumgebung, und die Browseransicht wird währenddessen automatisch und live generiert; dieser Ansatz heißt dort _Moldable Live Programming_, die Umsetzung dazu Clerk, siehe https://clerk.vision/. Clerk für das _Moldable View Programming_ hält automatisch während des Entwickelns die Websicht im Browser aktuell; die Nachbildung der Notizbuch-Programmierung im Stil von Jupyter/JupyterLab ist offensichtlich.
+[^1]: Wer einen Eindruck von der Notizbuch-Programmierung gewinnen möchte, kann sich z.B. meinen [Simulator für Quantenschaltungen](https://github.com/denkspuren/qcsim/blob/main/qcsim-dev.ipynb) anschauen.
 
-Ich habe die Idee aufgegriffen und etwas vereinfacht, damit sie ohne viel Aufwand auch für Java, die JShell oder jede andere Programmiersprache umsetzbar wird. Man programmiert wie gewohnt mit Java in der IDE oder mittels JShell-Skripten im Editor und instruiert den Browser, was er anzeigen soll. Ich nenne das _Live View Programming_ (LVP). Clerk als Namen habe ich beibehalten. Beim _Live View Programming_ sagt man Clerk, was im Browser angezeigt werden soll. Das ist viel einfacher umzusetzen, ermöglicht ebenso die Notizbuch-Programmierung, eröffnet aber darüber hinaus ganz andere Möglichkeiten der Verwendung. Man kann mit der hier vorgestellten Variante von Clerk z.B. auch das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming) umsetzen, was weitaus flexibler als die reine Notizbuch-Programmierung ist und eine Code-Dokumentation zusammen mit Beispielen ermöglicht.
+Als ich eine besondere Variante der Notizbuch-Programmierung namens Clerk für die Programmiersprache Clojure entdeckte, war es um mich geschehen: Statt im Browser, d.h. im Notizbuch zu programmieren, bleibt man bei Clerk in der gewohnten Entwicklungsumgebung, und die Browseransicht wird währenddessen automatisch und live generiert. Diese Art des Programmierens bezeichnen die Entwickler von Clerk als _Moldable Live Programming_, mehr Infos dazu finden sich unter https://clerk.vision/.
 
-Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/clerk/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung mit einem Webserver entstanden! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Abschnitte aus Code- und Textdateien herausschneiden und Zeichnungen mit einer Logo-Schildkröte erstellen. Insbesondere das Herausschneiden von Text- bzw. Codeabschnitten aus Dateien und das neue Java-Feature der String-Template (Preview-Feature in Java 21) sind sehr einfache aber mächtige Instrumente zur Code-Dokumentation und zur Unterstützung des [_Literate Programming_](https://en.wikipedia.org/wiki/Literate_programming).
+Clerk für Clojure ist ein mächtiges und eindrucksvolles Werkzeug -- Hut ab vor den Entwicklern. Was mich an diesem Ansatz  so fasziniert, ist seine konzeptuelle Eleganz und Einfachkeit: Es genügt ein simpler Webserver, den man programmierend ansteuern und erweitern kann, um im Browser Inhalte, gegebenenfalls sogar interaktive Inhalte anzeigen zu können. Damit kann man einen einfachen Satz an Darstellungsmöglichkeiten für Programmieranfänger:innen bereitstellen. Und erfahrene Programmierer:innen können eigene Erweiterungen für ihre Zwecke entwickeln.
 
-Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
+Diese Grundidee wollte ich so einfach und unkompliziert wie möglich für Java und die JShell umsetzen. Ich nenne diese Idee _Live View Programming_ (LVP). Clerk als Namen habe ich beibehalten, allerdings arbeitet das _Live View Programming_ nicht mit einem Clerk (engl. für Sachbearbeiter, Büroangestellter, Schreibkraft), sondern mit vielen Clerks. Jeder Clerk ist für eine spezielle _Live View_ zuständig. Dazu kommen _Skills_, die generelle Fähigkeiten beisteuern, die nicht an eine _Live View_ gebunden sind.
 
-Wer mag, kann den entstandenen Prototypen ausprobieren!
+Das _Live View Programming_ mit seinen Clerks und Skills ist mit einem sehr schlanken _Live View_-Webserver umsetzbar. Es braucht nur wenige Mittel, um damit die Notizbuch-Programmierung umzusetzen. Aber es geht noch viel mehr! Ein Beispiel ist das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), das ganz andere Wege bei der Kombination von Code und Dokumentation geht. Ein anderes Beispiel ist ein Clerk für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik), was zur Grafik-Programmierung animiert. Ein weiteres Beispiel ist ein Clerk, der eine GUI für das Spiel [TicTacToe] bereitstellt. In all diesen Beispielen programmiert man wie gewohnt mit Java in der IDE oder mittels JShell-Skripten und einem Editor und instruiert den Browser, was er anzeigen soll. Das ist -- ehrlich gesagt -- ziemlich cool!
 
-## 💻 Ausprobiert: Clerk für die JShell
+## 💻 Ein erster Kontakt: _Live View Programming_ für die JShell
 
-Zum Ausprobieren muss das Java JDK 21 installiert (ich verwende das OpenJDK) und dieses Git-Repository heruntergeladen sein. Wer `git` installiert hat, kann das wie folgt machen.
+Zum Ausprobieren muss das Java JDK 21 bzw. 22 installiert (ich verwende das OpenJDK) und dieses Git-Repository heruntergeladen sein. Wer `git` installiert hat, kann das wie folgt machen.
 
 ```shell
 git clone https://github.com/denkspuren/clerk.git
 ```
 
-Da der Code mit [String Templates](https://docs.oracle.com/en/java/javase/21/language/string-templates.html) ein Preview-Feature von Java nutzt, muss die JShell im `clerk`-Ordner mit der Option `--enable-preview` aufgerufen werden. Zudem aktiviert `-R-ea` die Berücksichtigung von `assert`-Anweisungen.
+Da der Code mit [String Templates](https://docs.oracle.com/en/java/javase/21/language/string-templates.html) ein Preview-Feature von Java nutzt, muss die JShell im `clerk`-Ordner mit der Option `--enable-preview` aufgerufen werden.
+<!-- Zudem aktiviert `-R-ea` die Berücksichtigung von `assert`-Anweisungen. -->
 
 ```shell
-jshell -R-ea --enable-preview
+jshell --enable-preview
 ```
 
 ### 🎹 Clerk zur interaktiven Live-View-Programmierung
 
-Die Datei `clerk.java` wird in die JShell geladen und Clerk gestartet.
+Die Datei `clerk.java` wird in die JShell geladen und der Server für die _Live View_ gestartet.
 
 ```
 jshell> /open clerk.java
@@ -42,7 +43,7 @@ Open http://localhost:50001 in your browser
 $38 ==> LiveView@2d38eb89
 ```
 
-Öffnen Sie Ihren Browser (bei mir ist es Chrome) mit dieser Webadresse. Im Browser kann man nun mitverfolgen, was passiert, wenn man Clerk nutzt. 
+Öffnen Sie Ihren Browser (bei mir ist es Chrome) mit dieser Webadresse. Im Browser kann man nun mitverfolgen, was passiert, wenn man die _Live View_ nutzt. 
 
 Probieren wir einen einfachen Begrüßungstext im Markdown-Format:
 
@@ -52,7 +53,7 @@ jshell> Clerk.markdown("Hello, _this_ is **Clerk**!")
 
 Im Browser ist "Hello, _this_ is **Clerk**!" zu sehen. 😀
 
-Als nächstes erzeugen wir eine kleine Logo-Zeichnung. Mehr zu Logo erfahren Sie im nächsten Abschnitt. (Mindestens einmal ist die Angabe der `Clerk.view` wichtig. Wenn man Clerk nur mit einer LiveView laufen lässt, kann man nachfolgende Instanziierungen von `Turtle` auch ohne `Clerk.view` z.B. mit `new Turtle(200, 200)` erzeugen.)
+Als nächstes erzeugen wir eine kleine _Turtle_-Grafik. Die Idee, eine Grafik mit einer Schildkröte (_turtle_) zu programmieren, hat die Programmiersprache Logo in die Welt getragen. Mehr dazu erfahren Sie im nächsten Abschnitt.
 
 ```java
 jshell> Turtle turtle = new Turtle(200, 200)
@@ -61,10 +62,13 @@ turtle ==> Turtle@3b764bce
 
 Ein Kästchen, die Zeichenfläche, von 200 x 200 Punkten ist im Browser zu sehen. In der Mitte befindet sich eine unsichtbare Schildkröte, die nach Osten ausgerichtet und mit einem Zeichenstift ausgestattet ist und die wir mit ein paar Anweisungen so umherschicken, dass schrittweise ein Quadrat entsteht.
 
-Geben Sie nun 4x die folgende Anweisung für die Schildkröte ein.
+Geben Sie die folgende Anweisung view Mal für die Schildkröte ein.
 
 ```java
-turtle.forward(80).left(90); // 4x eingeben
+turtle.forward(80).left(90);
+turtle.forward(80).left(90);
+turtle.forward(80).left(90);
+turtle.forward(80).left(90);
 ```
 
 Sie sollten nun ein Quadrat im Zeichenfeld sehen. Die Schildkröte blickt am Schluss ihres Wegs wieder gen Osten. Ergänzen wir einen "Kreis", den wir aus 12 Strichen zusammensetzen.
@@ -80,11 +84,11 @@ Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
 > Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen. 
 
-Das wirkt wie Spielerei und soll es auch sein. Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Nutzungsmöglichkeiten von Clerk gehen jedoch über die "Spielerei" hinaus.
+Das wirkt wie Spielerei. Ohne Frage, Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Möglichkeiten des _Live View Programming_ gehen jedoch weit über die "Spielerei" hinaus.
 
 ### 📄 Live View Programming zur Dokumentation
 
-Obwohl der Clerk-Prototyp einfach und kurz gehalten ist, kann man noch mehr damit machen. Zum Beispiel kann man ein Notizbuch als Dokumentation zum Java-Code erzeugen -- und das alles aus der Java-Datei heraus in der man programmiert, so wie beim originalen Clerk für Clojure.
+Mit dem _Live View Programming_ kann man -- ganz im Sinne des Literate Programming -- eine _Live View_ zur Dokumentation von Java-Code erzeugen -- und das alles aus der Java-Datei heraus, in der man das Programm geschrieben hat. Code und Dokumentation können miteinander kombiniert werden.
 
 In dem git-Repository findet sich die Datei [`logo.java`](/logo.java). Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
 
@@ -96,7 +100,7 @@ Open http://localhost:50001 in your browser
 $76 ==> LiveView@dcf3e99
 ```
 
-Refreshen Sie die Seite im Browser oder laden Sie sie neu, um eine leere Seite zu sehen
+Refreshen Sie die Seite im Browser oder laden Sie sie neu, um eine leere Seite zu sehen. Dann können Sie `logo.java` ausführen.
 
 ```java
 jshell> /o logo.java  // /o ist Kurzform von /open
@@ -106,11 +110,11 @@ Im Browser sieht das Ergebnis so aus (Sie sehen hier nur einen Teil der Seite):
 
 ![Das Ergebnis von `logo.java`](logo.png)
 
-Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Und ich kann Codeauszüge an geeigneten Stellen in die Dokumentation setzen. Der Code in [`logo.java`](/logo.java) erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
+Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Mit der Skill namens `File` können Codeauszüge an geeigneten Stellen in die Dokumentation gesetzt werden. Der Code in [`logo.java`](/logo.java) erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
 
-Um das besser zu verstehen, schauen Sie sich den Code und die Benutzung von Clerk in der Datei [`logo.java`](/logo.java) mit einem Editor Ihrer Wahl an.
+Um das besser zu verstehen, schauen Sie sich den Code in der Datei [`logo.java`](/logo.java) mit einem Editor Ihrer Wahl an.
 
-> Offenbar wird das Java-Preview-Feature der String-Templates offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates möglicherweise durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
+> Das Java-Preview-Feature der String-Templates wird offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates möglicherweise durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
 
 # 📝 Skizze zur Arbeitsweise des Clerk-Prototypen
 
@@ -159,6 +163,15 @@ Weitere Überlegungen zur Überarbeitung des aktuellen Prototypen sind unter [Co
 Wie man Clerk modular gestalten könnte zum Zwecke der Erweiterung, ob man es doch als `jar`-Datei ausliefern sollte, ... diesen Fragen kann man sich widmen, wenn der Prototyp reift und mit einem HTTP-Server ausgestattet ist.
 
 ## 🙏 Dank für Beiträge
+
+
+Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/clerk/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung mit einem Webserver entstanden! Man kann mit dieser Clerk-Variante aus der JShell heraus Markdown erzeugen, Abschnitte aus Code- und Textdateien herausschneiden und Zeichnungen mit einer Logo-Schildkröte erstellen. Insbesondere das Herausschneiden von Text- bzw. Codeabschnitten aus Dateien und das neue Java-Feature der String-Template (Preview-Feature in Java 21) sind sehr einfache aber mächtige Instrumente zur Code-Dokumentation und zur Unterstützung des [_Literate Programming_](https://en.wikipedia.org/wiki/Literate_programming).
+
+Es ist schon krass cool, wenn man in der JShell mit Java-Code "nebenan" im Browser etwas hineinschreibt und Logo-Bilder entstehen. Da geht noch viel, viel mehr!
+
+Wer mag, kann den entstandenen Prototypen ausprobieren!
+
+-- und damit eine Blaupause für die Realisierung in jeder anderen Programmiersprache liefern. 
 
 [@BjoernLoetters](https://github.com/kuchenkruste) war von Clerk ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Vielen Dank dafür! Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/clerk/tree/websockets) hinterlegt.
 
