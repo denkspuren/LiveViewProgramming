@@ -3,3 +3,5 @@
 *.iml
 target/
 build
+test.java
+Test.java

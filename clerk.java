@@ -3,10 +3,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -20,62 +22,42 @@ import java.util.stream.Collectors;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
-// jshell -R-ea --enable-preview
-
-class Clerk {
-    static LiveView view;
-    static Markdown markdown;
-
-    static String generateID(int n) { // random alphanumeric string of size n
-        return new Random().ints(n, 0, 36).
-                            mapToObj(i -> Integer.toString(i, 36)).
-                            collect(Collectors.joining());
-    }
-
-    // Open Server at default port
-    static void serve() {
-        serve(LiveView.defaultPort);
-    }
-
-    // Open Server at custom port
-    static void serve(int port) {
-        if (view != null) {
-            view.stop();
-        }
-        try {
-            view = new LiveView(port);
-        } catch (Exception e) {
-            System.err.printf("Error starting Server: %s\n", e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    static Markdown markdown(String markdownText) {
-        if (markdown == null) markdown = new Markdown(Clerk.view);
-        return markdown.markdown(markdownText);
-    }
-}
+// To run this code type `jshell -R-ea --enable-preview`
 
 enum SSEType { WRITE, CALL, SCRIPT, LOAD; }
 
 class LiveView {
     final HttpServer server;
     final int port;
-    static final int defaultPort = 50001;
+    static int defaultPort = 50_001;
     static final String index = "./web/index.html";
+    static Map<Integer,LiveView> views = new HashMap<>();
+    List<String> paths = new ArrayList<>();
+
+    static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
+    static int getDefaultPort() { return defaultPort; }
 
     List<HttpExchange> sseClientConnections;
 
     // barrier required to temporarily block SSE event of type `SSEType.LOAD`
     private final CyclicBarrier barrier = new CyclicBarrier(2);
 
-    private static final Map<String, String> mimeTypes = 
-        Map.of("html", "text/html",
-               "js", "text/javascript",
-               "css", "text/css",
-               "ico", "image/x-icon");
+    static LiveView onPort(int port) {
+        port = Math.abs(port);
+        try {
+            if (!views.containsKey(port))
+                views.put(port, new LiveView(port));
+            return views.get(port);
+        } catch (IOException e) {
+            System.err.printf("Error starting Server: %s\n", e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-    public LiveView(int port) throws IOException {
+    static LiveView onPort() { return onPort(defaultPort); }
+
+    private LiveView(int port) throws IOException {
         this.port = port;
         sseClientConnections = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
@@ -83,7 +65,6 @@ class LiveView {
         System.out.println("Open http://localhost:" + port + " in your browser");
 
         server.createContext("/loaded", exchange -> {
-            // System.out.println("loaded: " + exchange.toString());
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
@@ -108,7 +89,6 @@ class LiveView {
             exchange.getResponseHeaders().add("Cache-Control", "no-cache");
             exchange.getResponseHeaders().add("Connection", "keep-alive");
             exchange.sendResponseHeaders(200, 0);
-            // System.out.println("Added exchange " + exchange);
             sseClientConnections.add(exchange);
         });
 
@@ -122,7 +102,7 @@ class LiveView {
                     : "." + exchange.getRequestURI().getPath();
             try (final InputStream stream = new FileInputStream(path)) {
                 final byte[] bytes = stream.readAllBytes();
-                exchange.getResponseHeaders().add("Content-Type", guessMimeType(path) + "; charset=utf-8");
+                exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(path)) + "; charset=utf-8");
                 exchange.sendResponseHeaders(200, bytes.length);
                 exchange.getResponseBody().write(bytes);
                 exchange.getResponseBody().flush();
@@ -133,16 +113,6 @@ class LiveView {
 
         server.setExecutor(Executors.newFixedThreadPool(5));
         server.start();
-    }
-
-    String guessMimeType(final String path) {
-        final int index = path.lastIndexOf('.');
-        if (index >= 0) {
-            final String ending = path.substring(index + 1);
-            return mimeTypes.getOrDefault(ending, "text/plain");
-        } else {
-            return "text/plain";
-        }
     }
 
     void sendServerEvent(SSEType sseType, String data) {
@@ -168,7 +138,7 @@ class LiveView {
         sseClientConnections.removeAll(deadConnections);
     }
 
-    void createResponseContext(String path, Consumer<String> delegate) throws IOException {
+    void createResponseContext(String path, Consumer<String> delegate) {
         server.createContext(path, exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
@@ -196,35 +166,45 @@ class LiveView {
         });
     }
 
-    void write(String html)        { sendServerEvent(SSEType.WRITE, html); }
-    void call(String javascript)   { sendServerEvent(SSEType.CALL, javascript); }
-    void script(String javascript) { sendServerEvent(SSEType.SCRIPT, javascript); }
-    void load(String path)         { sendServerEvent(SSEType.LOAD, path); }
-
     public void stop() {
         sseClientConnections.clear();
+        views.remove(port);
         server.stop(0);
     }
-}
 
-interface ViewManagement {
-    default LiveView checkViewAndLoadOnce(LiveView view, List<LiveView> views, String path) {
-        if (Objects.isNull(view)) view = !views.isEmpty() ? views.getFirst() : null;
-        if (Objects.isNull(view)) throw new IllegalArgumentException("No view given or existing");
-        if (!views.contains(view)) {
-            view.load(path);
-            views.add(view);
-        }
-        return view;
+    static void shutdown() {
+        views.forEach((k, v) -> v.stop());
     }
 }
 
-abstract class ViewManager implements ViewManagement {
-    static List<LiveView> views = new ArrayList<>();
-    LiveView view;
+interface Clerk {
+    static String generateID(int n) { // random alphanumeric string of size n
+        return new Random().ints(n, 0, 36).
+                            mapToObj(i -> Integer.toString(i, 36)).
+                            collect(Collectors.joining());
+    }
+
+    static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
+
+    static LiveView view(int port) { return LiveView.onPort(port); }
+    static LiveView view() { return view(LiveView.getDefaultPort()); }
+
+    static void write(LiveView view, String html)        { view.sendServerEvent(SSEType.WRITE, html); }
+    static void call(LiveView view, String javascript)   { view.sendServerEvent(SSEType.CALL, javascript); }
+    static void script(LiveView view, String javascript) { view.sendServerEvent(SSEType.SCRIPT, javascript); }
+    static void load(LiveView view, String path) {
+        if (!view.paths.contains(path.trim())) {
+            view.sendServerEvent(SSEType.LOAD, path);
+            view.paths.add(path);
+        }
+    }
+
+    static void markdown(String text) { new Markdown(Clerk.view()).write(text); }
 }
 
 /open skills/File/File.java
-/open skills/Turtle/Turtle.java
-/open skills/Markdown/Markdown.java
+/open clerks/Turtle/Turtle.java
+/open clerks/Markdown/Markdown.java
+/open clerks/TicTacToe/TicTacToe.java
 
+// LiveView view = Clerk.view();
