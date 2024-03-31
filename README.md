@@ -16,7 +16,7 @@ Diese Grundidee wollte ich so einfach und unkompliziert wie möglich für Java u
 
 Das _Live View Programming_ mit seinen Clerks und Skills ist mit einem sehr schlanken _Live View_-Webserver umsetzbar. Es braucht nur wenige Mittel, um damit die Notizbuch-Programmierung umzusetzen. Aber es geht noch viel mehr! Ein Beispiel ist das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), das ganz andere Wege bei der Kombination von Code und Dokumentation geht. Ein anderes Beispiel ist ein Clerk für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik), was zur Grafik-Programmierung animiert. Ein weiteres Beispiel ist ein Clerk, der eine GUI für das Spiel [TicTacToe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) bereitstellt. In all diesen Beispielen programmiert man wie gewohnt mit Java in der IDE oder mittels JShell-Skripten und einem Editor und instruiert den Browser, was er anzeigen soll. Das ist -- ehrlich gesagt -- ziemlich cool!
 
-## 💻 Ein erster Kontakt: _Live View Programming_ für die JShell
+## 💻 _Live View Programming_ für die JShell
 
 Zum Ausprobieren muss das Java JDK 21 bzw. 22 installiert (ich verwende das OpenJDK) und dieses Git-Repository heruntergeladen sein. Wer `git` installiert hat, kann das wie folgt machen.
 
