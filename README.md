@@ -80,7 +80,7 @@ for (int i = 1; i <= 12; i++)
 
 Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
-![Ein Turtle-Beispiel](/Turtle/TurtleExample.png)
+![Ein Turtle-Beispiel](/clerks/Turtle/TurtleExample.png)
 
 > Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen. 
 
