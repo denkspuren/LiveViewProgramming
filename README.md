@@ -1,6 +1,6 @@
 # Clerk: Live View Programming with Java's JShell
 
-Ich stelle Ihnen hier Clerk, die daraus hervorgegangene Idee des _Live View Programming_ und einen Clerk-Prototypen für Java bzw. die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Ganz unten gibt es einen Mitmach-Aufruf und Vorschläge, woran man arbeiten und worüber man nachdenken könnte.
+Ich stelle Ihnen hier Clerk, die daraus hervorgegangene Idee des _Live View Programming_ und eine Umsetzung für Java bzw. die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Sie können sich gerne an der Entwicklung beteiligen!
 
 ## 💟 Motivation: Clerk, das will ich auch haben!
 
