@@ -48,10 +48,10 @@ $38 ==> LiveView@2d38eb89
 Probieren wir einen einfachen Begrüßungstext im Markdown-Format:
 
 ```java
-jshell> Clerk.markdown("Hello, _this_ is **Clerk**!")
+jshell> Clerk.markdown("Hello, _this_ is **Live View Programming** in action!")
 ```
 
-Im Browser ist "Hello, _this_ is **Clerk**!" zu sehen. 😀
+Im Browser ist "Hello, _this_ is **Live View Programming** in action!" zu sehen. 😀
 
 Als nächstes erzeugen wir eine kleine _Turtle_-Grafik. Die Idee, eine Grafik mit einer Schildkröte (_turtle_) zu programmieren, hat die Programmiersprache Logo in die Welt getragen. Mehr dazu erfahren Sie im nächsten Abschnitt.
 
