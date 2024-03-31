@@ -72,7 +72,7 @@ class LiveView {
             exchange.sendResponseHeaders(200, 0);
             exchange.close();
             try {
-                barrier.await(30L, TimeUnit.SECONDS);
+                barrier.await(2L, TimeUnit.SECONDS);
             } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                 System.err.print(e);
                 System.exit(1);
@@ -125,7 +125,7 @@ class LiveView {
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD) {
                     try {
-                        barrier.await(30L, TimeUnit.SECONDS);
+                        barrier.await(2L, TimeUnit.SECONDS);
                     } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
                         System.err.print(SSEType.LOAD + " missed confirmation: " + e);
                         deadConnections.add(connection); // connection is assumed to be dead
