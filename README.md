@@ -1,8 +1,8 @@
-# Clerk: Live View Programming with Java's JShell
+# Live View Programming with Java's JShell
 
-Ich stelle Ihnen hier Clerk, die daraus hervorgegangene Idee des _Live View Programming_ und eine Umsetzung für Java bzw. die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Sie können sich gerne an der Entwicklung beteiligen!
+Ich stelle Ihnen hier die Idee des _Live View Programming_ und eine Umsetzung für Java bzw. die JShell vor. Wenn Sie Gefallen an der Idee und dem Projekt finden: Sie können sich gerne an der Entwicklung beteiligen!
 
-## 💟 Motivation: Clerk, das will ich auch haben!
+## 💟 Motivation: Das will ich auch haben!
 
 Wer in Python programmiert, hat meist schon von der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface) mit [Jupyter bzw. JupyterLab](https://jupyter.org/) gehört oder sie sogar schon genutzt. Man programmiert direkt im Browser, wo eine Notizbuch-Umgebung über einen Server bereitgestellt wird. Das Notizbuch ermöglicht die Kombination von Programmcode und Dokumentation in beliebiger Abfolge, wobei die Programmentwicklung inkrementell und explorativ, d.h. in kleinen Schritten und im Stil einer Erkundung verläuft. Das Notizbuch zeigt Zwischenausgaben der Programmausführung an und Datenplots und andere visuelle und teils interaktive Darstellungen können erzeugt und eingebunden werden. Die Notizbuch-Programmierung ist z.B. in den Datenwissenschaften, im Quantencomputing und in der KI-Entwicklung weit verbreitet.[^1]
 
@@ -12,7 +12,7 @@ Als ich eine besondere Variante der Notizbuch-Programmierung namens Clerk für d
 
 Clerk für Clojure ist ein mächtiges und eindrucksvolles Werkzeug -- Hut ab vor den Entwicklern. Was mich an diesem Ansatz  so fasziniert, ist seine konzeptuelle Eleganz und Einfachkeit: Es genügt ein simpler Webserver, den man programmierend ansteuern und erweitern kann, um im Browser Inhalte, gegebenenfalls sogar interaktive Inhalte anzeigen zu können. Damit kann man einen einfachen Satz an Darstellungsmöglichkeiten für Programmieranfänger:innen bereitstellen. Und erfahrene Programmierer:innen können eigene Erweiterungen für ihre Zwecke entwickeln.
 
-Diese Grundidee wollte ich so einfach und unkompliziert wie möglich für Java und die JShell umsetzen. Ich nenne diese Idee _Live View Programming_ (LVP). Clerk als Namen habe ich beibehalten, allerdings arbeitet das _Live View Programming_ nicht mit einem Clerk (engl. für Sachbearbeiter, Büroangestellter, Schreibkraft), sondern mit vielen Clerks. Jeder Clerk ist für eine spezielle _Live View_ zuständig. Dazu kommen _Skills_, die generelle Fähigkeiten beisteuern, die nicht an eine _Live View_ gebunden sind.
+Diese Grundidee wollte ich so einfach und unkompliziert wie möglich für Java und die JShell umsetzen. Ich nenne diese Idee _Live View Programming_ (LVP). Clerk als Namen habe ich beibehalten, allerdings arbeitet das _Live View Programming_ nicht mit einem Clerk (engl. für Sachbearbeiter, Büroangestellter, Schreibkraft), sondern mit vielen Clerks. Jeder Clerk ist für eine spezielle View in einer _Live View_ zuständig. Dazu kommen _Skills_, die generelle Fähigkeiten beisteuern, die nicht an eine _Live View_ gebunden sind.
 
 Das _Live View Programming_ mit seinen Clerks und Skills ist mit einem sehr schlanken _Live View_-Webserver umgesetzt. Es braucht nur wenige Mittel, um damit eine Notizbuch-Programmierung umzusetzen. Aber es geht noch viel mehr! Ein Beispiel ist das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), das ganz andere Wege bei der Kombination von Code und Dokumentation geht. Ein anderes Beispiel ist ein Clerk für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik), was zur Grafik-Programmierung animiert. Ein weiteres Beispiel ist ein Clerk, der eine GUI für das Spiel [TicTacToe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) bereitstellt. In all diesen Beispielen programmiert man wie gewohnt mit Java in der IDE oder mittels JShell-Skripten und einem Editor und instruiert den Browser, was er anzeigen soll. Das ist -- ehrlich gesagt -- ziemlich cool!
 
@@ -21,7 +21,7 @@ Das _Live View Programming_ mit seinen Clerks und Skills ist mit einem sehr schl
 Zum Ausprobieren muss das Java JDK 21 bzw. 22 installiert (ich verwende das OpenJDK) und dieses Git-Repository heruntergeladen sein. Wer `git` installiert hat, kann das wie folgt machen.
 
 ```shell
-git clone https://github.com/denkspuren/clerk.git
+git clone https://github.com/denkspuren/LiveViewProgramming.git
 ```
 
 Da der Code mit [String Templates](https://docs.oracle.com/en/java/javase/21/language/string-templates.html) ein Preview-Feature von Java nutzt, muss die JShell im `clerk`-Ordner mit der Option `--enable-preview` aufgerufen werden.
@@ -33,10 +33,10 @@ jshell --enable-preview
 
 ### 🎹 Clerk zur interaktiven Live-View-Programmierung
 
-Die Datei `clerk.java` wird in die JShell geladen und der Server für die _Live View_ gestartet.
+Die Datei `lvp.java` (kurz für _Live View Programming_) wird in die JShell geladen und der Server für die _Live View_ gestartet.
 
 ```
-jshell> /open clerk.java
+jshell> /open lvp.java
 
 jshell> Clerk.view()
 Open http://localhost:50001 in your browser
@@ -120,7 +120,7 @@ Um das besser zu verstehen, schauen Sie sich den Code in der Datei [`logo.java`]
 
 ## 🪟 Live Views 
 
-Wenn Sie sich die Datei [`clerk.java`](/clerk.java) anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist, um eine Infrastruktur für das _Live View Programming_ aufzusetzen. In der Datei befindet sich im Wesentlichen eine Klasse und ein Interface:
+Wenn Sie sich die Datei [`lvp.java`](/lvp.java) anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist, um eine Infrastruktur für das _Live View Programming_ aufzusetzen. In der Datei befindet sich im Wesentlichen eine Klasse und ein Interface:
 
 * Die Klasse `LiveView` setzt mit der Methode `onPort` einen Server auf, der eine _Live View_ im Browser bedient. Diese _Live View_ zeigt die `index.html` aus dem `web`-Verzeichnis an und lädt das notwendige Stückchen Client-Code `script.js`.
 
@@ -165,11 +165,11 @@ Und ich habe noch eine Vision: Dass diese Umsetzung für Java als Blaupause für
 
 Ein paar Beiträge hat es schon gegeben:
 
-* Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/clerk/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung eines Webservers mit Server Sent Events (SSE) entstanden! Von Ramon stammt auch der TicTacToe-Clerk.
+* Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/LiveViewProgramming/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung eines Webservers mit Server Sent Events (SSE) entstanden! Von Ramon stammt auch der TicTacToe-Clerk.
 
-* [@BjoernLoetters](https://github.com/kuchenkruste) war von Clerk ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/clerk/tree/websockets) hinterlegt. Ich empfehle das Studium seines Codes sehr, man kann viel daran über Websockets lernen!
+* [@BjoernLoetters](https://github.com/BjoernLoetters) war von der Idee des _Live View Programming_ ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/LiveViewProgramming/tree/websockets) hinterlegt. Ich empfehle das Studium seines Codes sehr, man kann viel daran über Websockets lernen!
 
-* Vielen Dank an [@ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/clerk/pull/5)!
+* Vielen Dank an [@ginschel](https://github.com/ginschel) für einen ersten [CSS-Vorschlag](https://github.com/denkspuren/LiveViewProgramming/pull/5)!
 
 Wenn Sie Lust haben, beteiligen Sie sich!
 
