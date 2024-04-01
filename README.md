@@ -116,7 +116,7 @@ Um das besser zu verstehen, schauen Sie sich den Code in der Datei [`logo.java`]
 
 > Das Java-Preview-Feature der String-Templates wird offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates möglicherweise durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
 
-# 📝 Skizze zur Arbeitsweise des Clerk-Prototypen
+# 📝 Skizze zur Arbeitsweise des LVP-Prototypen
 
 ## 🪟 Live Views 
 
