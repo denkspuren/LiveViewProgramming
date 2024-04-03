@@ -39,6 +39,13 @@ function setUp() {
           }, 100);
           break;
         }
+        case "CLEAR": {
+          const element = document.getElementById("events");
+          while (element.firstChild) {
+            element.removeChild(element.firstChild);
+          }
+          break;
+        }
         default:
           console.log("Unknown Action");
           break;

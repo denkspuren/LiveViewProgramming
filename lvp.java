@@ -24,7 +24,7 @@ import com.sun.net.httpserver.HttpServer;
 
 // To run this code type `jshell -R-ea --enable-preview`
 
-enum SSEType { WRITE, CALL, SCRIPT, LOAD; }
+enum SSEType { WRITE, CALL, SCRIPT, LOAD, CLEAR; }
 
 class LiveView {
     final HttpServer server;
@@ -198,6 +198,7 @@ interface Clerk {
             view.paths.add(path);
         }
     }
+    static void clear(LiveView view) { view.sendServerEvent(SSEType.CLEAR, ""); }
 
     static void markdown(String text) { new Markdown(Clerk.view()).write(text); }
 }
