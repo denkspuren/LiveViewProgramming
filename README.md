@@ -92,17 +92,11 @@ Mit dem _Live View Programming_ kann man -- ganz im Sinne des Literate Programmi
 
 In dem git-Repository findet sich die Datei [`logo.java`](/logo.java). Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
 
-```java
-jshell> Clerk.view().stop()
-
-jshell> Clerk.view()
-Open http://localhost:50001 in your browser
-$76 ==> LiveView@dcf3e99
-```
-
-Refreshen Sie die Seite im Browser oder laden Sie sie neu, um eine leere Seite zu sehen. Dann können Sie `logo.java` ausführen.
+Löschen Sie die Inhalte in der aktuellen _Live View_ und führen Sie `logo.java` aus.
 
 ```java
+jshell> Clerk.clear()
+
 jshell> /o logo.java  // /o ist Kurzform von /open
 ```
 
@@ -132,6 +126,7 @@ Der Webserver nutzt _Server Sent Events_ (SSE) als Mittel, um die _Live View_ im
     - `call` schickt JavaScript-Code über eine View zur Ausführung an den Browser
     - `script` schickt JavaScript-Code über eine View an den Browser, der ihn in ein `<script>`-Tag einpackt, im DOM des Browsers hinzufügt und ausführt
     - `load` fordert den Browser über eine View zum Laden einer JavaScript-Bibliothek auf. Eine JavaScript-Bibliothek wird nur genau einmal pro View geladen
+    - `clear` entfernt alle HTML-Tags im DOM, die mit `id="events"` ausgewiesen sind, d.h. es werden alle `write`-Einträge gelöscht.
 
 Interessant ist noch die statische Methode `markdown` in `Clerk`, mit der direkt Markdown-Text an den Browser der Standard-View (das ist die View zum default Port 50001) geschickt und gerendet wird.
 

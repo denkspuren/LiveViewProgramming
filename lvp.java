@@ -199,8 +199,9 @@ interface Clerk {
         }
     }
     static void clear(LiveView view) { view.sendServerEvent(SSEType.CLEAR, ""); }
+    static void clear() { clear(view()); };
 
-    static void markdown(String text) { new Markdown(Clerk.view()).write(text); }
+    static void markdown(String text) { new Markdown(view()).write(text); }
 }
 
 /open skills/File/File.java
