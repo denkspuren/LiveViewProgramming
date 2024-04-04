@@ -29,6 +29,7 @@ function setUp() {
         case "LOAD": {
           loadedDiv.style.display = 'block';
           const newElement = document.createElement("script");
+          newElement.classList.add("persistent");
           newElement.src = data;
           newElement.onload = function (_) {
             fetch("/loaded", {method: "post"}).catch(console.log);
@@ -44,6 +45,15 @@ function setUp() {
           while (element.firstChild) {
             element.removeChild(element.firstChild);
           }
+
+          const toRemove = [];
+          for (const node of document.body.children) {
+            if (node.classList == null || !node.classList.contains("persistent")) {
+              toRemove.push(node);
+            }
+          }
+          toRemove.forEach(x => document.body.removeChild(x));
+          
           break;
         }
         default:
