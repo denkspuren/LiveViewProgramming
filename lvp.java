@@ -6,18 +6,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,7 +32,7 @@ class LiveView {
     final int port;
     static int defaultPort = 50_001;
     static final String index = "./web/index.html";
-    static Map<Integer,LiveView> views = new HashMap<>();
+    static Map<Integer,LiveView> views = new ConcurrentHashMap<>();
     List<String> paths = new ArrayList<>();
 
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
@@ -40,7 +40,7 @@ class LiveView {
 
     List<HttpExchange> sseClientConnections;
 
-    // barrier required to temporarily block SSE event of type `SSEType.LOAD`
+    // lock required to temporarily block processing of `SSEType.LOAD`
     Lock lock = new ReentrantLock();
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
@@ -68,6 +68,7 @@ class LiveView {
         server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
 
+        // loaded-Request to signal successful processing of SSEType.LOAD
         server.createContext("/loaded", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
@@ -129,8 +130,12 @@ class LiveView {
                           .write(("data: " + (sseType + ":" + data).replaceAll("(\\r|\\n|\\r\\n)", "\\\\n") + "\n\n")
                                   .getBytes(StandardCharsets.UTF_8));
                 connection.getResponseBody().flush();
-                if (sseType == SSEType.LOAD && !loadEventOccured)
+                if (sseType == SSEType.LOAD && !loadEventOccured) {
                     loadEventOccurredCondition.await(2_000, TimeUnit.MILLISECONDS);
+                    if (!loadEventOccured)
+                        System.err.println("LOAD-Timeout: " + data);
+                        // TODO: failed load i.e. <script>-Tag should be removed in index.html
+                }
             } catch (IOException e) {
                 deadConnections.add(connection);
             } catch (InterruptedException e) {
