@@ -10,17 +10,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.Condition;
 
 // To run this code type `jshell -R-ea --enable-preview`
 
@@ -40,7 +41,10 @@ class LiveView {
     List<HttpExchange> sseClientConnections;
 
     // barrier required to temporarily block SSE event of type `SSEType.LOAD`
-    private final CyclicBarrier barrier = new CyclicBarrier(2);
+    Lock lock = new ReentrantLock();
+    Condition loadEventOccurredCondition = lock.newCondition();
+    boolean loadEventOccured = false;
+
 
     static LiveView onPort(int port) {
         port = Math.abs(port);
@@ -71,11 +75,12 @@ class LiveView {
             }
             exchange.sendResponseHeaders(200, 0);
             exchange.close();
-            try {
-                barrier.await(2L, TimeUnit.SECONDS);
-            } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
-                System.err.print(e);
-                System.exit(1);
+            lock.lock();
+            try { // try/finally pattern for locks
+                loadEventOccured = true;
+                loadEventOccurredCondition.signalAll();
+            } finally {
+                lock.unlock();
             }
         });
 
@@ -118,21 +123,23 @@ class LiveView {
     void sendServerEvent(SSEType sseType, String data) {
         List<HttpExchange> deadConnections = new ArrayList<>();
         for (HttpExchange connection : sseClientConnections) {
+            if (sseType == SSEType.LOAD) lock.lock();
             try {
                 connection.getResponseBody()
                           .write(("data: " + (sseType + ":" + data).replaceAll("(\\r|\\n|\\r\\n)", "\\\\n") + "\n\n")
                                   .getBytes(StandardCharsets.UTF_8));
                 connection.getResponseBody().flush();
-                if (sseType == SSEType.LOAD) {
-                    try {
-                        barrier.await(2L, TimeUnit.SECONDS);
-                    } catch (InterruptedException | BrokenBarrierException | TimeoutException e) {
-                        System.err.print(SSEType.LOAD + " missed confirmation: " + e);
-                        deadConnections.add(connection); // connection is assumed to be dead
-                    }                    
-                }
+                if (sseType == SSEType.LOAD && !loadEventOccured)
+                    loadEventOccurredCondition.await(2_000, TimeUnit.MILLISECONDS);
             } catch (IOException e) {
                 deadConnections.add(connection);
+            } catch (InterruptedException e) {
+                System.err.println("LOAD-Timeout: " + data + ", " + e);
+            } finally {
+                if (sseType == SSEType.LOAD) {
+                    loadEventOccured = false;
+                    lock.unlock();
+                }
             }
         }
         sseClientConnections.removeAll(deadConnections);
