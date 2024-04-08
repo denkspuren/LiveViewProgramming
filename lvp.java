@@ -132,9 +132,7 @@ class LiveView {
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD && !loadEventOccured) {
                     loadEventOccurredCondition.await(2_000, TimeUnit.MILLISECONDS);
-                    if (!loadEventOccured)
-                        System.err.println("LOAD-Timeout: " + data);
-                        // TODO: failed load i.e. <script>-Tag should be removed in index.html
+                    if (!loadEventOccured) System.err.println("LOAD-Timeout: " + data);
                 }
             } catch (IOException e) {
                 deadConnections.add(connection);
