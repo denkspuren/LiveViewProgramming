@@ -19,8 +19,6 @@ function loadScriptWithFallback(onlineSrc, offlineSrc) {
   });
 }
 
-// loadScriptWithFallback("https://casual-effects.com/markdeep/latest/markdeep.min.js", "markdeep.min.js");
-
 function setUp() {
   if (window.EventSource) {
     const source = new EventSource("/events");
@@ -52,7 +50,10 @@ function setUp() {
           setTimeout(() => {
             loadedDiv.style.display = 'none';
           }, 300);
-          loadScript(data);
+          var srcs = data.split(',');
+          srcs = srcs.map(src => src.trim());
+          if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
+          else loadScript(data);
           break;
         }
         case "CLEAR": {
