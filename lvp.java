@@ -217,8 +217,10 @@ interface Clerk {
 }
 
 /open skills/File/File.java
+/open skills/ObjectInspector/ObjectInspector.java
 /open clerks/Turtle/Turtle.java
 /open clerks/Markdown/Markdown.java
 /open clerks/TicTacToe/TicTacToe.java
+/open clerks/Dot/Dot.java
 
 // LiveView view = Clerk.view();
