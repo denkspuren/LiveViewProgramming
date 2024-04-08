@@ -1,8 +1,9 @@
 import static java.lang.StringTemplate.STR;
 
 record Markdown(LiveView view) implements Clerk {
-    public Markdown { 
-        Clerk.load(view, "https://cdn.jsdelivr.net/npm/marked/marked.min.js");
+    public Markdown {
+        String onlinePath = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
+        Clerk.load(view, onlinePath);
     }
     public Markdown write(String markdownText) {
         String ID = Clerk.generateID(10);
