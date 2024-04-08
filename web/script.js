@@ -19,8 +19,6 @@ function loadScriptWithFallback(onlineSrc, offlineSrc) {
   });
 }
 
-// loadScriptWithFallback("https://casual-effects.com/markdeep/latest/markdeep.min.js", "markdeep.min.js");
-
 function setUp() {
   if (window.EventSource) {
     const source = new EventSource("/events");
