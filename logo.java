@@ -10,8 +10,8 @@ Die Schildkröte kennt die folgenden Kommandos:
 
 Befehl | Bedeutung
 -------|----------
-`pendown()` | Setze den Stift auf die Zeichenfläche (Anfangseinstellung)
-`penup()`   | Hebe den Stift von der Zeichenfläche ab
+`penDown()` | Setze den Stift auf die Zeichenfläche (Anfangseinstellung)
+`penUp()`   | Hebe den Stift von der Zeichenfläche ab
 `forward(`_distance_`)`  | Bewege dich um _distance_ vorwärts
 `backward(`_distance_`)` | Bewege dich um _distance_ rückwärts 
 `right(`_degrees_`)`     | Drehe dich um die Gradzahl _degrees_ nach rechts
