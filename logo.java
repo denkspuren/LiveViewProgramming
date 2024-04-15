@@ -16,8 +16,8 @@ Befehl | Bedeutung
 `backward(`_distance_`)` | Bewege dich um _distance_ rückwärts 
 `right(`_degrees_`)`     | Drehe dich um die Gradzahl _degrees_ nach rechts
 `left(`_degrees_`)`      | Drehe dich um die Gradzahl _degrees_ nach links
-`color(`color`)`         | Setze die Farbe (in HTML typischen Farbformaten)
-`lineWidth(`width`)`     | Setze die Dicke der Linie (default: 1)
+`color(`_color_`)`       | Setze die Farbe (in HTML typischen Farbformaten)
+`lineWidth(`_width_`)`   | Setze die Dicke der Linie (default: 1)
 
 Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
 
