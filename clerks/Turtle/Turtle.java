@@ -51,4 +51,14 @@ class Turtle implements Clerk {
         Clerk.call(view, STR."turtle\{ID}.right(\{degrees});");
         return this;
     }
+
+    Turtle color(String color) {
+        Clerk.call(view, STR."turtle\{ID}.color('\{color}');");
+        return this;
+    }
+
+    Turtle lineWidth(double width) {
+        Clerk.call(view, STR."turtle\{ID}.lineWidth('\{width}')");
+        return this;
+    }
 }
