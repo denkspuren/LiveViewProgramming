@@ -16,9 +16,9 @@ enum RGB { // https://w3schools.sinsixx.com/css/css_colornames.asp.htm
     WHITE(0xFF, 0xFF ,0xFF),
     YELLOW(0xFFFF00);
 
-    final int colorcode;
+    final int colorCode;
 
-    private RGB(int red, int green, int blue) { colorcode = color(red, green, blue); }
+    private RGB(int red, int green, int blue) { colorCode = color(red, green, blue); }
     private RGB(int code) { this(red(code), green(code), blue(code)); }
 
     static int color(int code) {
@@ -34,7 +34,5 @@ enum RGB { // https://w3schools.sinsixx.com/css/css_colornames.asp.htm
     static int blue(int colorCode)  { return  colorCode & 0b11111111;                          }
 
     static String hex(int code) { return String.format("0x%06x", color(code)); }
-    static String hex(RGB rgb) { return hex(rgb.colorcode); }
-
-    @Override public String toString() { return hex(this); }
+    String hex() { return hex(this.colorcode); }
 }
