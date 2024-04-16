@@ -16,8 +16,6 @@ Befehl | Bedeutung
 `backward(`_distance_`)` | Bewege dich um _distance_ rückwärts 
 `right(`_degrees_`)`     | Drehe dich um die Gradzahl _degrees_ nach rechts
 `left(`_degrees_`)`      | Drehe dich um die Gradzahl _degrees_ nach links
-`color(`_color_`)`       | Setze die Farbe (in HTML typischen Farbformaten)
-`lineWidth(`_width_`)`   | Setze die Dicke der Linie (default: 1)
 
 Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
 
@@ -49,9 +47,10 @@ Turtle arrow(Turtle t, double length) {
 Turtle edge(Turtle t, double length, double space) {
     return arrow(t, length).penUp().forward(space).penDown();
 }
-for (int i = 0; i < 4; i++) {
-    myFirstTurtle = edge(myFirstTurtle.lineWidth(1+i%2), 100, 5).right(90);
-}
+myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
 // myFirstTurtle
 
 Clerk.markdown(STR.
@@ -63,7 +62,6 @@ Die Programmiersprache Logo ist nicht so schwer zu verstehen, wie das nachstehen
 ```logo
 TO tree :size
    if :size < 5 [forward :size back :size stop]
-   setpencolor (list random 255 random 255 random 255)
    forward :size/3
    left 30 tree :size*2/3 right 30
    forward :size/6
@@ -99,9 +97,6 @@ void tree(Turtle turtle, double size) {
         turtle.forward(size).backward(size);
         return;
     }
-
-    turtle.color(new Random().nextInt(256), new Random().nextInt(256), new Random().nextInt(256));
-
     turtle.forward(size / 3).left(30);
     tree(turtle, size * 2.0 / 3.0);
     turtle.right(30);
