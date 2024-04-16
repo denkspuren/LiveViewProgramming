@@ -19,6 +19,7 @@ Befehl | Bedeutung
 `color(int red, int green, int blue)` | Setze Stiftfarbe mit den RGB-Farbanteilen _red_, _green_ und _blue_
 `color(int rgb)`            | Setze Stiftfarbe auf den kodierten RGB-Farbwert _rgb_
 `lineWidth(double width)`   | Setze Stiftbreite auf _width_
+`reset()`                   | Löscht Zeichenfläche, Schildkröte in Bildmitte
 
 Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt und das Zeichnen gesteuert. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
 
