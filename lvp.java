@@ -215,7 +215,7 @@ interface Clerk {
     static void markdown(String text) { new Markdown(view()).write(text); }
 }
 
-/open skills/File/File.java
+/open skills/Text/Text.java
 /open clerks/Turtle/Turtle.java
 /open clerks/Markdown/Markdown.java
 /open clerks/TicTacToe/TicTacToe.java
