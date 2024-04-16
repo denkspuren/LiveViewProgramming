@@ -52,13 +52,18 @@ class Turtle implements Clerk {
         return this;
     }
 
-    Turtle color(String color) {
-        Clerk.call(view, STR."turtle\{ID}.color('\{color}');");
+    Turtle color(int red, int green, int blue) {
+        Clerk.call(view, STR."turtle\{ID}.color('rgb(\{red & 0xFF}, \{green & 0xFF}, \{blue & 0xFF})');");
+        return this;
+    }
+
+    Turtle color(int rgb) {
+        color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF);
         return this;
     }
 
     Turtle lineWidth(double width) {
-        Clerk.call(view, STR."turtle\{ID}.lineWidth('\{width}')");
+        Clerk.call(view, STR."turtle\{ID}.lineWidth('\{width}');");
         return this;
     }
 }
