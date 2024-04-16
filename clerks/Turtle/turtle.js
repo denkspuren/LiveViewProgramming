@@ -48,4 +48,12 @@ class Turtle {
     left(degrees) {
         this.angle -= degrees;
     }
+
+    color(color) {
+        this.ctx.strokeStyle = color;
+    }
+
+    lineWidth(width) {
+        this.ctx.lineWidth = width;
+    }
 }
