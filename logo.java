@@ -63,7 +63,7 @@ Die Programmiersprache Logo ist nicht so schwer zu verstehen, wie das nachstehen
 ```logo
 TO tree :size
    if :size < 5 [forward :size back :size stop]
-   setpc list random 255 random 255 random 255
+   setpencolor (list random 255 random 255 random 255)
    forward :size/3
    left 30 tree :size*2/3 right 30
    forward :size/6
@@ -100,7 +100,7 @@ void tree(Turtle turtle, double size) {
         return;
     }
 
-    turtle.color("rgb(" + Math.random() * 255 + " , " + Math.random() * 255 + ", " + Math.random() * 255 + ")");
+    turtle.color(new Random().nextInt(256), new Random().nextInt(256), new Random().nextInt(256));
 
     turtle.forward(size / 3).left(30);
     tree(turtle, size * 2.0 / 3.0);
