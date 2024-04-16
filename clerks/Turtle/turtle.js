@@ -12,9 +12,6 @@ class Turtle {
         this.angle = 0;
         this.penDown();
         this.color("black");
-        //this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        //this.ctx.beginPath();
-        // this.ctx.strokeStyle = "black";
     }
 
     penDown() {
