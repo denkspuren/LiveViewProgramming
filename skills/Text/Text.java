@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class File { // Class with static methods for file operations
+class Text { // Class with static methods for file operations
     static void write(String fileName, String text) {
         try {
             Files.writeString(Path.of(fileName), text);
