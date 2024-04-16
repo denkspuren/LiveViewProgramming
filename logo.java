@@ -12,12 +12,15 @@ Befehl | Bedeutung
 -------|----------
 `penDown()` | Setze den Stift auf die Zeichenfläche (Anfangseinstellung)
 `penUp()`   | Hebe den Stift von der Zeichenfläche ab
-`forward(`_distance_`)`  | Bewege dich um _distance_ vorwärts
-`backward(`_distance_`)` | Bewege dich um _distance_ rückwärts 
-`right(`_degrees_`)`     | Drehe dich um die Gradzahl _degrees_ nach rechts
-`left(`_degrees_`)`      | Drehe dich um die Gradzahl _degrees_ nach links
+`forward(double distance)`  | Bewege dich um _distance_ vorwärts
+`backward(double distance)` | Bewege dich um _distance_ rückwärts 
+`right(double degrees)`     | Drehe dich um die Gradzahl _degrees_ nach rechts
+`left(double degrees)`      | Drehe dich um die Gradzahl _degrees_ nach links
+`color(int red, int green, int blue)` | Setze Stiftfarbe mit den RGB-Farbanteilen _red_, _green_ und _blue_
+`color(int rgb)`            | Setze Stiftfarbe auf den kodierten RGB-Farbwert _rgb_
+`lineWidth(double width)`   | Setze Stiftbreite auf _width_
 
-Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
+Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt und das Zeichnen gesteuert. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
 
 > Wenn man die Befehle in der JShell zur Verfügung hat, benötigt man kein weiteres Wissen zu Logo. Man kann mit den Sprachkonstrukten von Java arbeiten.
 
@@ -117,6 +120,30 @@ void tree(Turtle turtle, double size) {
 tree(turtle, 150);
 // tree
 
-Clerk.markdown("""
--- We are done!
+Clerk.markdown(STR."""
+## Beispiel 3: Es kommt Farbe ins Spiel
+
+Mit Farbe wird die Welt bunter und interessanter, und die Strichstärke kann man ebenfalls für Effekte einsetzen. Im nachfolgenden Beispiel verblasst die Farbe zunehmend und die Strichstärke lässt allmählich nach.
+
+```java
+\{Text.cutOut("./logo.java", "// triangles")}
+```
+""");
+
+// triangles
+Turtle turtle = new Turtle(300,350);
+void triangle(Turtle turtle, double size) {
+    turtle.forward(size).right(60).backward(size).right(60).forward(size).right(60 + 180);
+}
+
+for (int i = 1; i <= 36; i++) {
+    turtle.color(255,i * 256 / 37, i * 256 / 37);
+    turtle.lineWidth(1.0 - 1.0 / 36.0 * i);
+    triangle(turtle, 101 - 2 * i);
+    turtle.left(10).forward(10);
+}
+// triangles
+
+Clerk.markdown(STR."""
+-- Soviel möge als *Demo* vorerst genügen!
 """);
