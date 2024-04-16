@@ -66,4 +66,9 @@ class Turtle implements Clerk {
         Clerk.call(view, STR."turtle\{ID}.lineWidth('\{width}');");
         return this;
     }
+
+    Turtle reset() {
+        Clerk.call(view, STR."turtle\{ID}.reset();");
+        return this;
+    }
 }

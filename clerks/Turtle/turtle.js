@@ -6,11 +6,12 @@ class Turtle {
     }
 
     reset() {
+        this.ctx.reset();
         this.x = this.canvas.width / 2;
         this.y = this.canvas.height / 2;
         this.angle = 0;
-        this.isPenDown = true;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.penDown();
+        this.color("black");
     }
 
     penDown() {
