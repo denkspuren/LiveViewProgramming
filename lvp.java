@@ -132,9 +132,8 @@ class LiveView {
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD && !loadEventOccured) {
                     loadEventOccurredCondition.await(2_000, TimeUnit.MILLISECONDS);
-                    if (!loadEventOccured)
-                        System.err.println("LOAD-Timeout: " + data);
-                        // TODO: failed load i.e. <script>-Tag should be removed in index.html
+                    if (loadEventOccured) paths.add(data);
+                    else System.err.println("LOAD-Timeout: " + data);
                 }
             } catch (IOException e) {
                 deadConnections.add(connection);
@@ -205,10 +204,10 @@ interface Clerk {
     static void call(LiveView view, String javascript)   { view.sendServerEvent(SSEType.CALL, javascript); }
     static void script(LiveView view, String javascript) { view.sendServerEvent(SSEType.SCRIPT, javascript); }
     static void load(LiveView view, String path) {
-        if (!view.paths.contains(path.trim())) {
-            view.sendServerEvent(SSEType.LOAD, path);
-            view.paths.add(path);
-        }
+        if (!view.paths.contains(path.trim())) view.sendServerEvent(SSEType.LOAD, path);
+    }
+    static void load(LiveView view, String onlinePath, String offlinePath) {
+        load(view, onlinePath + ", " + offlinePath);
     }
     static void clear(LiveView view) { view.sendServerEvent(SSEType.CLEAR, ""); }
     static void clear() { clear(view()); };
@@ -216,11 +215,12 @@ interface Clerk {
     static void markdown(String text) { new Markdown(view()).write(text); }
 }
 
-/open skills/File/File.java
+/open skills/Text/Text.java
 /open skills/ObjectInspector/ObjectInspector.java
 /open clerks/Turtle/Turtle.java
 /open clerks/Markdown/Markdown.java
 /open clerks/TicTacToe/TicTacToe.java
 /open clerks/Dot/Dot.java
+/open clerks/Input/Slider.java
 
 // LiveView view = Clerk.view();

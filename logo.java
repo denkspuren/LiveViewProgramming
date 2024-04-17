@@ -4,20 +4,24 @@ Clerk.markdown(STR.
 
 _Dominikus Herzberg_, _Technische Hochschule Mittelhessen_
 
-Bei der Programmiersprache [Logo](https://de.wikipedia.org/wiki/Logo_(Programmiersprache)) steht eine Schildkröte (_turtle_) im Mittelpunkt -- und zwar im wahrsten Sinne des Wortes. Auf einer weißen Fläche ist in der Mitte die Schildkröte platziert. An ihr ist ein Stift befestigt und sie ist zu Beginn nach rechts ausgerichtet, sie blickt Richtung Osten.
+Bei der Programmiersprache [Logo](https://de.wikipedia.org/wiki/Logo_(Programmiersprache)) steht eine Schildkröte (_turtle_) im Mittelpunkt – und zwar im wahrsten Sinne des Wortes. Auf einer weißen Fläche ist in der Mitte die Schildkröte platziert. An ihr ist ein Stift befestigt und sie ist zu Beginn nach rechts ausgerichtet, sie blickt Richtung Osten.
 
 Die Schildkröte kennt die folgenden Kommandos:
 
 Befehl | Bedeutung
 -------|----------
-`pendown()` | Setze den Stift auf die Zeichenfläche (Anfangseinstellung)
-`penup()`   | Hebe den Stift von der Zeichenfläche ab
-`forward(`_distance_`)`  | Bewege dich um _distance_ vorwärts
-`backward(`_distance_`)` | Bewege dich um _distance_ rückwärts 
-`right(`_degrees_`)`     | Drehe dich um die Gradzahl _degrees_ nach rechts
-`left(`_degrees_`)`      | Drehe dich um die Gradzahl _degrees_ nach links
+`penDown()` | Setze den Stift auf die Zeichenfläche (Anfangseinstellung)
+`penUp()`   | Hebe den Stift von der Zeichenfläche ab
+`forward(double distance)`  | Bewege dich um _distance_ vorwärts
+`backward(double distance)` | Bewege dich um _distance_ rückwärts 
+`right(double degrees)`     | Drehe dich um die Gradzahl _degrees_ nach rechts
+`left(double degrees)`      | Drehe dich um die Gradzahl _degrees_ nach links
+`color(int red, int green, int blue)` | Setze Stiftfarbe mit den RGB-Farbanteilen _red_, _green_ und _blue_
+`color(int rgb)`            | Setze Stiftfarbe auf den kodierten RGB-Farbwert _rgb_
+`lineWidth(double width)`   | Setze Stiftbreite auf _width_
+`reset()`                   | Löscht Zeichenfläche, Schildkröte in Bildmitte
 
-Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
+Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt und das Zeichnen gesteuert. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
 
 > Wenn man die Befehle in der JShell zur Verfügung hat, benötigt man kein weiteres Wissen zu Logo. Man kann mit den Sprachkonstrukten von Java arbeiten.
 
@@ -28,7 +32,7 @@ Mit `new Turtle(300,300)` wird eine neue Schildkröte mittig auf eine Zeichenfl�
 Die folgende Logo-Anwendung demonstriert, wie man mittels Methoden schrittweise graphische Einheiten erstellen und zusammensetzen kann.
 
 ```java
-\{File.cutOut("./logo.java", "// myFirstTurtle")}
+\{Text.cutOut("./logo.java", "// myFirstTurtle")}
 ```
 
 Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich kleine Zwischenräume gelassen wurden.
@@ -78,13 +82,13 @@ tree 150
 Die Java-Methode `tree` bildet das obige Logo-Programm nach; lediglich aus praktischen Überlegungen lasse ich den Rekursionsabbruch etwas früher greifen.
 
 ```java
-\{File.cutOut("./logo.java", "// turtle tree")}
+\{Text.cutOut("./logo.java", "// turtle tree")}
 ```
 
 Der Aufruf der Methode `tree` erzeugt etwas, was einem "Baum" ähnelt.
 
 ```java
-\{File.cutOut("./logo.java", "// tree")}
+\{Text.cutOut("./logo.java", "// tree")}
 ```
 
 """);
@@ -117,6 +121,63 @@ void tree(Turtle turtle, double size) {
 tree(turtle, 150);
 // tree
 
-Clerk.markdown("""
--- We are done!
+Clerk.markdown(STR."""
+## Beispiel 3: Es kommt Farbe ins Spiel
+
+Mit Farbe wird die Welt bunter und interessanter, und die Strichstärke kann man ebenfalls für Effekte einsetzen. Im nachfolgenden Beispiel verblasst die Farbe zunehmend und die Strichstärke lässt allmählich nach.
+
+```java
+\{Text.cutOut("./logo.java", "// triangles")}
+```
+""");
+
+// triangles
+Turtle turtle = new Turtle(300,350);
+
+void triangle(Turtle turtle, double size) {
+    turtle.forward(size).right(60).backward(size).right(60).forward(size).right(60 + 180);
+}
+
+void drawing(Turtle turtle, double size) {
+    for (int i = 1; i <= 36; i++) {
+        turtle.color(255,i * 256 / 37, i * 256 / 37);
+        turtle.lineWidth(1.0 - 1.0 / 36.0 * i);
+        triangle(turtle, size + 1 - 2 * i);
+        turtle.left(10).forward(10);
+    }
+}
+
+drawing(turtle, 100);
+// triangles
+
+Clerk.markdown(STR."""
+## Beispiel 4: Interaktivität mit Slider (Preview-Feature, _unstable_)
+
+Es ist auch möglich, eine Turtle-Grafik mit einem Slider-Clerk zu koppeln – und es entsteht eine interaktive Anwendung.
+
+```java
+\{Text.cutOut("./logo.java", "// interactivity")}
+```
+
+Das macht noch mehr Spaß! Die Zeichnungen werden auf Seiten des Java-Programms mit jeder Änderung am Slider neu erzeugt.
+
+> Nutzt man die Entwicklertools im Chrome-Browser, um die internen Abläufe zu verfolgen, treten beim "Sliden" sofort `onerror`-Events auf. Der Browser erholt sich zwar davon, aber der Interaktionseffekt ist dahin. Ohne Entwicklertools läuft auf einem MacBook Air mit M1-Prozessor meist alles flüssig und unproblematisch. Allerdings gibt es auch hier gelegentlich Aussetzer. Es scheint nötig zu sein, während der Abarbeitung des `input`-Events vom Slider weitere Folgeevents zu unterbinden. Wie gesagt, ein Preview-Feature, wo es noch hakt.
+""");
+
+// interactivity
+turtle = new Turtle(300, 350);
+
+drawing(turtle, (200.0 + 10.0) / 2.0);
+
+Slider slider = new Slider(Clerk.view(), 10, 200);
+slider.attachTo(response -> {
+    double size = Double.parseDouble(response);
+    turtle.reset();
+    drawing(turtle, size);
+});
+// interactivity
+
+
+Clerk.markdown(STR."""
+Soviel möge als Demo vorerst genügen! _More features to come_ 😉
 """);

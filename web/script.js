@@ -1,4 +1,23 @@
-const loadedDiv = document.getElementById('loadMessage');  
+const loadedDiv = document.getElementById('loadMessage');
+
+function loadScript(src, onError = () => console.log('script loading failed: ', src)) {
+  var script = document.createElement('script');
+  script.src = src;
+  script.onload = function() {
+    script.classList.add("persistent");
+    console.log('script loaded:', src);
+    fetch("/loaded", {method: "post"}).catch(console.log);
+  };
+  script.onerror = onError;
+  document.body.appendChild(script);
+}
+
+function loadScriptWithFallback(onlineSrc, offlineSrc) {
+  loadScript(onlineSrc, function() {
+    console.log('loading', onlineSrc, 'failed, trying', offlineSrc);
+    loadScript(offlineSrc);
+  });
+}
 
 function setUp() {
   if (window.EventSource) {
@@ -28,16 +47,13 @@ function setUp() {
         }
         case "LOAD": {
           loadedDiv.style.display = 'block';
-          const newElement = document.createElement("script");
-          newElement.classList.add("persistent");
-          newElement.src = data;
-          newElement.onload = function (_) {
-            fetch("/loaded", {method: "post"}).catch(console.log);
-          }
-          document.body.appendChild(newElement);
           setTimeout(() => {
             loadedDiv.style.display = 'none';
-          }, 100);
+          }, 300);
+          var srcs = data.split(',');
+          srcs = srcs.map(src => src.trim());
+          if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
+          else loadScript(data);
           break;
         }
         case "CLEAR": {
@@ -64,7 +80,7 @@ function setUp() {
 
     source.onerror = function (error) {
       console.error("EventSource failed:", error);
-      source.close();
+      // source.close(); // uncommented to enable recovery
     };
 
   } else {
