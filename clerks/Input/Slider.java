@@ -23,7 +23,7 @@ class Slider implements Clerk {
         Clerk.script(view, STR."""
             slider\{ID}.addEventListener("input", (event) => {
                 const value = event.target.value;
-                console.log(`slider\{ID}: value = ${value}$`);
+                console.log(`slider\{ID}: value = ${value}`);
                 fetch('slider\{ID}', {
                     method: "post",
                     body: value.toString()
