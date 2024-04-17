@@ -1,6 +1,7 @@
 class Dot implements Clerk {
-    final String libPath1 = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
-    final String libPath2 = "clerks/Dot/dot.js";
+    final String visLibOnlinePath = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
+    final String visLibOfflinePath = "clerks/Dot/vis-network.min.js";
+    final String dotLibPath = "clerks/Dot/dot.js";
     final String ID;
     LiveView view;
     int width, height;
@@ -10,8 +11,8 @@ class Dot implements Clerk {
         this.width = width;
         this.height = height;
 
-        Clerk.load(view, libPath1);
-        Clerk.load(view, libPath2);
+        Clerk.load(view, visLibOnlinePath, visLibOfflinePath);
+        Clerk.load(view, dotLibPath);
 
         ID = Clerk.getHashID(this);
 
