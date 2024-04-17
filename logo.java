@@ -4,7 +4,7 @@ Clerk.markdown(STR.
 
 _Dominikus Herzberg_, _Technische Hochschule Mittelhessen_
 
-Bei der Programmiersprache [Logo](https://de.wikipedia.org/wiki/Logo_(Programmiersprache)) steht eine Schildkröte (_turtle_) im Mittelpunkt -- und zwar im wahrsten Sinne des Wortes. Auf einer weißen Fläche ist in der Mitte die Schildkröte platziert. An ihr ist ein Stift befestigt und sie ist zu Beginn nach rechts ausgerichtet, sie blickt Richtung Osten.
+Bei der Programmiersprache [Logo](https://de.wikipedia.org/wiki/Logo_(Programmiersprache)) steht eine Schildkröte (_turtle_) im Mittelpunkt – und zwar im wahrsten Sinne des Wortes. Auf einer weißen Fläche ist in der Mitte die Schildkröte platziert. An ihr ist ein Stift befestigt und sie ist zu Beginn nach rechts ausgerichtet, sie blickt Richtung Osten.
 
 Die Schildkröte kennt die folgenden Kommandos:
 
@@ -133,18 +133,51 @@ Mit Farbe wird die Welt bunter und interessanter, und die Strichstärke kann man
 
 // triangles
 Turtle turtle = new Turtle(300,350);
+
 void triangle(Turtle turtle, double size) {
     turtle.forward(size).right(60).backward(size).right(60).forward(size).right(60 + 180);
 }
 
-for (int i = 1; i <= 36; i++) {
-    turtle.color(255,i * 256 / 37, i * 256 / 37);
-    turtle.lineWidth(1.0 - 1.0 / 36.0 * i);
-    triangle(turtle, 101 - 2 * i);
-    turtle.left(10).forward(10);
+void drawing(Turtle turtle, double size) {
+    for (int i = 1; i <= 36; i++) {
+        turtle.color(255,i * 256 / 37, i * 256 / 37);
+        turtle.lineWidth(1.0 - 1.0 / 36.0 * i);
+        triangle(turtle, size + 1 - 2 * i);
+        turtle.left(10).forward(10);
+    }
 }
+
+drawing(turtle, 100);
 // triangles
 
 Clerk.markdown(STR."""
--- Soviel möge als *Demo* vorerst genügen!
+## Beispiel 4: Interaktivität mit Slider (Preview-Feature, _unstable_)
+
+Es ist auch möglich, eine Turtle-Grafik mit einem Slider-Clerk zu koppeln – und es entsteht eine interaktive Anwendung.
+
+```java
+\{Text.cutOut("./logo.java", "// interactivity")}
+```
+
+Das macht noch mehr Spaß! Die Zeichnungen werden auf Seiten des Java-Programms mit jeder Änderung am Slider neu erzeugt.
+
+> Nutzt man die Entwicklertools im Chrome-Browser, um die internen Abläufe zu verfolgen, treten beim "Sliden" sofort `onerror`-Events auf. Der Browser erholt sich zwar davon, aber der Interaktionseffekt ist dahin. Ohne Entwicklertools läuft auf einem MacBook Air mit M1-Prozessor meist alles flüssig und unproblematisch. Allerdings gibt es auch hier gelegentlich Aussetzer. Es scheint nötig zu sein, während der Abarbeitung des `input`-Events vom Slider weitere Folgeevents zu unterbinden. Wie gesagt, ein Preview-Feature, wo es noch hakt.
+""");
+
+// interactivity
+turtle = new Turtle(300, 350);
+
+drawing(turtle, (200.0 + 10.0) / 2.0);
+
+Slider slider = new Slider(Clerk.view(), 10, 200);
+slider.attachTo(response -> {
+    double size = Double.parseDouble(response);
+    turtle.reset();
+    drawing(turtle, size);
+});
+// interactivity
+
+
+Clerk.markdown(STR."""
+Soviel möge als Demo vorerst genügen! _More features to come_ 😉
 """);
