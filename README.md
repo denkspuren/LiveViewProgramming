@@ -82,7 +82,11 @@ Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
 ![Ein Turtle-Beispiel](/clerks/Turtle/TurtleExample.png)
 
-> Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen. 
+> Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen.
+
+Es ist zudem möglich, Views interaktiv zu koppeln. In der Animation sieht man, wie eine _Turtle_-Grafik mit einem _Slider_ verbunden ist.
+
+![Interaktives Beispiel: Slider gekoppelt mit Turtle-Grafik](/docs/SliderAndTurtle.gif)
 
 Das wirkt wie Spielerei. Ohne Frage, Programmieren darf Spaß machen -- und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Möglichkeiten des _Live View Programming_ gehen jedoch weit über die "Spielerei" hinaus.
 
