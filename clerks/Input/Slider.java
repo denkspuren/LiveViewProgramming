@@ -35,3 +35,4 @@ class Slider implements Clerk {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/range
+// Alternatives Event: slider\{ID}.addEventListener("change", (event) => {
