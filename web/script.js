@@ -80,7 +80,7 @@ function setUp() {
 
     source.onerror = function (error) {
       console.error("EventSource failed:", error);
-      source.close();
+      // source.close(); // uncommented to enable recovery
     };
 
   } else {
