@@ -20,15 +20,4 @@ record Markdown(LiveView view) implements Clerk {
             """);
         return this;
     }
-
-    public Markdown writeEscaped(String markdownText) {
-        String escapedString = markdownText.replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll("'", "&#39;")
-            .replaceAll("\"", "&quot;");
-
-        write(escapedString);
-        return this;
-    }
 }

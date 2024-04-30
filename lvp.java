@@ -131,7 +131,7 @@ class LiveView {
                                   .getBytes(StandardCharsets.UTF_8));
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD && !loadEventOccured) {
-                    loadEventOccurredCondition.await(5_000, TimeUnit.MILLISECONDS);
+                    loadEventOccurredCondition.await(2_000, TimeUnit.MILLISECONDS);
                     if (loadEventOccured) paths.add(data);
                     else System.err.println("LOAD-Timeout: " + data);
                 }
@@ -212,7 +212,7 @@ interface Clerk {
     static void clear(LiveView view) { view.sendServerEvent(SSEType.CLEAR, ""); }
     static void clear() { clear(view()); };
 
-    static void markdown(String text) { new Markdown(view()).writeEscaped(text); }
+    static void markdown(String text) { new Markdown(view()).write(text); }
 }
 
 /open skills/Text/Text.java
