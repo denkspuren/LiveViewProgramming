@@ -26,15 +26,15 @@ class Text { // Class with static methods for file operations
                 isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
                 if (isInLabels) {
                     if (skipLines && includeStartLabel)
-                        snippet.add(escape(line));
+                        snippet.add(line);
                     if (!skipLines && includeEndLabel)
-                        snippet.add(escape(line));
+                        snippet.add(line);
                     skipLines = !skipLines;
                     continue;
                 }
                 if (skipLines)
                     continue;
-                snippet.add(escape(line));
+                snippet.add(line);
             }
         } catch (IOException e) {
             System.err.printf("Error reading %s\n", e.getMessage());
@@ -56,7 +56,7 @@ class Text { // Class with static methods for file operations
         return cutOut(fileName, true, true, "");
     }
 
-    static String escape(String text) {
+    static String escapeHtml(String text) {
         return text.replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;");
