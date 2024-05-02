@@ -55,4 +55,10 @@ class Text { // Class with static methods for file operations
     static String read(String fileName) {
         return cutOut(fileName, true, true, "");
     }
+
+    static String escapeHtml(String text) {
+        return text.replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;");
+    }
 }
