@@ -1,6 +1,6 @@
 Clerk.markdown(STR.
 """
-# Turtle-Programmierung mit Clerk
+# Turtle-Programmierung
 
 _Dominikus Herzberg_, _Technische Hochschule Mittelhessen_
 
