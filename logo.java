@@ -38,7 +38,7 @@ Die folgende Logo-Anwendung demonstriert, wie man mittels Methoden schrittweise 
 \{Text.cutOut("./logo.java", "// myFirstTurtle")}
 ```
 
-Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich kleine Zwischenräume gelassen wurden.
+Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich kleine Zwischenräume gelassen wurden, mit Angaben der Pfeilausrichtung.
 """);
 
 // myFirstTurtle
