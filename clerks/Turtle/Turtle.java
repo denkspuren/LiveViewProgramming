@@ -23,7 +23,7 @@ class Turtle implements Clerk {
     LiveView view;
     final int width, height;
     Font textFont = Font.SANSSERIF;
-    int  textSize = 10;
+    double textSize = 10;
     Font.Align textAlign = Font.Align.CENTER;
 
     Turtle(LiveView view, int width, int height) {
@@ -93,7 +93,7 @@ class Turtle implements Clerk {
         return this;
     }
 
-    Turtle text(String text, Font font, int size, Font.Align align) {
+    Turtle text(String text, Font font, double size, Font.Align align) {
         textFont = font;
         textSize = size;
         textAlign = align;
