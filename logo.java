@@ -19,7 +19,7 @@ Befehl | Bedeutung
 `color(int red, int green, int blue)` | Setze Stiftfarbe mit den RGB-Farbanteilen _red_, _green_ und _blue_
 `color(int rgb)`            | Setze Stiftfarbe auf den kodierten RGB-Farbwert _rgb_
 `lineWidth(double width)`   | Setze Stiftbreite auf _width_
-`text(String text, Font font, int size, Font.Align align)` | Schreibe Text vor deinen Kopf mit Angabe des Text-Fonts, der Größe und der Ausrichtung
+`text(String text, Font font, double size, Font.Align align)` | Schreibe Text vor deinen Kopf mit Angabe des Text-Fonts, der Größe und der Ausrichtung
 `text(String text)` | Schreibe Text vor deinen Kopf
 `reset()`                   | Lösche Zeichenfläche, gehe zurück in Bildmitte
 
@@ -54,14 +54,17 @@ Turtle arrow(Turtle t, double length) {
 Turtle edge(Turtle t, double length, double space) {
     return arrow(t, length).penUp().forward(space).penDown();
 }
+Turtle write(Turtle t, String text) { 
+    return t.penUp().forward(10).text(text).backward(10).penDown();
+}
 myFirstTurtle = edge(myFirstTurtle, 100, 5);
-myFirstTurtle.penUp().forward(10).text("East").backward(10).penDown().right(90);
+myFirstTurtle = write(myFirstTurtle, "East").right(90);
 myFirstTurtle = edge(myFirstTurtle, 100, 5);
-myFirstTurtle.penUp().forward(10).text("South").backward(10).penDown().right(90);
+myFirstTurtle = write(myFirstTurtle, "South").right(90);
 myFirstTurtle = edge(myFirstTurtle, 100, 5);
-myFirstTurtle.penUp().forward(10).text("West").backward(10).penDown().right(90);
+myFirstTurtle = write(myFirstTurtle, "West").right(90);
 myFirstTurtle = edge(myFirstTurtle, 100, 5);
-myFirstTurtle.penUp().forward(10).text("North").backward(10).penDown().right(90);
+myFirstTurtle = write(myFirstTurtle, "North").right(90);
 // myFirstTurtle
 
 Clerk.markdown(STR.
