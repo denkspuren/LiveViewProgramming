@@ -14,9 +14,8 @@ record Markdown(LiveView view) implements Clerk {
             </div>
             """);
         Clerk.call(view, STR."""
-            var markdownContent = document.getElementById("\{ID}").textContent;
-            var renderedHTML = marked.parse(markdownContent);
-            document.getElementById("\{ID}").innerHTML = marked.parse(renderedHTML);
+            var markdown = document.getElementById("\{ID}");
+            markdown.innerHTML = marked.parse(markdown.textContent);
             """);
         return this;
     }
