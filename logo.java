@@ -1,6 +1,6 @@
 Clerk.markdown(STR.
 """
-# Turtle-Programmierung mit Clerk
+# Turtle-Programmierung
 
 _Dominikus Herzberg_, _Technische Hochschule Mittelhessen_
 
@@ -19,7 +19,10 @@ Befehl | Bedeutung
 `color(int red, int green, int blue)` | Setze Stiftfarbe mit den RGB-Farbanteilen _red_, _green_ und _blue_
 `color(int rgb)`            | Setze Stiftfarbe auf den kodierten RGB-Farbwert _rgb_
 `lineWidth(double width)`   | Setze Stiftbreite auf _width_
-`reset()`                   | Löscht Zeichenfläche, Schildkröte in Bildmitte
+`text(String text, Font font, double size, Font.Align align)` | Schreibe Text vor deinen Kopf mit Angabe des Text-Fonts, der Größe und der Ausrichtung
+`text(String text)` | Schreibe Text vor deinen Kopf
+`reset()`                   | Lösche Zeichenfläche, gehe zurück in Bildmitte
+
 
 Mit diesen Kommandos wird die Schildkröte über die Zeichenfläche geschickt und das Zeichnen gesteuert. Wenn man Abfolgen von diesen Kommandos programmiert, kann man teils mit sehr wenig Code interessante Zeichnungen erstellen.
 
@@ -35,7 +38,7 @@ Die folgende Logo-Anwendung demonstriert, wie man mittels Methoden schrittweise 
 \{Text.cutOut("./logo.java", "// myFirstTurtle")}
 ```
 
-Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich kleine Zwischenräume gelassen wurden.
+Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich kleine Zwischenräume gelassen wurden, mit Angaben der Pfeilausrichtung.
 """);
 
 // myFirstTurtle
@@ -51,10 +54,17 @@ Turtle arrow(Turtle t, double length) {
 Turtle edge(Turtle t, double length, double space) {
     return arrow(t, length).penUp().forward(space).penDown();
 }
-myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
-myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
-myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
-myFirstTurtle = edge(myFirstTurtle, 100, 5).right(90);
+Turtle write(Turtle t, String text) { 
+    return t.penUp().forward(10).text(text).backward(10).penDown();
+}
+myFirstTurtle = edge(myFirstTurtle, 100, 5);
+myFirstTurtle = write(myFirstTurtle, "East").right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5);
+myFirstTurtle = write(myFirstTurtle, "South").right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5);
+myFirstTurtle = write(myFirstTurtle, "West").right(90);
+myFirstTurtle = edge(myFirstTurtle, 100, 5);
+myFirstTurtle = write(myFirstTurtle, "North").right(90);
 // myFirstTurtle
 
 Clerk.markdown(STR.

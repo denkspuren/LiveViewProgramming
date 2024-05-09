@@ -57,4 +57,16 @@ class Turtle {
     lineWidth(width) {
         this.ctx.lineWidth = width;
     }
+
+    text(text, font = '10px sans-serif', align = 'center') {
+        const radians = (this.angle * Math.PI) / 180 + Math.PI / 2.0;
+        this.ctx.save();
+        this.ctx.translate(this.x, this.y);
+        this.ctx.rotate(radians);
+        this.ctx.font = font;
+        this.ctx.fillStyle = this.ctx.strokeStyle;
+        this.ctx.textAlign = align;
+        this.ctx.fillText(text, 0, 0);
+        this.ctx.restore();
+    }
 }
