@@ -1,9 +1,30 @@
-import static java.lang.StringTemplate.STR;
+enum Font { 
+    ARIAL("Arial"),
+    VERDANA("Verdana"),
+    TIMES("Times New Roman"),
+    COURIER("Courier New"),
+    SERIF("serif"),
+    SANSSERIF("sans-serif");
+
+    final String fullName; 
+
+    private Font(String fullName) { this.fullName = fullName; }
+    
+    public String toString() { return fullName;}
+
+    static enum Align {
+        CENTER, LEFT, RIGHT;
+        public String toString() { return name().toLowerCase(); }    
+    }
+}
 
 class Turtle implements Clerk {
     final String ID;
     LiveView view;
     final int width, height;
+    Font textFont = Font.SANSSERIF;
+    int  textSize = 10;
+    Font.Align textAlign = Font.Align.CENTER;
 
     Turtle(LiveView view, int width, int height) {
         this.view = view;
@@ -71,4 +92,14 @@ class Turtle implements Clerk {
         Clerk.call(view, STR."turtle\{ID}.reset();");
         return this;
     }
+
+    Turtle text(String text, Font font, int size, Font.Align align) {
+        textFont = font;
+        textSize = size;
+        textAlign = align;
+        Clerk.call(view, STR."turtle\{ID}.text('\{text}', '\{"" + size + "px " + font}', '\{align}')");
+        return this;
+    }
+
+    Turtle text(String text) { return text(text, textFont, textSize, textAlign); }
 }
