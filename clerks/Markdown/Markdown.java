@@ -10,12 +10,13 @@ record Markdown(LiveView view) implements Clerk {
         String ID = Clerk.generateID(10);
         Clerk.write(view, STR."""
             <div id="\{ID}">
+            \{markdownText}
             </div>
             """);
         Clerk.call(view, STR."""
-            document.getElementById("\{ID}").innerHTML = marked.parse(`
-            \{markdownText}
-            `);
+            var markdownContent = document.getElementById("\{ID}").textContent;
+            var renderedHTML = marked.parse(markdownContent);
+            document.getElementById("\{ID}").innerHTML = marked.parse(renderedHTML);
             """);
         return this;
     }
