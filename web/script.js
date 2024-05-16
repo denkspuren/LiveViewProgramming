@@ -26,7 +26,11 @@ function setUp() {
     source.onmessage = function (event) {
       const splitPos = event.data.indexOf(":");
       const action = event.data.slice(0, splitPos);
-      const data = event.data.slice(splitPos + 1).replaceAll("\\n", "\n");
+      const base64Data = event.data.slice(splitPos + 1);
+      const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
+      // const data = atob(base64Data);
+      // console.log(`Action: ${action}\n`);
+      // console.log(`Data: ${data}\n`);
 
       switch (action) {
         case "CALL": {
