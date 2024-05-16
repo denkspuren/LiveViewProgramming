@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -126,12 +127,14 @@ class LiveView {
         for (HttpExchange connection : sseClientConnections) {
             if (sseType == SSEType.LOAD) lock.lock();
             try {
+                byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
+                String base64Data = Base64.getEncoder().encodeToString(binaryData);
+                String message = "data: " + sseType + ":" + base64Data + "\n\n";
                 connection.getResponseBody()
-                          .write(("data: " + (sseType + ":" + data).replaceAll("(\\r|\\n|\\r\\n)", "\\\\n") + "\n\n")
-                                  .getBytes(StandardCharsets.UTF_8));
+                          .write(message.getBytes());
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD && !loadEventOccured) {
-                    loadEventOccurredCondition.await(2_000, TimeUnit.MILLISECONDS);
+                    loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
                     if (loadEventOccured) paths.add(data);
                     else System.err.println("LOAD-Timeout: " + data);
                 }
