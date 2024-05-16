@@ -29,9 +29,8 @@ function setUp() {
       const base64Data = event.data.slice(splitPos + 1);
       const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
       // const data = atob(base64Data);
-      console.log(`Action: ${action}\n`);
-      console.log(`Data: ${data}\n`);
-
+      // console.log(`Action: ${action}\n`);
+      // console.log(`Data: ${data}\n`);
 
       switch (action) {
         case "CALL": {
