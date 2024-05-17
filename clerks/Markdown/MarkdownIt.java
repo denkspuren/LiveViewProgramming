@@ -1,6 +1,6 @@
 import static java.lang.StringTemplate.STR;
 
-record Markdown(LiveView view) implements Clerk {
+record MarkdownIt(LiveView view) implements Clerk {
     public MarkdownIt {
         String onlinePath = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
         String localPath = "clerks/Markdown/markdown-it.min.js";
