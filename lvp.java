@@ -215,13 +215,14 @@ interface Clerk {
     static void clear(LiveView view) { view.sendServerEvent(SSEType.CLEAR, ""); }
     static void clear() { clear(view()); };
 
-    static void markdown(String text) { new Markdown(view()).write(text); }
+    static void markdown(String text) { new MarkdownIt(view()).write(text); }
 }
 
 /open skills/Text/Text.java
 /open skills/ObjectInspector/ObjectInspector.java
 /open clerks/Turtle/Turtle.java
-/open clerks/Markdown/Markdown.java
+/open clerks/Markdown/Marked.java
+/open clerks/Markdown/MarkdownIt.java
 /open clerks/TicTacToe/TicTacToe.java
 /open clerks/Dot/Dot.java
 /open clerks/Input/Slider.java
