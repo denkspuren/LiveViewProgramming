@@ -69,4 +69,23 @@ class Turtle {
         this.ctx.fillText(text, 0, 0);
         this.ctx.restore();
     }
+    moveTo(x, y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    lineTo(x, y) {
+        const originalPenState = this.isPenDown;
+        this.isPenDown = true;
+
+        this.ctx.beginPath();
+        this.ctx.moveTo(this.x, this.y);
+        this.ctx.lineTo(x, y);
+        this.ctx.stroke();
+
+        this.x = x;
+        this.y = y;
+
+        this.isPenDown = originalPenState;
+    }
 }
