@@ -102,4 +102,14 @@ class Turtle implements Clerk {
     }
 
     Turtle text(String text) { return text(text, textFont, textSize, textAlign); }
+
+    Turtle moveTo(double x, double y) {
+        Clerk.call(view, STR."turtle\{ID}.moveTo(\{x}, \{y});");
+        return this;
+    }
+
+    Turtle lineTo(double x, double y) {
+    Clerk.call(view, STR."turtle\{ID}.lineTo(\{x}, \{y});");
+    return this;
+    }
 }
