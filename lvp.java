@@ -26,7 +26,7 @@ import java.util.concurrent.locks.Condition;
 
 // To run this code type `jshell -R-ea --enable-preview`
 
-enum SSEType { WRITE, CALL, SCRIPT, LOAD, CLEAR; }
+enum SSEType { WRITE, CALL, SCRIPT, LOAD, CLEAR, CACHE, EXECUTE; }
 
 class LiveView {
     final HttpServer server;
@@ -228,3 +228,12 @@ interface Clerk {
 /open clerks/Input/Slider.java
 
 // LiveView view = Clerk.view();
+
+
+// Caching Example 
+// Sending Cache Instructions
+// CACHE:ID:ACTION:DATA
+// view.sendServerEvent(SSEType.CACHE, "a1:" + SSEType.WRITE + ":" + Base64.getEncoder().encodeToString("<h1>Caching works!</h1>".getBytes(StandardCharsets.UTF_8)))
+
+// Executing Cache with ID
+// view.sendServerEvent(SSEType.EXECUTE, "a1")
