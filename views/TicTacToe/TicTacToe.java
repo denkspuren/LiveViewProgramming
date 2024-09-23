@@ -6,7 +6,7 @@ import java.util.Optional;
 class TicTacToe implements Clerk {
     final String ID;
     final int width, height;
-    final String libPath = "clerks/TicTacToe/tictactoe.js";
+    final String libPath = "views/TicTacToe/tictactoe.js";
     LiveView view;
     
     int[] fields = {0,0,0,0,0,0,0,0,0};

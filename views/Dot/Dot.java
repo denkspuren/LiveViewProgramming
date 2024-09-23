@@ -1,7 +1,7 @@
 class Dot implements Clerk {
     final String visLibOnlinePath = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
-    final String visLibOfflinePath = "clerks/Dot/vis-network.min.js";
-    final String dotLibPath = "clerks/Dot/dot.js";
+    final String visLibOfflinePath = "views/Dot/vis-network.min.js";
+    final String dotLibPath = "views/Dot/dot.js";
     final String ID;
     LiveView view;
     int width, height;

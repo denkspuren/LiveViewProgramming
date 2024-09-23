@@ -31,7 +31,7 @@ class Turtle implements Clerk {
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
         ID = Clerk.getHashID(this);
-        Clerk.load(view, "clerks/Turtle/turtle.js");
+        Clerk.load(view, "views/Turtle/turtle.js");
         Clerk.write(view, STR."""
             <canvas id="turtleCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
             </canvas>
