@@ -163,7 +163,7 @@ drawing(turtle, 100);
 Clerk.markdown(STR."""
 ## Beispiel 4: Interaktivität mit Slider (Preview-Feature, _unstable_)
 
-Es ist auch möglich, eine Turtle-Grafik mit einem Slider-Clerk zu koppeln – und es entsteht eine interaktive Anwendung.
+Es ist auch möglich, eine Turtle-Grafik mit einee Slider-View zu koppeln – und es entsteht eine interaktive Anwendung.
 
 ```java
 \{Text.cutOut("./logo.java", "// interactivity")}
