@@ -5,31 +5,27 @@ class Slider implements Clerk {
     Slider(LiveView view, double min, double max) {
         this.view = view;
         ID = Clerk.getHashID(this);
-        Clerk.write(view, STR."""
-            <div>
-                <input type="range"
-                       id="slider\{ID}"
-                       min="\{min}"
-                       max="\{max}"
-                       step="any"/>
-            </div>
-        """);
-        Clerk.script(view, STR."""
-            const slider\{ID} = document.getElementById('slider\{ID}');
-        """);
+        Clerk.write(view, "<div><input type='range' id='slider" + ID + "' min='" + min + "' max='" + max + "' step='any'/> </div>");
+        Clerk.script(view, "const slider" + ID + " = document.getElementById('slider" + ID + "');");
     }
     Slider attachTo(Consumer<String> delegate) {
-        this.view.createResponseContext(STR."/slider\{ID}", delegate);
-        Clerk.script(view, STR."""
-            slider\{ID}.addEventListener("input", (event) => {
-                const value = event.target.value;
-                console.log(`slider\{ID}: value = ${value}`);
-                fetch('slider\{ID}', {
-                    method: "post",
-                    body: value.toString()
-                }).catch(console.log);
-            });
-        """);
+        this.view.createResponseContext("/slider" + ID, delegate);
+        Clerk.script(view, "slider" + ID +
+        """
+        .addEventListener("input", (event) => {
+            const value = event.target.value;
+            console.log(`slider""" + ID + 
+        """
+        : value = ${value}`);
+        fetch('slider""" + ID +
+        """
+            ', {
+                method: "post",
+                body: value.toString()
+            }).catch(console.log);
+        });
+        """
+        );
         return this;
     }
 }
