@@ -12,9 +12,9 @@ Als ich eine besondere Variante der Notizbuch-Programmierung namens Clerk für d
 
 Clerk für Clojure ist ein mächtiges und eindrucksvolles Werkzeug -- Hut ab vor den Entwicklern. Was mich an diesem Ansatz  so fasziniert, ist seine konzeptuelle Eleganz und Einfachkeit: Es genügt ein simpler Webserver, den man programmierend ansteuern und erweitern kann, um im Browser Inhalte, gegebenenfalls sogar interaktive Inhalte anzeigen zu können. Damit kann man einen einfachen Satz an Darstellungsmöglichkeiten für Programmieranfänger:innen bereitstellen. Und erfahrene Programmierer:innen können eigene Erweiterungen für ihre Zwecke entwickeln.
 
-Diese Grundidee wollte ich so einfach und unkompliziert wie möglich für Java und die JShell umsetzen. Ich nenne diese Idee _Live View Programming_ (LVP). Clerk als Namen habe ich beibehalten, allerdings arbeitet das _Live View Programming_ nicht mit einem Clerk (engl. für Sachbearbeiter, Büroangestellter, Schreibkraft), sondern mit vielen Clerks. Jeder Clerk ist für eine spezielle View in einer _Live View_ zuständig. Dazu kommen _Skills_, die generelle Fähigkeiten beisteuern, die nicht an eine _Live View_ gebunden sind.
+Diese Grundidee wollte ich so einfach und unkompliziert wie möglich für Java und die JShell umsetzen. Ich nenne diese Idee _Live View Programming_ (LVP). Clerk als Namen habe ich beibehalten. Der Clerk (engl. für Sachbearbeiter, Büroangestellter, Schreibkraft) hilft verschiedenen Views mit einer _Live View_ zu kommunizieren. Jede _View_ bietet eigene Möglichkeiten unterschiedliche Inhalte in einer _Live View_ darzustellen. Dazu kommen _Skills_, die generelle Fähigkeiten beisteuern, die nicht an eine _Live View_ gebunden sind.
 
-Das _Live View Programming_ mit seinen Clerks und Skills ist mit einem sehr schlanken _Live View_-Webserver umgesetzt. Es braucht nur wenige Mittel, um damit eine Notizbuch-Programmierung umzusetzen. Aber es geht noch viel mehr! Ein Beispiel ist das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), das ganz andere Wege bei der Kombination von Code und Dokumentation geht. Ein anderes Beispiel ist ein Clerk für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik), was zur Grafik-Programmierung animiert. Ein weiteres Beispiel ist ein Clerk, der eine GUI für das Spiel [TicTacToe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) bereitstellt. In all diesen Beispielen programmiert man wie gewohnt mit Java in der IDE oder mittels JShell-Skripten und einem Editor und instruiert den Browser, was er anzeigen soll. Das ist -- ehrlich gesagt -- ziemlich cool!
+Das _Live View Programming_ mit seinen Views und Skills ist mit einem sehr schlanken _Live View_-Webserver umgesetzt. Es braucht nur wenige Mittel, um damit eine Notizbuch-Programmierung umzusetzen. Aber es geht noch viel mehr! Ein Beispiel ist das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), das ganz andere Wege bei der Kombination von Code und Dokumentation geht. Ein anderes Beispiel ist eine View für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik), was zur Grafik-Programmierung animiert. Ein weiteres Beispiel ist eine View, der eine GUI für das Spiel [TicTacToe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) bereitstellt. In all diesen Beispielen programmiert man wie gewohnt mit Java in der IDE oder mittels JShell-Skripten und einem Editor und instruiert den Browser, was er anzeigen soll. Das ist -- ehrlich gesagt -- ziemlich cool!
 
 ## 💻 _Live View Programming_ für die JShell
 
@@ -24,7 +24,7 @@ Zum Ausprobieren muss das Java JDK 21 bzw. 22 installiert (ich verwende das Open
 git clone https://github.com/denkspuren/LiveViewProgramming.git
 ```
 
-Da der Code mit [String Templates](https://docs.oracle.com/en/java/javase/21/language/string-templates.html) ein Preview-Feature von Java nutzt, muss die JShell im `clerk`-Ordner mit der Option `--enable-preview` aufgerufen werden.
+Da der Code mit [String Templates](https://docs.oracle.com/en/java/javase/21/language/string-templates.html) ein Preview-Feature von Java nutzt, muss die JShell im `LiveViewProgramming`-Ordner mit der Option `--enable-preview` aufgerufen werden.
 <!-- Zudem aktiviert `-R-ea` die Berücksichtigung von `assert`-Anweisungen. -->
 
 ```shell
@@ -80,7 +80,7 @@ for (int i = 1; i <= 12; i++)
 
 Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
-![Ein Turtle-Beispiel](/clerks/Turtle/TurtleExample.png)
+![Ein Turtle-Beispiel](/views/Turtle/TurtleExample.png)
 
 > Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen.
 
@@ -124,7 +124,7 @@ Wenn Sie sich die Datei [`lvp.java`](/lvp.java) anschauen, werden Sie feststelle
 
 Der Webserver nutzt _Server Sent Events_ (SSE) als Mittel, um die _Live View_ im Browser beliebig zu erweitern. Man kann mit der Methode `sendServerEvent` entweder HTML-Code, `<script>`-Tags oder JavaScript-Code senden oder JavaScript-Bibliotheken laden.
 
-* Das Interface `Clerk` bietet ein paar statische Methode an, um die Programmierung von Clerks zu erleichtern. Dazu gehören die folgenden Wrapper für die Methode `sendServerEvent` aus der `LiveView`:
+* Das Interface `Clerk` bietet ein paar statische Methode an, um die Programmierung von Views zu erleichtern. Dazu gehören die folgenden Wrapper für die Methode `sendServerEvent` aus der `LiveView`:
 
     - `write` schickt HTML-Code über eine View an den Browser, wo der HTML-Code gerendert wird
     - `call` schickt JavaScript-Code über eine View zur Ausführung an den Browser
@@ -134,17 +134,17 @@ Der Webserver nutzt _Server Sent Events_ (SSE) als Mittel, um die _Live View_ im
 
 Interessant ist noch die statische Methode `markdown` in `Clerk`, mit der direkt Markdown-Text an den Browser der Standard-View (das ist die View zum default Port 50001) geschickt und gerendet wird.
 
-## 🧑‍💼 Clerks
+## 🧑‍💼 Views
 
-Im Verzeichnis [`clerks`](/clerks/) finden sich ein paar Clerks, um _Views_ zu erzeugen und zu bedienen. Darunter ist ein Clerk für [`Markdown`](https://de.wikipedia.org/wiki/Markdown) zur Nutzung der Markdown-Notation, ein Clerk für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik) und ein Clerk, der eine GUI für das Spiel [Tic-Tac-Toe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) realisiert.
+Im Verzeichnis [`views`](/views/) finden sich ein paar Views. Darunter ist eine View für [`Markdown`](https://de.wikipedia.org/wiki/Markdown) zur Nutzung der Markdown-Notation, eine View für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik) und eine View, der eine GUI für das Spiel [Tic-Tac-Toe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) realisiert.
 
-Clerks sind immer mit einer _Live View_ assoziiert und stellen zudem den browser-seitig benötigten Code zur Verfügung, um die _View_ zu erzeugen. Als Programmierkonvention implementiert ein Clerk stets das Interface `Clerk`.
+Views sind immer mit einer _Live View_ assoziiert und stellen zudem den browser-seitig benötigten Code zur Verfügung, um die _View_ zu erzeugen. Als Programmierkonvention implementiert eine View stets das Interface `Clerk`.
 
 ## 🤹 Skills
 
-Skills sind im Verzeichnis [`skills`](/skills/) zu finden. Skills haben nichts mit einer _View_ zu tun, sie stellen spezielle oder generelle Fähigkeiten zur Verfügung, die man beim _Live View Programming_ oder im Zusammenspiel mit Clerks gebrauchen kann. `File` ist z.B. ein wichtiger Skill, um Text oder Code aus einer Datei "ausschneiden" zu können, was elementar für die Code-Dokumentation ist.
+Skills sind im Verzeichnis [`skills`](/skills/) zu finden. Skills haben nichts mit einer _View_ zu tun, sie stellen spezielle oder generelle Fähigkeiten zur Verfügung, die man beim _Live View Programming_ oder im Zusammenspiel mit Views gebrauchen kann. `File` ist z.B. ein wichtiger Skill, um Text oder Code aus einer Datei "ausschneiden" zu können, was elementar für die Code-Dokumentation ist.
 
-> Solange einzelne Clerks und Skills nicht weiter dokumentiert sind (das wird noch kommen), studieren Sie am besten den Code der Clerks und Skills. In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser wenigen grundlegenden Fähigkeiten. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert.
+> Solange einzelne Views und Skills nicht weiter dokumentiert sind (das wird noch kommen), studieren Sie am besten den Code der Views und Skills. In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser wenigen grundlegenden Fähigkeiten. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert.
 
 # 🚀 Der Prototyp ist erst der Anfang
 
@@ -152,7 +152,7 @@ Skills sind im Verzeichnis [`skills`](/skills/) zu finden. Skills haben nichts m
 
 Meine Vision für das _Live View Programming_ ist zunächst, dieses Werkzeug in der Programmierungsbildung meiner Informatik-Studierenden an der THM einzusetzen.
 
-Zum einen scheint mir Clerk für Programmier-Anfänger:innen geeignet zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man z.B. Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert und am Bild erkennen kann, ob man die Schleife korrekt umgesetzt hat. Gerne würde ich das _Live View Programming_ um die Möglichkeit erweitern, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline); @RamonDevPrivate hat das bereits mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) vorbereitet. Das _Live View Programming_ kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen. Mit solchen Erweiterungen können Clerks und Skills Teil der Entwicklungswerkzeuge beim Programmieren werden.
+Zum einen scheint mir Clerk für Programmier-Anfänger:innen geeignet zu sein: Es macht vermutlich mehr Sinn und Spaß, wenn man z.B. Schleifen-Konstrukte erlernt, indem man Logo-Zeichnungen generiert und am Bild erkennen kann, ob man die Schleife korrekt umgesetzt hat. Gerne würde ich das _Live View Programming_ um die Möglichkeit erweitern, automatisiert ein Objektdiagramm zu einer gegebenen Objektreferenz zu erzeugen -- das geht mit dem Java-Reflection-API und z.B. [Graphviz-Online](https://dreampuf.github.io/GraphvizOnline); @RamonDevPrivate hat das bereits mit diesem [Gist](https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee) vorbereitet. Das _Live View Programming_ kann also dabei helfen, den zur Laufzeit entstandenen Graphen aus Objekten und Referenzen zu verstehen. Mit solchen Erweiterungen können Views und Skills Teil der Entwicklungswerkzeuge beim Programmieren werden.
 
 Zum anderen können auch erfahrene Entwickler:innen mit dem _Live View Programming_ eine anschauliche und verständliche Dokumentation zu ihrem Code erstellen. Wenn visuelle Anteile das unterstützen können, umso besser. Man kann das _Live View Programming_ aber ebenso für Experimente, exploratives Programmieren und Notebook-basierte Programmierung verwenden. Sicher gibt es noch viele andere, denkbare Anwendungsszenarien.
 
@@ -160,11 +160,11 @@ Und ich habe noch eine Vision: Dass diese Umsetzung für Java als Blaupause für
 
 ## 💃🕺 Mitmach-Aufruf
 
-> Sie sind gerne willkommen, sich an der Entwicklung des _Live View Programming with Java's JShell_ zu beteiligen. Schreiben Sie neue Clerks und Skills! Oder entwickeln Sie am Kern der _Live View_ mit.
+> Sie sind gerne willkommen, sich an der Entwicklung des _Live View Programming with Java's JShell_ zu beteiligen. Schreiben Sie neue Views und Skills! Oder entwickeln Sie am Kern der _Live View_ mit.
 
 Ein paar Beiträge hat es schon gegeben:
 
-* Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/LiveViewProgramming/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung eines Webservers mit Server Sent Events (SSE) entstanden! Von Ramon stammt auch der TicTacToe-Clerk.
+* Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/LiveViewProgramming/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung eines Webservers mit Server Sent Events (SSE) entstanden! Von Ramon stammt auch die TicTacToe-View.
 
 * [@BjoernLoetters](https://github.com/BjoernLoetters) war von der Idee des _Live View Programming_ ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/LiveViewProgramming/tree/websockets) hinterlegt. Ich empfehle das Studium seines Codes sehr, man kann viel daran über Websockets lernen!
 
