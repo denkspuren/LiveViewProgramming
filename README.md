@@ -22,14 +22,13 @@ Zum Ausprobieren muss das Java JDK 21 bzw. 22 installiert (ich verwende das Open
 
 ```shell
 git clone https://github.com/denkspuren/LiveViewProgramming.git
-```
-
-Da der Code mit [String Templates](https://docs.oracle.com/en/java/javase/21/language/string-templates.html) ein Preview-Feature von Java nutzt, muss die JShell im `LiveViewProgramming`-Ordner mit der Option `--enable-preview` aufgerufen werden.
-<!-- Zudem aktiviert `-R-ea` die Berücksichtigung von `assert`-Anweisungen. -->
+``
 
 ```shell
-jshell --enable-preview
+jshell
+
 ```
+<!-- Zudem aktiviert `-R-ea` die Berücksichtigung von `assert`-Anweisungen. -->
 
 ### 🎹 Ein Beispiel zur Live-View-Programmierung
 
@@ -111,8 +110,6 @@ Im Browser sieht das Ergebnis so aus (Sie sehen hier nur einen Teil der Seite):
 Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder werden durch die Abarbeitung in der JShell erst erzeugt. Mit der Skill namens `File` können Codeauszüge an geeigneten Stellen in die Dokumentation gesetzt werden. Der Code in [`logo.java`](/logo.java) erklärt sich durch die hinzugefügte Dokumentation, den darin enthaltenen Code und dessen Ausführung sozusagen von selbst.
 
 Um das besser zu verstehen, schauen Sie sich den Code in der Datei [`logo.java`](/logo.java) mit einem Editor Ihrer Wahl an.
-
-> Das Java-Preview-Feature der String-Templates wird offenbar noch nicht in jedem Editor (oder von einer entsprechenden Erweiterung) richtig dargestellt. Das Syntax-Highlighting kommt durch die String-Templates möglicherweise durcheinander und der Java-Code wird eventuell nicht sehr leserlich angezeigt.
 
 # 📝 Skizze zur Arbeitsweise des LVP-Prototypen
 
