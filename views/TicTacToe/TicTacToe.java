@@ -1,5 +1,3 @@
-import static java.lang.StringTemplate.STR;
-
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -19,13 +17,10 @@ class TicTacToe implements Clerk {
         Clerk.load(view, libPath);
         ID = Clerk.getHashID(this);
 
-        Clerk.write(view, STR."""
-            <canvas id="tttCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
-            </canvas>
-                """);
-        Clerk.script(view, STR."const ttt\{ID} = new TicTacToe(document.getElementById('tttCanvas\{ID}'), 'ttt\{ID}');");
+        Clerk.write(view, "<canvas id='tttCanvas" + ID + "' width='" + this.width + "' height='" + this.height + "' style='border:1px solid #000;'></canvas>");
+        Clerk.script(view, "const ttt" + ID + " = new TicTacToe(document.getElementById('tttCanvas" + ID + "'), 'ttt" + ID + "');");
         
-        this.view.createResponseContext(STR."/ttt\{ID}", response -> {
+        this.view.createResponseContext("/ttt" + ID, response -> {
             int i = Integer.parseInt(response);
             if (i >= 0 && i < 9) {
                 move(i);
@@ -49,14 +44,14 @@ class TicTacToe implements Clerk {
     }
 
     TicTacToe sendWinPosition(int start, int end) {
-        Clerk.call(view, STR."ttt\{ID}.showWinner(\{start}, \{end})");
+        Clerk.call(view, "ttt" + ID + ".showWinner(" + start + ", " + end + ")");
         return this;
     }
 
     TicTacToe move(int position) {
         if (fields[position] == 0) {
             fields[position] = turn;
-            Clerk.call(view, STR."ttt\{ID}.drawToken(\{turn == 1}, \{position})");
+            Clerk.call(view, "ttt" + ID + ".drawToken(" + turn == 1 + ", " + position + ")");
             turn = -turn;            
         }
         return this;

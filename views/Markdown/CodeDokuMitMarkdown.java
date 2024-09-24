@@ -1,5 +1,5 @@
 
-Clerk.markdown(STR."""
+Clerk.markdown("""
 # Die Code-Dokumentation mit Markdown
 
 Für die Code-Dokumentation mit Markdown sind String-Templates und der Text-Skill entscheidende Hilfsmittel. Zum einen erlauben sie, Code in Markdown einzubinden, zum anderen, den Gebrauch von "spitzen" Klammern (`<>`) zu ermöglichen.
@@ -19,11 +19,11 @@ assert factorial(4) == 24 && factorial(5) == 120;
 
 // STR-Beispiel
 int num;
-String s = STR."Die Fakultät von \{num = 6} ist \{factorial(num)}."
+String s = "Die Fakultät von " + (num = 6) + " ist " + factorial(num) + ".";
 // STR-Beispiel
 
 
-Clerk.markdown(STR."""
+Clerk.markdown("""
 ## String-Templates mit eingebetteten Ausdrücken
 
 Mit Java 21 haben String-Templates als Preview-Feature Einzug in Java gehalten ‒ mehr Informationen zu diesem neuen Sprachkonstrukt finden sich [hier](https://docs.oracle.com/en/java/javase/22/language/string-templates.html). Mit String-Templates lassen sich Ausdrücke zur Auswertung in einen String einbinden.
@@ -31,19 +31,27 @@ Mit Java 21 haben String-Templates als Preview-Feature Einzug in Java gehalten �
 Ein Beispiel: Der Template-Prozessor `STR` bekommt einen String übergeben mit zwei eingebetteten Ausdrücken, die jeweils durch `\\{` und `}`markiert sind. Die Ergebnisse der Auswertung werden vom Template-Prozessor in den resultierenden String eingefügt.
 
 ```
-\{Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "// STR-Beispiel")}
+"""
++
+Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "// STR-Beispiel")
++
+"""
 ```
 
 Das Ergebnis der Zeichenkette ist
 
 ```
-\{s}
+"""
++
+s
++
+"""
 ```
 
 String-Templates bieten die Basis, um auf einfache Weise ganze Textauszüge in den Markdown-Text, der mit `Clerk.markdown()` erzeugt wird, einzubinden.
 """);
 
-Clerk.markdown(STR."""
+Clerk.markdown("""
 ## Texte ausschneiden mit `Text.cut`
 
 Mit dem Skill `Text` kann Text aus einer Datei ausgeschnitten werden. Der Methodenkopf von `cutOut` erwartet einen Dateinamen, zwei boolsche Werte und eine beliebige Anzahl an Labels.
@@ -73,42 +81,66 @@ Textstelle, umschlossen von einem LabelC
 Mit dem folgenden Aufruf
 
 ```
-\{Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "<!-- LabelCff -->").replaceAll("(\\n)?```(\\n)?","")}
+"""
++
+Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "<!-- LabelCff -->").replaceAll("(\\n)?```(\\n)?","")
++
+"""
 ```
 
 ergibt sich
 
 <!-- LabelCff -->
 ```
-\{Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", false, false, "// LabelC")}
+"""
++
+Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", false, false, "// LabelC")
++
+"""
 ```
 <!-- LabelCff -->
 
 Setzt man einen der boolschen Werte auf `true`, wird das entsprechende Label mit übernommen.
 
 ```
-\{Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "<!-- LabelCft -->").replaceAll("(\\n)?```(\\n)?","")}
+"""
++
+Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "<!-- LabelCft -->").replaceAll("(\\n)?```(\\n)?","")
++
+"""
 ```
 
 Das Ergebnis sieht so aus:
 
 <!-- LabelCft -->
 ```
-\{Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", false, true, "// LabelC")}
+"""
++
+Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", false, true, "// LabelC")
++
+"""
 ```
 <!-- LabelCft -->
 
 Sind mehrere Stellen mit dem gleichen Label belegt, kann man diese Bereiche ausschneiden. Wenn die boolschen Werte beide `false` sind, kann man den Aufruf verkürzen.
 
 ```
-\{Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "<!-- LabelAB -->").replaceAll("(\\n)?```(\\n)?","")}
+"""
++
+Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "<!-- LabelAB -->").replaceAll("(\\n)?```(\\n)?","")
++
+"""
 ```
 
 Zunächst wird die erste Textstelle zwischen `LabelA` und `LabelB` ausgeschnitten, dann die zweite.
 
 <!-- LabelAB -->
 ```
-\{Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "// LabelA", "// LabelB")}
+"""
++
+Text.cutOut("clerks/Markdown/CodeDokuMitMarkdown.java", "// LabelA", "// LabelB")
++
+"""
 ```
 <!-- LabelAB -->
 
@@ -124,7 +156,10 @@ Der Algorithmus zu `Text.cutOut(...)`, um einen Ausschnitt aus einer Textdatei, 
 Als Java-Methode:
 
 ```java
-\{Text.cutOut("skills/Text/Text.java", "// Cut out a snippet", "// done")}
+"""
++
+Text.cutOut("skills/Text/Text.java", "// Cut out a snippet", "// done")
++
+"""
 ```
-
 """);
