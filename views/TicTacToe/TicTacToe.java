@@ -51,7 +51,7 @@ class TicTacToe implements Clerk {
     TicTacToe move(int position) {
         if (fields[position] == 0) {
             fields[position] = turn;
-            Clerk.call(view, "ttt" + ID + ".drawToken(" + turn == 1 + ", " + position + ")");
+            Clerk.call(view, "ttt" + ID + ".drawToken(" + (turn == 1) + ", " + position + ")");
             turn = -turn;            
         }
         return this;
