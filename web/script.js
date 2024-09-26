@@ -40,6 +40,8 @@ function setUp() {
   }
 }
 
+
+
 function handleActions(instruction) {
   const splitPos = instruction.indexOf(":");
   const action = instruction.slice(0, splitPos);
@@ -120,3 +122,8 @@ function handleActions(instruction) {
 setUp();
 
 // https://samthor.au/2020/understanding-load/
+
+
+CACHE:true:WRITE:PGgxPkNhY2hpbmcgd29ya3MhPC9oMT4=
+WRITE:false:data
+BASE64:CACHE:WRITE:data

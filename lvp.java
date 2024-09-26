@@ -191,7 +191,16 @@ class LiveView {
     }
 }
 
+class SSEHandler implements PrimitiveClerk {
+    boolean isPacking;
+    String collectedData;
+
+    "write:haojdioajoiwd:execute"
+    "write:gjoisajfoiejfoei:write:jofisjeoifjsoijfeois:store:id:write:djaodjioajd:execute:restore:id:execute"
+}
+
 interface Clerk {
+    static List<String> collectedData;
     static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
                             mapToObj(i -> Integer.toString(i, 36)).
@@ -215,6 +224,14 @@ interface Clerk {
     static void clear(LiveView view) { view.sendServerEvent(SSEType.CLEAR, ""); }
     static void clear() { clear(view()); };
 
+    static void execute();
+
+    static void store(String id);
+    static void restore(String id);
+
+    static void delete();
+    static void delete(String id);
+
     static void markdown(String text) { new MarkdownIt(view()).write(text); }
 }
 
@@ -233,7 +250,7 @@ interface Clerk {
 // Caching Example 
 // Sending Cache Instructions
 // CACHE:ID:ACTION:DATA
-// view.sendServerEvent(SSEType.CACHE, "a1:" + SSEType.WRITE + ":" + Base64.getEncoder().encodeToString("<h1>Caching works!</h1>".getBytes(StandardCharsets.UTF_8)))
+ view.sendServerEvent(SSEType.CACHE, "a1:" + SSEType.WRITE + ":" + Base64.getEncoder().encodeToString("<h1>Caching works!</h1>".getBytes(StandardCharsets.UTF_8)))
 
 // Executing Cache with ID
 // view.sendServerEvent(SSEType.EXECUTE, "a1")
