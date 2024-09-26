@@ -1,5 +1,3 @@
-import static java.lang.StringTemplate.STR;
-
 record Marked(LiveView view) implements Clerk {
     public Marked {
         String onlinePath = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
