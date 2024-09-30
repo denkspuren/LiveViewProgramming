@@ -7,6 +7,7 @@ import java.util.Base64;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -26,7 +27,7 @@ import java.util.concurrent.locks.Condition;
 
 // To run this code type `jshell -R-ea --enable-preview`
 
-enum SSEType { WRITE, CALL, SCRIPT, LOAD, CLEAR, CACHE, EXECUTE; }
+enum SSEType { HTML, CALL, LOAD, CLEAR, EXECUTE, STORE, RESTORE; }
 
 class LiveView {
     final HttpServer server;
@@ -45,6 +46,8 @@ class LiveView {
     Lock lock = new ReentrantLock();
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
+
+    List<String> cache = new ArrayList<>();
 
 
     static LiveView onPort(int port) {
@@ -122,32 +125,66 @@ class LiveView {
         server.start();
     }
 
-    void sendServerEvent(SSEType sseType, String data) {
+    String encode(String data) {
+        byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
+        return Base64.getEncoder().encodeToString(binaryData);
+    }
+
+    void cache(SSEType action, String data) {
+        cache.add(pack(action, data));
+    }
+
+    void cache(SSEType action) {
+        cache.add(action.toString());
+    }
+
+    void packAndSend() {
+        if (cache.isEmpty()) {
+            System.err.println("Nothing to send!");
+            return;
+        }
+
+        String message = cache.get(0);
+        for (int i = 1; i < cache.size(); i++) {
+            message += ":" + cache.get(i);
+        }
+        sendServerEvent(message);
+        cache.clear();
+    }
+
+    String pack(SSEType action, String data) {
+        return action + ":" + encode(data);
+    }
+
+    void load(String data) {
+        lock.lock();
+        try {
+            String message = pack(SSEType.LOAD, data);
+            sendServerEvent(message);
+            if (!loadEventOccured) {
+                loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
+                if (loadEventOccured) paths.add(data);
+                else System.err.println("LOAD-Timeout: " + data);
+            }
+        } catch (InterruptedException e) {
+            System.err.println("LOAD-Timeout: " + data + ", " + e);
+        } finally {
+            loadEventOccured = false;
+            lock.unlock();
+            
+        }
+    }
+
+    void sendServerEvent(String message) {
+        message = "data:" + message + "\n\n";
         List<HttpExchange> deadConnections = new ArrayList<>();
         for (HttpExchange connection : sseClientConnections) {
-            if (sseType == SSEType.LOAD) lock.lock();
             try {
-                byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
-                String base64Data = Base64.getEncoder().encodeToString(binaryData);
-                String message = "data: " + sseType + ":" + base64Data + "\n\n";
-                connection.getResponseBody()
-                          .write(message.getBytes());
-                connection.getResponseBody().flush();
-                if (sseType == SSEType.LOAD && !loadEventOccured) {
-                    loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
-                    if (loadEventOccured) paths.add(data);
-                    else System.err.println("LOAD-Timeout: " + data);
-                }
+                connection.getResponseBody().write(message.getBytes());
+                connection.getResponseBody().flush();                
             } catch (IOException e) {
                 deadConnections.add(connection);
-            } catch (InterruptedException e) {
-                System.err.println("LOAD-Timeout: " + data + ", " + e);
-            } finally {
-                if (sseType == SSEType.LOAD) {
-                    loadEventOccured = false;
-                    lock.unlock();
-                }
-            }
+            } 
         }
         sseClientConnections.removeAll(deadConnections);
     }
@@ -191,16 +228,7 @@ class LiveView {
     }
 }
 
-class SSEHandler implements PrimitiveClerk {
-    boolean isPacking;
-    String collectedData;
-
-    "write:haojdioajoiwd:execute"
-    "write:gjoisajfoiejfoei:write:jofisjeoifjsoijfeois:store:id:write:djaodjioajd:execute:restore:id:execute"
-}
-
 interface Clerk {
-    static List<String> collectedData;
     static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
                             mapToObj(i -> Integer.toString(i, 36)).
@@ -212,45 +240,43 @@ interface Clerk {
     static LiveView view(int port) { return LiveView.onPort(port); }
     static LiveView view() { return view(LiveView.getDefaultPort()); }
 
-    static void write(LiveView view, String html)        { view.sendServerEvent(SSEType.WRITE, html); }
-    static void call(LiveView view, String javascript)   { view.sendServerEvent(SSEType.CALL, javascript); }
-    static void script(LiveView view, String javascript) { view.sendServerEvent(SSEType.SCRIPT, javascript); }
+    static void html(LiveView view, String text)         { view.cache(SSEType.HTML, text); }
+    static void call(LiveView view, String javascript)   { view.cache(SSEType.CALL, javascript); }
+    static void execute(LiveView view)                   { view.cache(SSEType.EXECUTE); }
+    static void send(LiveView view)                      { view.packAndSend(); }
+
+
     static void load(LiveView view, String path) {
-        if (!view.paths.contains(path.trim())) view.sendServerEvent(SSEType.LOAD, path);
+        if (!view.paths.contains(path.trim())) view.load(path);
     }
     static void load(LiveView view, String onlinePath, String offlinePath) {
         load(view, onlinePath + ", " + offlinePath);
     }
-    static void clear(LiveView view) { view.sendServerEvent(SSEType.CLEAR, ""); }
-    static void clear() { clear(view()); };
+    static void clear(LiveView view) { view.cache(SSEType.CLEAR); }
+    // Clear + Execute + instant send
+    static void clear() { 
+        clear(view());
+        execute(view());
+        send(view());
+     }
 
-    static void execute();
+    // static void store(String id);
+    // static void restore(String id);
 
-    static void store(String id);
-    static void restore(String id);
-
-    static void delete();
-    static void delete(String id);
-
-    static void markdown(String text) { new MarkdownIt(view()).write(text); }
+    // static void markdown(String text) { new MarkdownIt(view()).write(text); }
 }
 
-/open skills/Text/Text.java
-/open skills/ObjectInspector/ObjectInspector.java
-/open clerks/Turtle/Turtle.java
-/open clerks/Markdown/Marked.java
-/open clerks/Markdown/MarkdownIt.java
-/open clerks/TicTacToe/TicTacToe.java
-/open clerks/Dot/Dot.java
-/open clerks/Input/Slider.java
+// /open skills/Text/Text.java
+// /open skills/ObjectInspector/ObjectInspector.java
+// /open clerks/Turtle/Turtle.java
+// /open clerks/Markdown/Marked.java
+// /open clerks/Markdown/MarkdownIt.java
+// /open clerks/TicTacToe/TicTacToe.java
+// /open clerks/Dot/Dot.java
+// /open clerks/Input/Slider.java
 
-// LiveView view = Clerk.view();
-
-
-// Caching Example 
-// Sending Cache Instructions
-// CACHE:ID:ACTION:DATA
- view.sendServerEvent(SSEType.CACHE, "a1:" + SSEType.WRITE + ":" + Base64.getEncoder().encodeToString("<h1>Caching works!</h1>".getBytes(StandardCharsets.UTF_8)))
-
-// Executing Cache with ID
-// view.sendServerEvent(SSEType.EXECUTE, "a1")
+LiveView view = Clerk.view();
+Clerk.html(view, "<h1>Hello World</h1>");
+Clerk.html(view, "<p>This will be a test</p>");
+Clerk.execute(view);
+// Clerk.send(view);

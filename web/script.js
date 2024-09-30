@@ -26,7 +26,8 @@ function setUp() {
     const source = new EventSource("/events");
 
     source.onmessage = function (event) {
-      handleActions(event.data);      
+      if(debug) console.log(`Message: ${event.data}`);
+      handleActions(event.data.split(":"));      
     };
 
     source.onerror = function (error) {
@@ -40,31 +41,37 @@ function setUp() {
   }
 }
 
+function decode(data) {
+  return new TextDecoder("utf-8").decode(Uint8Array.from(atob(data), c => c.charCodeAt(0)));
+}
+
+function currentInstruction() {};
+
+function compose(...fucntions) {
+  return (input) => {
+    return fucntions.reduce((acc, fn) => {
+      return fn(acc);
+    }, input);
+  };
+}
 
 
-function handleActions(instruction) {
-  const splitPos = instruction.indexOf(":");
-  const action = instruction.slice(0, splitPos);
-  const base64Data = instruction.slice(splitPos + 1);
-  const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
-
-  // const data = atob(base64Data);
-  if (debug) console.log(`Action: ${action}\nData: ${data}\n`);
-  switch (action) {
+function handleActions(actions) {
+  if (actions === undefined || actions.length === 0) return;
+  if (debug) console.log(`Action: ${actions[0]}`);
+  switch (actions[0]) {
     case "CALL": {
-      Function(data).apply(); // https://www.educative.io/answers/eval-vs-function-in-javascript
+      if (debug) console.log(`Data: ${decode(actions[1])}`);
+      const fn = () => Function(decode(actions[1])).apply(); // https://www.educative.io/answers/eval-vs-function-in-javascript
+      currentInstruction = compose(currentInstruction, fn);
+      handleActions(actions.slice(2, actions.length));
       break;
     }
-    case "SCRIPT": {
-      const newElement = document.createElement("script");
-      newElement.innerHTML = data;
-      document.body.appendChild(newElement);
-      break;
-    }
-    case "WRITE": {
-      const newElement = document.createElement("p");
-      newElement.innerHTML = data;
-      document.getElementById("events").appendChild(newElement);
+    case "HTML": {
+      if (debug) console.log(`Data: ${decode(actions[1])}`);
+      const fn = () => document.body.innerHTML += decode(actions[1]);
+      currentInstruction = compose(currentInstruction, fn);
+      handleActions(actions.slice(2, actions.length));
       break;
     }
     case "LOAD": {
@@ -72,45 +79,30 @@ function handleActions(instruction) {
       setTimeout(() => {
         loadedDiv.style.display = 'none';
       }, 300);
-      var srcs = data.split(',');
+      let srcs = actions[1].split(',');
       srcs = srcs.map(src => src.trim());
       if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
-      else loadScript(data);
+      else loadScript(actions);
       break;
     }
     case "CLEAR": {
-      const element = document.getElementById("events");
-      while (element.firstChild) {
-        element.removeChild(element.firstChild);
-      }
-
-      const toRemove = [];
-      for (const node of document.body.children) {
-        if (node.classList == null || !node.classList.contains("persistent")) {
-          toRemove.push(node);
+      const fn = () => {
+        const toRemove = [];
+        for (const node of document.body.children) {
+          if (node.classList == null || !node.classList.contains("persistent")) {
+            toRemove.push(node);
+          }
         }
+        toRemove.forEach(x => document.body.removeChild(x));
       }
-      toRemove.forEach(x => document.body.removeChild(x));
-      
-      break;
-    }
-    case "CACHE": {
-      const splitPos = data.indexOf(":");
-      const id = data.slice(0, splitPos);
-      const instruction = data.slice(splitPos + 1)
-      if (debug) console.log(`Saving ${instruction} with ID ${id}!`);
-      
-      if (actionCache.has(id)) actionCache.get(id).push(instruction);
-      else actionCache.set(id, [instruction]);
+      currentInstruction = compose(currentInstruction, fn);
+      handleActions(actions.slice(1, actions.length));      
       break;
     }
     case "EXECUTE": {
-      const instructions = actionCache.get(data);
-      if (debug) console.log(`Executing ${instruction}`);
-      if (instructions) {
-        for (const instruction of instructions)
-          handleActions(instruction);
-      }
+      this.currentInstruction();
+      this.currentInstruction = () => {};
+      handleActions(actions.slice(1, actions.length));
       break;
     }
     default:
@@ -122,8 +114,3 @@ function handleActions(instruction) {
 setUp();
 
 // https://samthor.au/2020/understanding-load/
-
-
-CACHE:true:WRITE:PGgxPkNhY2hpbmcgd29ya3MhPC9oMT4=
-WRITE:false:data
-BASE64:CACHE:WRITE:data
