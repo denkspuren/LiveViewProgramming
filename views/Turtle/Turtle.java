@@ -31,12 +31,9 @@ class Turtle implements Clerk {
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
         ID = Clerk.getHashID(this);
-        Clerk.load(view, "clerks/Turtle/turtle.js");
-        Clerk.write(view, STR."""
-            <canvas id="turtleCanvas\{ID}" width="\{this.width}" height="\{this.height}" style="border:1px solid #000;">
-            </canvas>
-            """);
-        Clerk.script(view, STR."const turtle\{ID} = new Turtle(document.getElementById('turtleCanvas\{ID}'));");
+        Clerk.load(view, "views/Turtle/turtle.js");
+        Clerk.write(view, "<canvas id='turtleCanvas" + ID + "' width='" + this.width + "' height='" + this.height + "' style='border:1px solid #000;'></canvas>");
+        Clerk.script(view, "const turtle" + ID + " = new Turtle(document.getElementById('turtleCanvas" + ID + "'));");
     }
 
     Turtle(LiveView view) { this(view, 500, 500); }
@@ -44,37 +41,37 @@ class Turtle implements Clerk {
     Turtle() { this(Clerk.view()); }
 
     Turtle penDown() {
-        Clerk.call(view, STR."turtle\{ID}.penDown();");
+        Clerk.call(view, "turtle" + ID + ".penDown();");
         return this;
     }
 
     Turtle penUp() {
-        Clerk.call(view, STR."turtle\{ID}.penUp();");
+        Clerk.call(view, "turtle" + ID + ".penUp();");
         return this;
     }
 
     Turtle forward(double distance) {
-        Clerk.call(view, STR."turtle\{ID}.forward(\{distance});");
+        Clerk.call(view, "turtle" + ID + ".forward(" + distance + ");");
         return this;
     }
 
     Turtle backward(double distance) {
-        Clerk.call(view, STR."turtle\{ID}.backward(\{distance});");
+        Clerk.call(view, "turtle" + ID + ".backward(" + distance + ");");
         return this;
     }
 
     Turtle left(double degrees) {
-        Clerk.call(view, STR."turtle\{ID}.left(\{degrees});");
+        Clerk.call(view, "turtle" + ID + ".left(" + degrees + ");");
         return this;
     }
 
     Turtle right(double degrees) {
-        Clerk.call(view, STR."turtle\{ID}.right(\{degrees});");
+        Clerk.call(view, "turtle" + ID + ".right(" + degrees + ");");
         return this;
     }
 
     Turtle color(int red, int green, int blue) {
-        Clerk.call(view, STR."turtle\{ID}.color('rgb(\{red & 0xFF}, \{green & 0xFF}, \{blue & 0xFF})');");
+        Clerk.call(view, "turtle" + ID + ".color('rgb(" + (red & 0xFF) + ", " + (green & 0xFF) + ", " + (blue & 0xFF) + ")');");
         return this;
     }
 
@@ -84,12 +81,12 @@ class Turtle implements Clerk {
     }
 
     Turtle lineWidth(double width) {
-        Clerk.call(view, STR."turtle\{ID}.lineWidth('\{width}');");
+        Clerk.call(view, "turtle" + ID + ".lineWidth('" + width + "');");
         return this;
     }
 
     Turtle reset() {
-        Clerk.call(view, STR."turtle\{ID}.reset();");
+        Clerk.call(view, "turtle" + ID + ".reset();");
         return this;
     }
 
@@ -97,19 +94,19 @@ class Turtle implements Clerk {
         textFont = font;
         textSize = size;
         textAlign = align;
-        Clerk.call(view, STR."turtle\{ID}.text('\{text}', '\{"" + size + "px " + font}', '\{align}')");
+        Clerk.call(view, "turtle" + ID + ".text('" + text + "', '" + "" + size + "px " + font + "', '" + align + "')");
         return this;
     }
 
     Turtle text(String text) { return text(text, textFont, textSize, textAlign); }
 
     Turtle moveTo(double x, double y) {
-        Clerk.call(view, STR."turtle\{ID}.moveTo(\{x}, \{y});");
+        Clerk.call(view, "turtle" + ID + ".moveTo(" + x + ", " + y + ");");
         return this;
     }
 
     Turtle lineTo(double x, double y) {
-    Clerk.call(view, STR."turtle\{ID}.lineTo(\{x}, \{y});");
+    Clerk.call(view, "turtle" + ID + ".lineTo(" + x + ", " + y + ");");
     return this;
     }
 }

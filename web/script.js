@@ -44,7 +44,7 @@ function setUp() {
           break;
         }
         case "WRITE": {
-          const newElement = document.createElement("p");
+          const newElement = document.createElement("div");
           newElement.innerHTML = data;
           document.getElementById("events").appendChild(newElement);
           break;

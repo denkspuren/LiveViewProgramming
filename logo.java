@@ -1,4 +1,4 @@
-Clerk.markdown(STR.
+Clerk.markdown(
 """
 # Turtle-Programmierung
 
@@ -35,7 +35,11 @@ Mit `new Turtle(300,300)` wird eine neue Schildkröte mittig auf eine Zeichenfl�
 Die folgende Logo-Anwendung demonstriert, wie man mittels Methoden schrittweise graphische Einheiten erstellen und zusammensetzen kann.
 
 ```java
-\{Text.cutOut("./logo.java", "// myFirstTurtle")}
+"""
++
+Text.cutOut("./logo.java", "// myFirstTurtle") + "\n"
++
+"""
 ```
 
 Das Ergebnis sieht dann so aus: ein Quadrat aus Pfeilen, wobei absichtlich kleine Zwischenräume gelassen wurden, mit Angaben der Pfeilausrichtung.
@@ -67,7 +71,7 @@ myFirstTurtle = edge(myFirstTurtle, 100, 5);
 myFirstTurtle = write(myFirstTurtle, "North").right(90);
 // myFirstTurtle
 
-Clerk.markdown(STR.
+Clerk.markdown(
 """
 ## Beispiel 2: Umsetzung eines Logo-Programms in Java
 
@@ -92,13 +96,21 @@ tree 150
 Die Java-Methode `tree` bildet das obige Logo-Programm nach; lediglich aus praktischen Überlegungen lasse ich den Rekursionsabbruch etwas früher greifen.
 
 ```java
-\{Text.cutOut("./logo.java", "// turtle tree")}
+"""
++
+Text.cutOut("./logo.java", "// turtle tree") + "\n"
++
+"""
 ```
 
 Der Aufruf der Methode `tree` erzeugt etwas, was einem "Baum" ähnelt.
 
 ```java
-\{Text.cutOut("./logo.java", "// tree")}
+"""
++
+Text.cutOut("./logo.java", "// tree") + "\n"
++
+"""
 ```
 
 """);
@@ -131,13 +143,17 @@ void tree(Turtle turtle, double size) {
 tree(turtle, 150);
 // tree
 
-Clerk.markdown(STR."""
+Clerk.markdown("""
 ## Beispiel 3: Es kommt Farbe ins Spiel
 
 Mit Farbe wird die Welt bunter und interessanter, und die Strichstärke kann man ebenfalls für Effekte einsetzen. Im nachfolgenden Beispiel verblasst die Farbe zunehmend und die Strichstärke lässt allmählich nach.
 
 ```java
-\{Text.cutOut("./logo.java", "// triangles")}
+"""
++
+Text.cutOut("./logo.java", "// triangles") + "\n"
++
+"""
 ```
 """);
 
@@ -160,13 +176,17 @@ void drawing(Turtle turtle, double size) {
 drawing(turtle, 100);
 // triangles
 
-Clerk.markdown(STR."""
+Clerk.markdown("""
 ## Beispiel 4: Interaktivität mit Slider (Preview-Feature, _unstable_)
 
-Es ist auch möglich, eine Turtle-Grafik mit einem Slider-Clerk zu koppeln – und es entsteht eine interaktive Anwendung.
+Es ist auch möglich, eine Turtle-Grafik mit einer Slider-View zu koppeln – und es entsteht eine interaktive Anwendung.
 
 ```java
-\{Text.cutOut("./logo.java", "// interactivity")}
+"""
++
+Text.cutOut("./logo.java", "// interactivity") + "\n"
++
+"""
 ```
 
 Das macht noch mehr Spaß! Die Zeichnungen werden auf Seiten des Java-Programms mit jeder Änderung am Slider neu erzeugt.
@@ -188,6 +208,6 @@ slider.attachTo(response -> {
 // interactivity
 
 
-Clerk.markdown(STR."""
+Clerk.markdown("""
 Soviel möge als Demo vorerst genügen! _More features to come_ 😉
 """);

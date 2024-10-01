@@ -220,11 +220,11 @@ interface Clerk {
 
 /open skills/Text/Text.java
 /open skills/ObjectInspector/ObjectInspector.java
-/open clerks/Turtle/Turtle.java
-/open clerks/Markdown/Marked.java
-/open clerks/Markdown/MarkdownIt.java
-/open clerks/TicTacToe/TicTacToe.java
-/open clerks/Dot/Dot.java
-/open clerks/Input/Slider.java
+/open views/Turtle/Turtle.java
+/open views/Markdown/Marked.java
+/open views/Markdown/MarkdownIt.java
+/open views/TicTacToe/TicTacToe.java
+/open views/Dot/Dot.java
+/open views/Input/Slider.java
 
 // LiveView view = Clerk.view();
