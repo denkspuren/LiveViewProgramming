@@ -16,7 +16,7 @@ class Text { // Class with static methods for file operations
         }
     }
 
-    // Cut out a snippet
+    // core method
     static String cutOut(Path path, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
         List<String> snippet = new ArrayList<>();
         boolean skipLines = true;
@@ -43,7 +43,7 @@ class Text { // Class with static methods for file operations
         }
         return snippet.stream().collect(Collectors.joining("\n"));
     }
-    // done
+    // end
 
     static String cutOut(Path path, String... labels) { return cutOut(path, false, false, labels); }
     static String read(Path path) { return cutOut(path, true, true, ""); }
