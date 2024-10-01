@@ -37,7 +37,7 @@ Die folgende Logo-Anwendung demonstriert, wie man mittels Methoden schrittweise 
 ```java
 """
 +
-Text.cutOut("./logo.java", "// myFirstTurtle")
+Text.cutOut("./logo.java", "// myFirstTurtle") + "\n"
 +
 """
 ```
@@ -98,7 +98,7 @@ Die Java-Methode `tree` bildet das obige Logo-Programm nach; lediglich aus prakt
 ```java
 """
 +
-Text.cutOut("./logo.java", "// turtle tree")
+Text.cutOut("./logo.java", "// turtle tree") + "\n"
 +
 """
 ```
@@ -108,7 +108,7 @@ Der Aufruf der Methode `tree` erzeugt etwas, was einem "Baum" ähnelt.
 ```java
 """
 +
-Text.cutOut("./logo.java", "// tree")
+Text.cutOut("./logo.java", "// tree") + "\n"
 +
 """
 ```
@@ -151,7 +151,7 @@ Mit Farbe wird die Welt bunter und interessanter, und die Strichstärke kann man
 ```java
 """
 +
-Text.cutOut("./logo.java", "// triangles")
+Text.cutOut("./logo.java", "// triangles") + "\n"
 +
 """
 ```
@@ -179,12 +179,12 @@ drawing(turtle, 100);
 Clerk.markdown("""
 ## Beispiel 4: Interaktivität mit Slider (Preview-Feature, _unstable_)
 
-Es ist auch möglich, eine Turtle-Grafik mit einee Slider-View zu koppeln – und es entsteht eine interaktive Anwendung.
+Es ist auch möglich, eine Turtle-Grafik mit einer Slider-View zu koppeln – und es entsteht eine interaktive Anwendung.
 
 ```java
 """
 +
-Text.cutOut("./logo.java", "// interactivity")
+Text.cutOut("./logo.java", "// interactivity") + "\n"
 +
 """
 ```
