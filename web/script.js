@@ -1,5 +1,4 @@
 const loadedDiv = document.getElementById('loadMessage');
-const actionCache = new Map();
 const debug = true;
 
 function loadScript(src, onError = () => console.error('script loading failed: ', src)) {
@@ -27,7 +26,7 @@ function setUp() {
 
     source.onmessage = function (event) {
       if(debug) console.log(`Message: ${event.data}`);
-      handleActions(event.data.split(":"));      
+      receive(event.data);      
     };
 
     source.onerror = function (error) {
@@ -47,16 +46,37 @@ function decode(data) {
 
 function currentInstruction() {};
 
-function compose(...fucntions) {
+function compose(...functions) {
   return (input) => {
-    return fucntions.reduce((acc, fn) => {
+    return functions.reduce((acc, fn) => {
       return fn(acc);
     }, input);
   };
 }
 
+const commandCache = [];
+//{action: 0, data: ""};
 
-function handleActions(actions) {
+function receive(commands) {
+  const commandList = commands.split("\n");
+  for (let i = 0; i < commandList.length; i++) {
+    const [command, data] = commandList[i].split(":");
+    switch (command) {
+      case "CALL":
+      case "HTML":
+        commandCache.push({(command === "CALL" ? 0 : 1), decode(data)});
+        break;
+      case "EXECUTE":
+        interpret(commandCache);
+        break;
+      default:
+        break;
+    }
+  }
+  
+}
+
+function interpret(commandCache) {
   if (actions === undefined || actions.length === 0) return;
   if (debug) console.log(`Action: ${actions[0]}`);
   switch (actions[0]) {

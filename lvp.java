@@ -241,9 +241,11 @@ interface Clerk {
     static LiveView view() { return view(LiveView.getDefaultPort()); }
 
     static void html(LiveView view, String text)         { view.cache(SSEType.HTML, text); }
-    static void call(LiveView view, String javascript)   { view.cache(SSEType.CALL, javascript); }
+    static void callJs(LiveView view, String javascript)   { view.cache(SSEType.CALL, javascript); }
     static void execute(LiveView view)                   { view.cache(SSEType.EXECUTE); }
     static void send(LiveView view)                      { view.packAndSend(); }
+
+    //old methods
 
 
     static void load(LiveView view, String path) {
