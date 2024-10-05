@@ -4,6 +4,7 @@ record MarkdownIt(LiveView view) implements Clerk {
         String localPath = "views/Markdown/markdown-it.min.js";
         Clerk.load(view, onlinePath, localPath);
         Clerk.load(view, "views/Markdown/highlight.min.js");
+        Clerk.load(view, "views/Markdown/mathjax3.js");
         // Clerk.script(view, """
         //     var md = markdownit({
         //         html: true,
@@ -25,6 +26,7 @@ record MarkdownIt(LiveView view) implements Clerk {
                 linkify: true,
                 typographer: true
             });
+            md.use(window.mathjax3);
             """);
     }
     public String write(String markdownText) {
