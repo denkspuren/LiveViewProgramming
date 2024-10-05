@@ -1,4 +1,3 @@
-
 Clerk.markdown("""
 # Die Code-Dokumentation mit Markdown
 
@@ -6,9 +5,11 @@ Für die Code-Dokumentation mit Markdown sind Textblöcke und der Text-Skill ent
 
 * Mit Textblöcken lassen sich String-Literale als Textblöcke über mehrere Zeilen hinweg angeben. Ein solcher Textblock beginnt und endet mit drei Anführungszeichen `\"""`.
 
-* Das LVP bringt einen Text-Skill mit, der hauptsächlich dafür da ist, um Text aus einer Datei auszuschneiden. Der Bereich, der ausgeschnitten werden soll, wird durch Textmarken (Labels) ausgewiesen.
+* Das LVP bringt einen Text-Skill mit, der hauptsächlich dafür da ist,
+  - um Text aus einer Datei auszuschneiden (Methode `cutOut`); der Bereich, der ausgeschnitten werden soll, wird durch Textmarken (Labels) ausgewiesen.
+  - um Text mit Aufüllfeldern zu versehen (Methode `fillOut`), in die Ergebnisse aus Auswertungen als Zeichenkette eingefügt werden.
 
-> In den Java-Versionen 21 und 22 gab es [String-Templates](https://docs.oracle.com/en/java/javase/22/language/string-templates.html) als Preview-Feature. Damit ließen sich sehr elegant die Auswertungen von Ausdrücken mitten in einen String einfügen. Leider sind die String-Templates mit Java 23 wieder entfernt worden -- ein einmaliger Vorgang für Preview-Features in der Historie von Java. Man kann nur hoffen, dass eine neue Form der String-Templates nicht lange auf sich warten lässt.
+> In den Java-Versionen 21 und 22 gab es [String-Templates](https://docs.oracle.com/en/java/javase/22/language/string-templates.html) als Preview-Feature. Damit ließen sich sehr elegant die Auswertungen von Ausdrücken mitten in einen String einfügen. Das wird in anderen Programmiersprachen auch als String-Interpolation bezeichnet. Leider sind die String-Templates mit Java 23 wieder entfernt worden -- ein einmaliger Vorgang für Preview-Features in der Historie von Java. Als leichtgewichtigen Ersatz gibt es deshalb im Text-Skill die statische Methode `fillOut`.
 
 """);
 
@@ -24,42 +25,55 @@ assert factorial(2) == 2 && factorial(3) == 6;
 assert factorial(4) == 24 && factorial(5) == 120;
 // Ende Fakultätsfunktion
 
-// STR-Beispiel
+// Beispiel
 int num;
 String s = "Die Fakultät von " + (num = 6) + " ist " + factorial(num) + ".";
-// STR-Beispiel
+// Beispiel
 
 
-Clerk.markdown("""
+Clerk.markdown(Text.fillOut("""
 ## Dynamische Inhalte in Zeichenketten einbetten
 
-Ohne String-Templates muss man auf bewährte Weise Zeichenketten mit dem `+`-Operator verketten (konkatenieren). Wenn Inhalte in einer Zeichenkette dynamisch berechnet und eingefügt werden sollen, kann man das beispielsweise wie folgt machen:
+Wenn Inhalte in einer Zeichenkette dynamisch berechnet und eingefügt werden sollen, kann man das beispielsweise wie folgt machen:
 
 ```
-"""
-+
-Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// STR-Beispiel") + "\n"
-+
-"""
+${Beispiel}
 ```
 
 Das Ergebnis der Zeichenkette `s` ist
 
 ```
-"""
-+
-s + "\n"
-+
-"""
+${Resultat}
 ```
 
-Das sieht dann im Markdown-Fließtext so aus: \s""" + s + "\n" +
-"""
+Das sieht dann, wenn man die Zeichenkette im Markdown einfügt (mit `Text.fillOut`), so aus: ${Resultat}
 
-Diese Technik der Einbettung von dynamischen Inhalten in eine Zeichenkette lässt sich ausreizen mit der Text-Skill. Damit kann der Java-Quelltext sich zur Laufzeit selbst ausschneiden zur Einbettung in Markdown! Das ist der Schlüssel zu sich selbst dokumentierenden Dokumenten.
-""");
+Diese Technik der Einbettung von dynamischen Inhalten in eine Zeichenkette lässt sich ausreizen mit der Text-Skill. Damit kann der Java-Quelltext sich zur Laufzeit selbst ausschneiden zur Einbettung in Markdown! Das ist der Schlüssel zu sich selbst dokumentierendem Programmcode.
+""", Map.of("Beispiel", Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// Beispiel"),
+            "Resultat", s)));
 
-Clerk.markdown("""
+Clerk.markdown(Text.fillOut(Map.of(
+"LabelCff",
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelCff"),
+"ResultLabelCff",
+// LabelCff
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", false, false, "// LabelC")
+// LabelCff
+, "LabelCft",
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelCft"),
+"ResultLabelCft",
+// LabelCft
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", false, true, "// LabelC")
+// LabelCft
+, "LabelAB",
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelAB"),
+"ResultLabelAB",
+// LabelAB
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelA", "// LabelB")
+// LabelAB
+, "TextCutOut",
+Text.cutOut("skills/Text/Text.java", "// core method", "// end")
+), """
 ## Texte ausschneiden mit `Text.cut`
 
 Mit dem Skill `Text` kann Text aus einer Datei ausgeschnitten werden. Der Methodenkopf von `cutOut` erwartet einen Dateinamen, zwei boolsche Werte und eine beliebige Anzahl an Labels.
@@ -89,23 +103,13 @@ Textstelle, umschlossen von einem LabelC
 Der folgende Aufruf
 
 ```
-"""
-+
-Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelCff") + "\n"
-+
-"""
+${LabelCff}
 ```
 
 liefert als Zeichenkette diesen Auszug (Snippet) aus der Datei zurück:
 
 ```
-"""
-+
-// LabelCff
-Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", false, false, "// LabelC")
-// LabelCff
-+ "\n" + 
-"""
+${ResultLabelCff}
 ```
 
 > Der Witz an diesem Beispiel ist das, was man hier nicht sieht, aber wichtig für die Idee einer eingebetteten, dynamischen Dokumentation ist: Der obige Aufruf ist tatsächlich ein Snippet von dem Code, der das resultierende Snippet erzeugt. Das klingt ein wenig seltsam, aber das ist genau der Kunstgriff, der garantiert, dass der Aufruf wirklich der ist, der das Ergebnis produziert. Wenn Sie einen Blick in die Java-Datei werfen, die diese View im Browser erzeugt hat, werden Sie das vermutlich verstehen und nachvollziehen können. Vergleichen Sie den Java-Quellcode mit dem Text im Browser.
@@ -113,45 +117,25 @@ Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", false, false, "// LabelC"
 Setzt man einen der boolschen Werte auf `true`, wird das entsprechende Label mit übernommen.
 
 ```
-"""
-+
-Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelCft") + "\n"
-+
-"""
+${LabelCft}
 ```
 
 Das Ergebnis sieht so aus:
 
 ```
-"""
-+
-// LabelCft
-Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", false, true, "// LabelC")
-// LabelCft
-+ "\n" +
-"""
+${ResultLabelCft}
 ```
 
 Sind mehrere Stellen mit dem gleichen Label belegt, kann man diese Bereiche ausschneiden. Wenn die boolschen Werte beide `false` sind, kann man den Aufruf verkürzen.
 
 ```
-"""
-+
-Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelAB") + "\n"
-+
-"""
+${LabelAB}
 ```
 
 Zunächst wird die erste Textstelle zwischen `LabelA` und `LabelB` ausgeschnitten, dann die zweite.
 
 ```
-"""
-+
-// LabelAB
-Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelA", "// LabelB")
-// LabelAB
-+ "\n" +
-"""
+${ResultLabelAB}
 ```
 
 ### Der Algorithmus zu `Text.cutOut`
@@ -166,10 +150,6 @@ Der Algorithmus zu `Text.cutOut(...)`, um einen Bereich aus einer Textdatei zu s
 Als Java-Methode:
 
 ```java
-"""
-+
-Text.cutOut("skills/Text/Text.java", "// core method", "// end") + "\n"
-+
-"""
+${TextCutOut}
 ```
-""");
+"""));
