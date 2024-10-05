@@ -108,6 +108,8 @@ Es ist zudem möglich, Views interaktiv zu koppeln. In der Animation sieht man, 
 
 So macht das Programmieren ganz anders Spaß! Und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Möglichkeiten des _Live View Programming_ gehen jedoch weit über die "Spielerei" hinaus.
 
+Eine kurze Demo zur Einführung bietet das YouTube-Video [Einführung in das Live View Programming mit Javas JShell](https://www.youtube.com/watch?v=itWU15ywmzA).
+
 ### 📄 Live View Programming zur Dokumentation
 
 Mit dem _Live View Programming_ kann man -- ganz im Sinne des Literate Programming -- eine _Live View_ zur Dokumentation von Java-Code erzeugen; und das alles aus der Java-Datei heraus, in der man das Programm geschrieben hat. Code und Dokumentation können miteinander kombiniert werden.
@@ -161,6 +163,10 @@ Views werden immer mit einer _Live View_ assoziiert und stellen zudem den browse
 Skills sind im Verzeichnis [`skills`](/skills/) zu finden. Skills haben nichts mit einer _View_ zu tun, sie stellen spezielle oder generelle Fähigkeiten zur Verfügung, die man beim _Live View Programming_ oder im Zusammenspiel mit Views gebrauchen kann. `Text` ist z.B. ein wichtiger Skill, um Text oder Code aus einer Datei "ausschneiden" zu können, was elementar für die Code-Dokumentation ist.
 
 > Solange einzelne Views und Skills nicht weiter dokumentiert sind (das wird noch kommen), studieren Sie am besten den Code der Views und Skills. In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser grundlegenden Fähigkeiten. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert.
+
+## 👁️ Ein Blick hinter die Kulissen
+
+In dem YouTube-Video ["Live View Programming: Ein Blick hinter die Kulissen"](https://youtu.be/Qj6PEYNSXnM) erkläre ich Ihnen, wie der LVP-Server an den Browser Daten schickt, den HTML-Code im Browser verändert und JavaScript-Programme nachlädt. Die Idee zum LVP besteht aus einem sehr einfachen Kern, der sich einfach erweitern lässt.
 
 # 🚀 Der Prototyp ist erst der Anfang
 
