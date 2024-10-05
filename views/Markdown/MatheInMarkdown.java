@@ -1,7 +1,8 @@
 Clerk.markdown("""
 # Mathe Beispiele
 ## Simple Math
-$2x_1+5x_2 = 12$
+Man kann Formeln wie $2x_1+5x_2 = 12$ direkt in der Textzeile unterbringen.
+
 ## Brüche
 $\\frac{1}{2}$
 
@@ -27,4 +28,4 @@ $$
 1x^2 + 2x = 5
 $$
 
-""")
+""");
