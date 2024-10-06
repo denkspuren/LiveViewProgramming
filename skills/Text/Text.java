@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 
 class Text { // Class with static methods for file operations
     static void write(String fileName, String text) {
@@ -62,5 +67,36 @@ class Text { // Class with static methods for file operations
         return text.replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;");
+    }
+
+    // Method `fillOut` emulates String interpolation, since String Templates
+    // have been removed in Java 23 (they were a preview feature in Java 21 and 22).
+
+    static String fillOut(Map<String, Object> replacements, String template) {
+        Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}"); // `${<key>}`
+        Matcher matcher = pattern.matcher(template);
+        StringBuffer result = new StringBuffer();
+
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (!replacements.containsKey(key))
+                System.err.println("WARNING: key +`" + key + "` not found in template:\n" + template);
+            Object replacement = replacements.getOrDefault(key, ""); 
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement.toString()));
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
+    static String fillOut(String template, Map<String, Object> replacements) {
+        return fillOut(replacements, template);
+    }
+
+    static String fillOut(String template, Object... replacements) {
+        Map<String, Object> m = new HashMap<>();
+        IntStream.range(0, replacements.length)
+            .forEach(i -> m.put(Integer.toString(i), replacements[i]));
+        return fillOut(m, template);
     }
 }
