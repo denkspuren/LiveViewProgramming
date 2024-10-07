@@ -77,7 +77,7 @@ function setUp() {
           break;
         }
         case "RELEASE":
-          lock = false;
+          locks = locks.filter(lock => lock !== data);
           break;
         default:
           console.log("Unknown Action");
@@ -97,7 +97,7 @@ function setUp() {
 }
 
 const Clerk = {}; // not used, yet
-let lock = false;
+let locks = [];
 setUp();
 
 // https://samthor.au/2020/understanding-load/
