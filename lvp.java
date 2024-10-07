@@ -153,6 +153,10 @@ class LiveView {
     }
 
     void createResponseContext(String path, Consumer<String> delegate) {
+        createResponseContext(path, delegate, "-1");
+    }
+
+    void createResponseContext(String path, Consumer<String> delegate, String id) {
         server.createContext(path, exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
@@ -170,7 +174,7 @@ class LiveView {
                 byte[] data = new byte[length];
                 exchange.getRequestBody().read(data);
                 delegate.accept(new String(data));
-                sendServerEvent(SSEType.RELEASE, "");
+                sendServerEvent(SSEType.RELEASE, id);
             } catch (NumberFormatException e) {
                 exchange.sendResponseHeaders(400, -1);
                 return;
