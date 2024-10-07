@@ -16,13 +16,13 @@ class Slider implements Clerk {
                 if (lock === true) return;
                 lock = true;
                 const value = event.target.value;
-                console.log(`slider${0}: value = ${value}`);
+                console.log(`slider${0}: value = ${1}`);
                 fetch('slider${0}', {
                    method: 'post',
                     body: value.toString()
                 }).catch(console.error);
             });
-            """, ID));
+            """, ID, "${value}"));
         return this;
     }
 }
