@@ -80,7 +80,7 @@ class Text { // Class with static methods for file operations
         while (matcher.find()) {
             String key = matcher.group(1);
             if (!replacements.containsKey(key))
-                System.err.println("WARNING: key +`" + key + "` not found in template:\n" + template);
+                System.err.println("WARNING: key \"" + key + "\" not found in template:\n" + template);
             Object replacement = replacements.getOrDefault(key, "${" + key + "}"); 
             matcher.appendReplacement(result, Matcher.quoteReplacement(replacement.toString()));
         }

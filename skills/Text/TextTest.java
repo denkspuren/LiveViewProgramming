@@ -11,3 +11,7 @@ assert Text.fillOut(
 assert Text.fillOut(
     "Das Ergebnis ist ${0} oder ${1}.", 2 + 3, 42).equals(
     "Das Ergebnis ist 5 oder 42.");
+
+assert Text.fillOut( // You'll get a WARNING on std.err
+    "Das Ergebnis ist ${0} oder ${value}.", 2 + 3).equals(
+    "Das Ergebnis ist 5 oder ${value}."); 
