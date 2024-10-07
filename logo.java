@@ -177,7 +177,6 @@ ${0}
 
 Das macht noch mehr Spaß! Die Zeichnungen werden auf Seiten des Java-Programms mit jeder Änderung am Slider neu erzeugt.
 
-> Nutzt man die Entwicklertools im Chrome-Browser, um die internen Abläufe zu verfolgen, treten beim "Sliden" sofort `onerror`-Events auf. Der Browser erholt sich zwar davon, aber der Interaktionseffekt ist dahin. Ohne Entwicklertools läuft auf einem MacBook Air mit M1-Prozessor meist alles flüssig und unproblematisch. Allerdings gibt es auch hier gelegentlich Aussetzer. Es scheint nötig zu sein, während der Abarbeitung des `input`-Events vom Slider weitere Folgeevents zu unterbinden. Wie gesagt, ein Preview-Feature, wo es noch hakt.
 """, Text.cutOut("./logo.java", "// interactivity")));
 
 // interactivity
