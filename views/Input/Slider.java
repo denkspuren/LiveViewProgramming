@@ -10,22 +10,19 @@ class Slider implements Clerk {
     }
     Slider attachTo(Consumer<String> delegate) {
         this.view.createResponseContext("/slider" + ID, delegate);
-        Clerk.script(view, "slider" + ID +
-        """
-        .addEventListener("input", (event) => {
-            const value = event.target.value;
-            console.log(`slider""" + ID + 
-        """
-        : value = ${value}`);
-        fetch('slider""" + ID +
-        """
-            ', {
-                method: "post",
-                body: value.toString()
-            }).catch(console.log);
-        });
-        """
-        );
+        Clerk.script(view, Text.fillOut(
+            """
+            slider${0}.addEventListener('input', (event) => {
+                if (lock === true) return;
+                lock = true;
+                const value = event.target.value;
+                console.log(`slider${0}: value = ${value}`);
+                fetch('slider${0}', {
+                   method: 'post',
+                    body: value.toString()
+                }).catch(console.error);
+            });
+            """, ID));
         return this;
     }
 }
