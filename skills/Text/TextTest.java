@@ -14,4 +14,8 @@ assert Text.fillOut(
 
 assert Text.fillOut( // You'll get a WARNING on std.err
     "Das Ergebnis ist ${0} oder ${value}.", 2 + 3).equals(
+    "Das Ergebnis ist 5 oder ${value}.");
+
+assert Text.fillOut(
+    "Das Ergebnis ist ${0} oder ${value}.", Map.of("0", 2 + 3, "value", "${value}")).equals(
     "Das Ergebnis ist 5 oder ${value}."); 

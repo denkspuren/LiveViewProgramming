@@ -1,4 +1,3 @@
-
 class Slider implements Clerk {
     final String ID;
     LiveView view;
@@ -22,7 +21,7 @@ class Slider implements Clerk {
                     body: value.toString()
                 }).catch(console.error);
             });
-            """, ID));
+            """, Map.of("0", ID, "value", "${value}")));
         return this;
     }
 }
