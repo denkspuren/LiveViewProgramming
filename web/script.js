@@ -76,6 +76,9 @@ function setUp() {
           
           break;
         }
+        case "RELEASE":
+          lock = false;
+          break;
         default:
           console.log("Unknown Action");
           break;
@@ -94,6 +97,7 @@ function setUp() {
 }
 
 const Clerk = {}; // not used, yet
+let lock = false;
 setUp();
 
 // https://samthor.au/2020/understanding-load/

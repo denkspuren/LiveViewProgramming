@@ -26,7 +26,7 @@ import java.util.concurrent.locks.Condition;
 
 // To run this code type `jshell -R-ea --enable-preview`
 
-enum SSEType { WRITE, CALL, SCRIPT, LOAD, CLEAR; }
+enum SSEType { WRITE, CALL, SCRIPT, LOAD, CLEAR, RELEASE; }
 
 class LiveView {
     final HttpServer server;
@@ -170,6 +170,7 @@ class LiveView {
                 byte[] data = new byte[length];
                 exchange.getRequestBody().read(data);
                 delegate.accept(new String(data));
+                sendServerEvent(SSEType.RELEASE, "");
             } catch (NumberFormatException e) {
                 exchange.sendResponseHeaders(400, -1);
                 return;
