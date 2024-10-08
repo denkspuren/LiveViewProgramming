@@ -125,12 +125,16 @@ function interpret(commandCache) {
       handleActions(actions.slice(1, actions.length));
       break;
     }
+    case "RELEASE":
+      locks = locks.filter(lock => lock !== data);
+      break;
     default:
       console.log("Unknown Action");
       break;
   }
 }
 
+let locks = [];
 setUp();
 
 // https://samthor.au/2020/understanding-load/

@@ -25,9 +25,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Condition;
 
-// To run this code type `jshell -R-ea --enable-preview`
+// To run this code type `jshell -R-ea`
 
-enum SSEType { HTML, CALL, LOAD, CLEAR, EXECUTE, STORE, RESTORE; }
+enum SSEType { HTML, CALL, LOAD, CLEAR, EXECUTE, STORE, RESTORE, RELEASE; }
 
 class LiveView {
     final HttpServer server;
@@ -190,6 +190,10 @@ class LiveView {
     }
 
     void createResponseContext(String path, Consumer<String> delegate) {
+        createResponseContext(path, delegate, "-1");
+    }
+
+    void createResponseContext(String path, Consumer<String> delegate, String id) {
         server.createContext(path, exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
@@ -207,6 +211,7 @@ class LiveView {
                 byte[] data = new byte[length];
                 exchange.getRequestBody().read(data);
                 delegate.accept(new String(data));
+                sendServerEvent(SSEType.RELEASE, id);
             } catch (NumberFormatException e) {
                 exchange.sendResponseHeaders(400, -1);
                 return;
@@ -270,12 +275,12 @@ interface Clerk {
 
 // /open skills/Text/Text.java
 // /open skills/ObjectInspector/ObjectInspector.java
-// /open clerks/Turtle/Turtle.java
-// /open clerks/Markdown/Marked.java
-// /open clerks/Markdown/MarkdownIt.java
-// /open clerks/TicTacToe/TicTacToe.java
-// /open clerks/Dot/Dot.java
-// /open clerks/Input/Slider.java
+// /open views/Turtle/Turtle.java
+// /open views/Markdown/Marked.java
+// /open views/Markdown/MarkdownIt.java
+// /open views/TicTacToe/TicTacToe.java
+// /open views/Dot/Dot.java
+// /open views/Input/Slider.java
 
 LiveView view = Clerk.view();
 Clerk.html(view, "<h1>Hello World</h1>");
