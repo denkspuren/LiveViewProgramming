@@ -1,8 +1,12 @@
-const loadedDiv = document.getElementById('loadMessage');
 const debug = true;
 
+const loadedDiv = document.getElementById('loadMessage');
+
+let commandCache = [];  //{action: 0, data: ""};
+let locks = [];
+
 function loadScript(src, onError = () => console.error('script loading failed: ', src)) {
-  var script = document.createElement('script');
+  const script = document.createElement('script');
   script.src = src;
   script.onload = function() {
     script.classList.add("persistent");
@@ -44,32 +48,66 @@ function decode(data) {
   return new TextDecoder("utf-8").decode(Uint8Array.from(atob(data), c => c.charCodeAt(0)));
 }
 
-function currentInstruction() {};
-
-function compose(...functions) {
-  return (input) => {
-    return functions.reduce((acc, fn) => {
-      return fn(acc);
-    }, input);
-  };
-}
-
-const commandCache = [];
-//{action: 0, data: ""};
-
 function receive(commands) {
-  const commandList = commands.split("\n");
-  for (let i = 0; i < commandList.length; i++) {
-    const [command, data] = commandList[i].split(":");
-    switch (command) {
-      case "CALL":
-      case "HTML":
-        commandCache.push({(command === "CALL" ? 0 : 1), decode(data)});
+  const commandList = commands.split("#");
+
+  for (const command of commandList) {
+    if (!command) return;
+    if (debug) console.log(`Processing: ${command}`);
+
+    const splitPos = command.indexOf(":");
+    const action = command.slice(0, splitPos !== -1 ? splitPos : command.length);
+
+    switch (action) {
+      case "CALL": {
+        const data = command.slice(splitPos+1);
+        commandCache.push({ action: 0, data: decode(data)});
         break;
+      }
+      case "HTML": {
+        const data = command.slice(splitPos+1);
+        commandCache.push({ action: 1, data: decode(data)});
+        break;
+      }
+      case "SCRIPT":  {
+        const data = command.slice(splitPos+1);
+        commandCache.push({ action: 2, data: decode(data)});
+        break;
+      }        
+      case "LOAD": {
+        const data = command.slice(splitPos+1);
+        loadedDiv.style.display = 'block';
+        setTimeout(() => {
+          loadedDiv.style.display = 'none';
+        }, 300);
+        let srcs = data.split(',');
+        srcs = srcs.map(src => src.trim());
+        if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
+        else loadScript(data);
+        break;
+      }
+      case "CLEAR": {
+        const toRemove = [];
+        for (const node of document.body.children) {
+          if (node.classList?.contains("persistent") === false) {
+            toRemove.push(node);
+          }
+        }
+        toRemove.forEach(x => document.body.removeChild(x));
+        commandCache = [];
+        break;
+      }
+      case "RELEASE": {
+        const data = command.slice(splitPos+1);
+        locks = locks.filter(lock => lock !== data);
+        break;
+      }
       case "EXECUTE":
         interpret(commandCache);
+        commandCache = [];
         break;
       default:
+        console.error("Unknown Action");
         break;
     }
   }
@@ -77,64 +115,34 @@ function receive(commands) {
 }
 
 function interpret(commandCache) {
-  if (actions === undefined || actions.length === 0) return;
-  if (debug) console.log(`Action: ${actions[0]}`);
-  switch (actions[0]) {
-    case "CALL": {
-      if (debug) console.log(`Data: ${decode(actions[1])}`);
-      const fn = () => Function(decode(actions[1])).apply(); // https://www.educative.io/answers/eval-vs-function-in-javascript
-      currentInstruction = compose(currentInstruction, fn);
-      handleActions(actions.slice(2, actions.length));
-      break;
-    }
-    case "HTML": {
-      if (debug) console.log(`Data: ${decode(actions[1])}`);
-      const fn = () => document.body.innerHTML += decode(actions[1]);
-      currentInstruction = compose(currentInstruction, fn);
-      handleActions(actions.slice(2, actions.length));
-      break;
-    }
-    case "LOAD": {
-      loadedDiv.style.display = 'block';
-      setTimeout(() => {
-        loadedDiv.style.display = 'none';
-      }, 300);
-      let srcs = actions[1].split(',');
-      srcs = srcs.map(src => src.trim());
-      if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
-      else loadScript(actions);
-      break;
-    }
-    case "CLEAR": {
-      const fn = () => {
-        const toRemove = [];
-        for (const node of document.body.children) {
-          if (node.classList == null || !node.classList.contains("persistent")) {
-            toRemove.push(node);
-          }
-        }
-        toRemove.forEach(x => document.body.removeChild(x));
+  if (commandCache === undefined) return;
+
+  for (const command of commandCache) {
+    if (debug) console.log(`Command: ${command.action} - ${command.data}`);
+
+    switch (command.action) {
+      case 0:
+        Function(command.data).apply(); // https://www.educative.io/answers/eval-vs-function-in-javascript
+        break;
+      case 1: {
+        const container = document.createElement("div");
+        container.innerHTML = command.data;
+        document.body.appendChild(container);
+        break;
       }
-      currentInstruction = compose(currentInstruction, fn);
-      handleActions(actions.slice(1, actions.length));      
-      break;
+      case 2: {
+        const scriptTag = document.createElement("script");
+        scriptTag.innerHTML = command.data;
+        document.body.appendChild(scriptTag);
+        break;
+      }
+      default:
+        console.error("Unknown Action");
+        break;
     }
-    case "EXECUTE": {
-      this.currentInstruction();
-      this.currentInstruction = () => {};
-      handleActions(actions.slice(1, actions.length));
-      break;
-    }
-    case "RELEASE":
-      locks = locks.filter(lock => lock !== data);
-      break;
-    default:
-      console.log("Unknown Action");
-      break;
   }
 }
 
-let locks = [];
 setUp();
 
 // https://samthor.au/2020/understanding-load/

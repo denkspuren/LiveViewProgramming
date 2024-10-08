@@ -27,7 +27,7 @@ import java.util.concurrent.locks.Condition;
 
 // To run this code type `jshell -R-ea`
 
-enum SSEType { HTML, CALL, LOAD, CLEAR, EXECUTE, STORE, RESTORE, RELEASE; }
+enum SSEType { HTML, CALL, SCRIPT, LOAD, CLEAR, EXECUTE, STORE, RESTORE, RELEASE; }
 
 class LiveView {
     final HttpServer server;
@@ -47,7 +47,7 @@ class LiveView {
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
 
-    List<String> cache = new ArrayList<>();
+    String cache = "";
 
 
     static LiveView onPort(int port) {
@@ -130,36 +130,28 @@ class LiveView {
         return Base64.getEncoder().encodeToString(binaryData);
     }
 
-    void cache(SSEType action, String data) {
-        cache.add(pack(action, data));
+    void addToCache(SSEType action) {
+        this.cache += action + "#";
     }
 
-    void cache(SSEType action) {
-        cache.add(action.toString());
+    void addToCache(SSEType action, String data) {
+       this.cache += action + ":" + encode(data) + "#";
     }
 
-    void packAndSend() {
-        if (cache.isEmpty()) {
+    void sendCache() {
+        if (this.cache.isEmpty()) {
             System.err.println("Nothing to send!");
             return;
         }
 
-        String message = cache.get(0);
-        for (int i = 1; i < cache.size(); i++) {
-            message += ":" + cache.get(i);
-        }
-        sendServerEvent(message);
-        cache.clear();
-    }
-
-    String pack(SSEType action, String data) {
-        return action + ":" + encode(data);
+        sendServerEvent(cache);
+        cache = "";
     }
 
     void load(String data) {
         lock.lock();
         try {
-            String message = pack(SSEType.LOAD, data);
+            String message = SSEType.LOAD + ":" + data;
             sendServerEvent(message);
             if (!loadEventOccured) {
                 loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
@@ -211,7 +203,7 @@ class LiveView {
                 byte[] data = new byte[length];
                 exchange.getRequestBody().read(data);
                 delegate.accept(new String(data));
-                sendServerEvent(SSEType.RELEASE, id);
+                sendServerEvent(SSEType.RELEASE + ":" + id);
             } catch (NumberFormatException e) {
                 exchange.sendResponseHeaders(400, -1);
                 return;
@@ -245,12 +237,29 @@ interface Clerk {
     static LiveView view(int port) { return LiveView.onPort(port); }
     static LiveView view() { return view(LiveView.getDefaultPort()); }
 
-    static void html(LiveView view, String text)         { view.cache(SSEType.HTML, text); }
-    static void callJs(LiveView view, String javascript)   { view.cache(SSEType.CALL, javascript); }
-    static void execute(LiveView view)                   { view.cache(SSEType.EXECUTE); }
-    static void send(LiveView view)                      { view.packAndSend(); }
+    static void write(LiveView view, String content)    {
+        html(view, content);
+        execute(view);
+        send(view);
+    }
+    
+    static void script(LiveView view, String content)    {
+        scriptJs(view, content);
+        execute(view);
+        send(view);
+    }
+    
+    static void call(LiveView view, String javascript) {
+        callJs(view, javascript);
+        execute(view);
+        send(view);
+    }
 
-    //old methods
+    static void html(LiveView view, String text)            { view.addToCache(SSEType.HTML, text); }
+    static void callJs(LiveView view, String javascript)    { view.addToCache(SSEType.CALL, javascript); }
+    static void scriptJs(LiveView view, String javascript)  { view.addToCache(SSEType.SCRIPT, javascript); }
+    static void execute(LiveView view)                      { view.addToCache(SSEType.EXECUTE); }
+    static void send(LiveView view)                         { view.sendCache(); }
 
 
     static void load(LiveView view, String path) {
@@ -259,31 +268,28 @@ interface Clerk {
     static void load(LiveView view, String onlinePath, String offlinePath) {
         load(view, onlinePath + ", " + offlinePath);
     }
-    static void clear(LiveView view) { view.cache(SSEType.CLEAR); }
-    // Clear + Execute + instant send
+    static void clear(LiveView view) { 
+        view.addToCache(SSEType.CLEAR);
+        send(view());
+    }
+
     static void clear() { 
         clear(view());
-        execute(view());
-        send(view());
      }
 
     // static void store(String id);
     // static void restore(String id);
 
-    // static void markdown(String text) { new MarkdownIt(view()).write(text); }
+    static void markdown(String text) { new MarkdownIt(view()).write(text); }
 }
 
-// /open skills/Text/Text.java
-// /open skills/ObjectInspector/ObjectInspector.java
-// /open views/Turtle/Turtle.java
-// /open views/Markdown/Marked.java
-// /open views/Markdown/MarkdownIt.java
-// /open views/TicTacToe/TicTacToe.java
-// /open views/Dot/Dot.java
-// /open views/Input/Slider.java
+/open skills/Text/Text.java
+/open skills/ObjectInspector/ObjectInspector.java
+/open views/Turtle/Turtle.java
+/open views/Markdown/Marked.java
+/open views/Markdown/MarkdownIt.java
+/open views/TicTacToe/TicTacToe.java
+/open views/Dot/Dot.java
+/open views/Input/Slider.java
 
 LiveView view = Clerk.view();
-Clerk.html(view, "<h1>Hello World</h1>");
-Clerk.html(view, "<p>This will be a test</p>");
-Clerk.execute(view);
-// Clerk.send(view);
