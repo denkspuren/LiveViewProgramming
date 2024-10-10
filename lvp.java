@@ -135,7 +135,7 @@ class LiveView {
     }
 
     void addToCache(SSEType action, String data) {
-       cache.append((cache.isEmpty() ? "" : "#") + action + ":" + encode(data));
+       cache.append((cache.isEmpty() ? "" : "#") + action + ":" + data);
     }
 
     void clearCache() {
@@ -249,26 +249,29 @@ interface Clerk {
     static LiveView view(int port) { return LiveView.onPort(port); }
     static LiveView view() { return view(LiveView.getDefaultPort()); }
 
-    static void html(LiveView view, String text)            { view.addToCache(SSEType.HTML, text); }
-    static void callJs(LiveView view, String javascript)    { view.addToCache(SSEType.CALL, javascript); }
-    static void scriptJs(LiveView view, String javascript)  { view.addToCache(SSEType.SCRIPT, javascript); }
+    static void html(LiveView view, String text)            { view.addToCache(SSEType.HTML, view.encode(text)); }
+    static void callJs(LiveView view, String javascript)    { view.addToCache(SSEType.CALL, view.encode(javascript)); }
+    static void scriptJs(LiveView view, String javascript)  { view.addToCache(SSEType.SCRIPT, view.encode(javascript)); }
     static void execute(LiveView view)                      { view.addToCache(SSEType.EXECUTE); }
     static void send(LiveView view)                         { view.sendCache(); }
+
+    static void store(LiveView view, String id)             { view.addToCache(SSEType.STORE, id); }
+    static void restore(LiveView view, String id)           { view.addToCache(SSEType.RESTORE, id); }
 
     /* Legacy Commands */
 
     static void write(LiveView view, String content)    {
-        view.sendCommand(SSEType.HTML, content);
+        view.sendCommand(SSEType.HTML, view.encode(content));
         view.sendCommand(SSEType.EXECUTE);
     }
     
     static void script(LiveView view, String javascript)    {
-        view.sendCommand(SSEType.SCRIPT, javascript);
+        view.sendCommand(SSEType.SCRIPT, view.encode(javascript));
         view.sendCommand(SSEType.EXECUTE);
     }
     
     static void call(LiveView view, String javascript) {
-        view.sendCommand(SSEType.CALL, javascript);
+        view.sendCommand(SSEType.CALL, view.encode(javascript));
         view.sendCommand(SSEType.EXECUTE);
     }
 
@@ -289,9 +292,6 @@ interface Clerk {
         clear(view());
      }
 
-    // static void store(String id);
-    // static void restore(String id);
-
     static void markdown(String text) { new MarkdownIt(view()).write(text); }
 }
 
@@ -305,3 +305,4 @@ interface Clerk {
 /open views/Input/Slider.java
 
 LiveView view = Clerk.view();
+

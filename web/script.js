@@ -4,6 +4,7 @@ const loadedDiv = document.getElementById('loadMessage');
 
 let commandCache = [];  //{action: 0, data: ""};
 let locks = [];
+let commandStore = new Map(); //k = ID; v = {action, data}
 
 function loadScript(src, onError = () => console.error('script loading failed: ', src)) {
   const script = document.createElement('script');
@@ -60,18 +61,18 @@ function receive(commands) {
 
     switch (action) {
       case "CALL": {
-        const data = command.slice(splitPos+1);
-        commandCache.push({ action: 0, data: decode(data)});
+        const data = decode(command.slice(splitPos+1));
+        commandCache.push({ action: 0, data: data});
         break;
       }
       case "HTML": {
-        const data = command.slice(splitPos+1);
-        commandCache.push({ action: 1, data: decode(data)});
+        const data = decode(command.slice(splitPos+1));
+        commandCache.push({ action: 1, data: data});
         break;
       }
       case "SCRIPT":  {
-        const data = command.slice(splitPos+1);
-        commandCache.push({ action: 2, data: decode(data)});
+        const data = decode(command.slice(splitPos+1));
+        commandCache.push({ action: 2, data: data});
         break;
       }        
       case "LOAD": {
@@ -95,6 +96,7 @@ function receive(commands) {
         }
         toRemove.forEach(x => document.body.removeChild(x));
         commandCache = [];
+        commandStore.clear();
         break;
       }
       case "RELEASE": {
@@ -106,6 +108,20 @@ function receive(commands) {
         interpret(commandCache);
         commandCache = [];
         break;
+      case "STORE": {
+        const data = command.slice(splitPos+1);
+        commandStore.set(data, commandCache);
+        commandCache = [];
+        break;
+      }
+      case "RESTORE": {
+        const data = command.slice(splitPos+1);
+        const commands = commandStore.get(data);
+
+        if (commands) commandCache = commandCache.concat(commands);
+        else console.warn(`CommandStore Entry with ID: ${data} not found!`);
+        break;
+      }
       default:
         console.error("Unknown Action");
         break;
