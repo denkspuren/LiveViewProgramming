@@ -47,7 +47,7 @@ class LiveView {
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
 
-    String cache = "";
+    StringBuffer cache = new StringBuffer();
 
 
     static LiveView onPort(int port) {
@@ -131,11 +131,15 @@ class LiveView {
     }
 
     void addToCache(SSEType action) {
-        this.cache += action + "#";
+        cache.append((cache.isEmpty() ? "" : "#") + action);
     }
 
     void addToCache(SSEType action, String data) {
-       this.cache += action + ":" + encode(data) + "#";
+       cache.append((cache.isEmpty() ? "" : "#") + action + ":" + encode(data));
+    }
+
+    void clearCache() {
+        cache.delete(0, cache.length());
     }
 
     void sendCache() {
@@ -144,8 +148,16 @@ class LiveView {
             return;
         }
 
-        sendServerEvent(cache);
-        cache = "";
+        sendServerEvent(cache.toString());
+        clearCache();
+    }
+
+    void sendCommand(SSEType action) {
+        sendServerEvent(action.toString());
+    }
+
+    void sendCommand(SSEType action, String data) {
+        sendServerEvent(action + ":" + encode(data));
     }
 
     void load(String data) {
@@ -237,30 +249,30 @@ interface Clerk {
     static LiveView view(int port) { return LiveView.onPort(port); }
     static LiveView view() { return view(LiveView.getDefaultPort()); }
 
-    static void write(LiveView view, String content)    {
-        html(view, content);
-        execute(view);
-        send(view);
-    }
-    
-    static void script(LiveView view, String content)    {
-        scriptJs(view, content);
-        execute(view);
-        send(view);
-    }
-    
-    static void call(LiveView view, String javascript) {
-        callJs(view, javascript);
-        execute(view);
-        send(view);
-    }
-
     static void html(LiveView view, String text)            { view.addToCache(SSEType.HTML, text); }
     static void callJs(LiveView view, String javascript)    { view.addToCache(SSEType.CALL, javascript); }
     static void scriptJs(LiveView view, String javascript)  { view.addToCache(SSEType.SCRIPT, javascript); }
     static void execute(LiveView view)                      { view.addToCache(SSEType.EXECUTE); }
     static void send(LiveView view)                         { view.sendCache(); }
 
+    /* Legacy Commands */
+
+    static void write(LiveView view, String content)    {
+        view.sendCommand(SSEType.HTML, content);
+        view.sendCommand(SSEType.EXECUTE);
+    }
+    
+    static void script(LiveView view, String javascript)    {
+        view.sendCommand(SSEType.SCRIPT, javascript);
+        view.sendCommand(SSEType.EXECUTE);
+    }
+    
+    static void call(LiveView view, String javascript) {
+        view.sendCommand(SSEType.CALL, javascript);
+        view.sendCommand(SSEType.EXECUTE);
+    }
+
+    /* Special Commands */
 
     static void load(LiveView view, String path) {
         if (!view.paths.contains(path.trim())) view.load(path);
@@ -269,8 +281,8 @@ interface Clerk {
         load(view, onlinePath + ", " + offlinePath);
     }
     static void clear(LiveView view) { 
-        view.addToCache(SSEType.CLEAR);
-        send(view());
+        view.sendCommand(SSEType.CLEAR);
+        view.clearCache();
     }
 
     static void clear() { 
