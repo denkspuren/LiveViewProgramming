@@ -1,16 +1,18 @@
-import java.util.Arrays;
-import java.util.Optional;
+package de.denkspuren.lvp.views.tictactoe;
 
-class TicTacToe implements Clerk {
-    final String ID;
-    final int width, height;
-    final String libPath = "views/TicTacToe/tictactoe.js";
+import de.denkspuren.lvp.Clerk;
+import de.denkspuren.lvp.LiveView;
+
+public class TicTacToe implements Clerk {
+    public final String ID;
+    public final int width, height;
+    final String libPath = "views/tictactoe/tictactoe.js";
     LiveView view;
     
     int[] fields = {0,0,0,0,0,0,0,0,0};
     int turn = 1;
 
-    TicTacToe(LiveView view, int width, int height) {
+    public TicTacToe(LiveView view, int width, int height) {
         this.view = view;
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
@@ -32,23 +34,23 @@ class TicTacToe implements Clerk {
         });
     }
 
-    TicTacToe(LiveView view) { this(view, 500, 500); }
-    TicTacToe(int width, int height) { this(Clerk.view(), width, height); }
-    TicTacToe() { this(Clerk.view());}
+    public TicTacToe(LiveView view) { this(view, 500, 500); }
+    public TicTacToe(int width, int height) { this(Clerk.view(), width, height); }
+    public TicTacToe() { this(Clerk.view());}
 
-    int[] getWinnerPos() {
+    public int[] getWinnerPos() {
         /*
             code
          */
         return new int[0];
     }
 
-    TicTacToe sendWinPosition(int start, int end) {
+    public TicTacToe sendWinPosition(int start, int end) {
         Clerk.call(view, "ttt" + ID + ".showWinner(" + start + ", " + end + ")");
         return this;
     }
 
-    TicTacToe move(int position) {
+    public TicTacToe move(int position) {
         if (fields[position] == 0) {
             fields[position] = turn;
             Clerk.call(view, "ttt" + ID + ".drawToken(" + (turn == 1) + ", " + position + ")");

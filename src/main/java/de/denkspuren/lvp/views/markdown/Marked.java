@@ -1,7 +1,11 @@
-record Marked(LiveView view) implements Clerk {
+package de.denkspuren.lvp.views.markdown;
+import de.denkspuren.lvp.Clerk;
+import de.denkspuren.lvp.LiveView;
+
+public record Marked(LiveView view) implements Clerk {
     public Marked {
         String onlinePath = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
-        String localPath = "views/Markdown/marked.min.js";
+        String localPath = "views/markdown/marked.min.js";
         Clerk.load(view, onlinePath, localPath);
         Clerk.script(view, """
             var md = marked.use({

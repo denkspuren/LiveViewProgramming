@@ -1,6 +1,6 @@
 // https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee
 // Author: https://github.com/RamonDevPrivate, Version 1, CC BY-NC-SA
-
+package de.denkspuren.lvp.skills.objectinspector;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -117,7 +117,7 @@ class ArrayNode extends ObjectNode_425 {
     }
 }
 
-class NodeGenerator {
+public class NodeGenerator {
     private int nodeCounter = 0; //used to generate an unique node name
         
     // save inspected objects to prevent infinite loops in case of recursion and identify already used objects 

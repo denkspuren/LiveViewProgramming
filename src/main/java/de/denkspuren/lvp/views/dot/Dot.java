@@ -1,7 +1,12 @@
+package de.denkspuren.lvp.views.dot;
+
+import de.denkspuren.lvp.Clerk;
+import de.denkspuren.lvp.LiveView;
+
 class Dot implements Clerk {
     final String visLibOnlinePath = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
-    final String visLibOfflinePath = "views/Dot/vis-network.min.js";
-    final String dotLibPath = "views/Dot/dot.js";
+    final String visLibOfflinePath = "views/dot/vis-network.min.js";
+    final String dotLibPath = "views/dot/dot.js";
     final String ID;
     LiveView view;
     int width, height;

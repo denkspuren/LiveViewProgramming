@@ -1,10 +1,14 @@
-record MarkdownIt(LiveView view) implements Clerk {
+package de.denkspuren.lvp.views.markdown;
+import de.denkspuren.lvp.Clerk;
+import de.denkspuren.lvp.LiveView;
+
+public record MarkdownIt(LiveView view) implements Clerk {
     public MarkdownIt {
         String onlinePath = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
-        String localPath = "views/Markdown/markdown-it.min.js";
+        String localPath = "views/markdown/markdown-it.min.js";
         Clerk.load(view, onlinePath, localPath);
-        Clerk.load(view, "views/Markdown/highlight.min.js");
-        Clerk.load(view, "views/Markdown/mathjax3.js");
+        Clerk.load(view, "views/markdown/highlight.min.js");
+        Clerk.load(view, "views/markdown/mathjax3.js");
         // Clerk.script(view, """
         //     var md = markdownit({
         //         html: true,
