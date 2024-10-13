@@ -1,6 +1,7 @@
 .DS_Store
 .idea
 *.iml
+*.vscode
 target/
 build
 test.java
