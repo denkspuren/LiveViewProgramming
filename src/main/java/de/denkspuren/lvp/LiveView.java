@@ -103,8 +103,6 @@ public class LiveView {
             final String path = exchange.getRequestURI().getPath().equals("/") ? index
                     : exchange.getRequestURI().getPath().startsWith("/web") ? exchange.getRequestURI().getPath() : "/de/denkspuren/lvp" + exchange.getRequestURI().getPath();
 
-            
-            System.out.println(path);
             try (final InputStream stream = LiveView.class.getResourceAsStream(path)) {
                 final byte[] bytes = stream.readAllBytes();
                 exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(path)) + "; charset=utf-8");
