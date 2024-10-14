@@ -137,7 +137,7 @@ public class LiveView {
             } catch (IOException e) {
                 deadConnections.add(connection);
             } catch (InterruptedException e) {
-                System.err.println("LOAD-Timeout: " + data + ", " + e);
+                System.err.println("LOAD-Interruption: " + data + ", " + e);
             } finally {
                 if (sseType == SSEType.LOAD) {
                     loadEventOccured = false;

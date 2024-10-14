@@ -6,16 +6,16 @@ function loadScript(src, onError = () => console.log('script loading failed: ', 
   script.onload = function() {
     script.classList.add("persistent");
     console.log('script loaded:', src);
-    fetch("/loaded", {method: "post"}).catch(console.log);
+    // fetch("/loaded", {method: "post"}).catch(console.log);
   };
   script.onerror = onError;
   document.body.appendChild(script);
 }
 
-function loadScriptWithFallback(onlineSrc, offlineSrc) {
-  loadScript(onlineSrc, function() {
-    console.log('loading', onlineSrc, 'failed, trying', offlineSrc);
-    loadScript(offlineSrc);
+function loadScriptWithFallback(mainSrc, alternativeSrc) {
+  loadScript(mainSrc, function() {
+    console.log('loading', mainSrc, 'failed, trying', alternativeSrc);
+    loadScript(alternativeSrc);
   });
 }
 
