@@ -6,7 +6,7 @@ function loadScript(src, onError = () => console.log('script loading failed: ', 
   script.onload = function() {
     script.classList.add("persistent");
     console.log('script loaded:', src);
-    // fetch("/loaded", {method: "post"}).catch(console.log);
+    fetch("/loaded", {method: "post"}).catch(console.log);
   };
   script.onerror = onError;
   document.body.appendChild(script);
