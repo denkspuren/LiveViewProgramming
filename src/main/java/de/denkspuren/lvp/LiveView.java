@@ -121,7 +121,10 @@ public class LiveView {
     public void sendServerEvent(SSEType sseType, String data) {
         List<HttpExchange> deadConnections = new ArrayList<>();
         for (HttpExchange connection : sseClientConnections) {
-            if (sseType == SSEType.LOAD) lock.lock();
+            if (sseType == SSEType.LOAD) {
+                lock.lock();
+                System.out.println("lock.lock(): " + java.time.Instant.now() + " " + data);
+            }
             try {
                 byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
                 String base64Data = Base64.getEncoder().encodeToString(binaryData);
@@ -130,7 +133,8 @@ public class LiveView {
                           .write(message.getBytes());
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD && !loadEventOccured) {
-                    loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
+                    loadEventOccurredCondition.await(10_000, TimeUnit.MILLISECONDS);
+                    System.out.println("await(): " + java.time.Instant.now() + " " + data);
                     if (loadEventOccured) paths.add(data);
                     else System.err.println("LOAD-Timeout: " + data);
                 }

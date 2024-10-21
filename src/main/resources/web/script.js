@@ -1,9 +1,11 @@
 const loadedDiv = document.getElementById('loadMessage');
 
 function loadScript(src, onError = () => console.log('script loading failed: ', src)) {
+  console.log('loadScript: ', new Date().toISOString(), ' src: ', src);
   var script = document.createElement('script');
   script.src = src;
   script.onload = function() {
+    console.log('loaded script: ', new Date().toISOString(), ' src: ', src);
     script.classList.add("persistent");
     console.log('script loaded:', src);
     fetch("/loaded", {method: "post"}).catch(console.log);
