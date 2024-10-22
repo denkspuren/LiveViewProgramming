@@ -1,6 +1,5 @@
 package de.denkspuren.lvp;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
@@ -121,8 +120,10 @@ public class LiveView {
     public void sendServerEvent(SSEType sseType, String data) {
         List<HttpExchange> deadConnections = new ArrayList<>();
         for (HttpExchange connection : sseClientConnections) {
+            System.out.println("SSE-Connection: " + connection);
             if (sseType == SSEType.LOAD) {
                 lock.lock();
+                loadEventOccured = false; // NEU
                 System.out.println("lock.lock(): " + java.time.Instant.now() + " " + data);
             }
             try {
@@ -132,7 +133,7 @@ public class LiveView {
                 connection.getResponseBody()
                           .write(message.getBytes());
                 connection.getResponseBody().flush();
-                if (sseType == SSEType.LOAD && !loadEventOccured) {
+                if (sseType == SSEType.LOAD) {
                     loadEventOccurredCondition.await(10_000, TimeUnit.MILLISECONDS);
                     System.out.println("await(): " + java.time.Instant.now() + " " + data);
                     if (loadEventOccured) paths.add(data);
@@ -144,7 +145,7 @@ public class LiveView {
                 System.err.println("LOAD-Interruption: " + data + ", " + e);
             } finally {
                 if (sseType == SSEType.LOAD) {
-                    loadEventOccured = false;
+                    // loadEventOccured = false; // REMOVED
                     lock.unlock();
                 }
             }

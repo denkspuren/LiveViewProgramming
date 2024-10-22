@@ -22,9 +22,9 @@ public interface Clerk {
     static void load(LiveView view, String path) {
         if (!view.paths.contains(path.trim())) view.sendServerEvent(SSEType.LOAD, path);
     }
-    static void load(LiveView view, String onlinePath, String offlinePath) {
-        load(view, offlinePath + ", " + onlinePath);
-    }
+    //static void load(LiveView view, String onlinePath, String offlinePath) {
+    //    load(view, offlinePath + ", " + onlinePath);
+    //}
     static void clear(LiveView view) { view.sendServerEvent(SSEType.CLEAR, ""); }
     static void clear() { clear(view()); };
 

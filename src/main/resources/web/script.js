@@ -53,12 +53,14 @@ function setUp() {
         }
         case "LOAD": {
           loadedDiv.style.display = 'block';
-          setTimeout(() => {
-            loadedDiv.style.display = 'none';
-          }, 300);
+          //setTimeout(() => {
+          //  loadedDiv.style.display = 'none';
+          // }, 300);
           var srcs = data.split(',');
           srcs = srcs.map(src => src.trim());
-          if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
+          console.log('LOAD received: ', new Date().toISOString(), ' data: ', data);
+          // if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
+          if (srcs.length >= 2) loadScript(srcs[0]);
           else loadScript(data);
           break;
         }

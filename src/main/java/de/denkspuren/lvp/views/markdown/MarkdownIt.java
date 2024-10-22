@@ -4,11 +4,12 @@ import de.denkspuren.lvp.LiveView;
 
 public record MarkdownIt(LiveView view) implements Clerk {
     public MarkdownIt {
-        String onlinePath = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
-        String localPath = "views/markdown/markdown-it.min.js";
-        Clerk.load(view, onlinePath, localPath);
-        Clerk.load(view, "views/markdown/highlight.min.js");
-        Clerk.load(view, "views/markdown/mathjax3.js");
+        // String onlinePath = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
+        // String localPath = "views/markdown/markdown-it.min.js";
+        // Clerk.load(view, onlinePath, localPath);
+        Clerk.load(view, "views/markdown/markdown-it.min.js");
+        // Clerk.load(view, "views/markdown/highlight.min.js");
+        // Clerk.load(view, "views/markdown/mathjax3.js");
         // Clerk.script(view, """
         //     var md = markdownit({
         //         html: true,
@@ -30,7 +31,7 @@ public record MarkdownIt(LiveView view) implements Clerk {
                 linkify: true,
                 typographer: true
             });
-            md.use(window.mathjax3);
+            // md.use(window.mathjax3);
             """);
     }
     public String write(String markdownText) {
