@@ -130,6 +130,7 @@ public class LiveView {
                 byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
                 String base64Data = Base64.getEncoder().encodeToString(binaryData);
                 String message = "data: " + sseType + ":" + base64Data + "\n\n";
+                connection.getResponseBody().flush();
                 connection.getResponseBody()
                           .write(message.getBytes());
                 connection.getResponseBody().flush();
@@ -150,7 +151,7 @@ public class LiveView {
                 }
             }
         }
-        sseClientConnections.removeAll(deadConnections);
+        sseClientConnections.removeAll(deadConnections); // TODO: need to be closed
     }
 
     public void createResponseContext(String path, Consumer<String> delegate) {
