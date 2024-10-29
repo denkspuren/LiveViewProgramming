@@ -11,13 +11,14 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -33,13 +34,12 @@ public class LiveView {
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
     static int getDefaultPort() { return defaultPort; }
 
-    public List<HttpExchange> sseClientConnections;
+    public Map<String, HttpExchange> sseClientConnections;
 
     // lock required to temporarily block processing of `SSEType.LOAD`
     Lock lock = new ReentrantLock();
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
-
 
     public static LiveView onPort(int port) {
         port = Math.abs(port);
@@ -58,7 +58,7 @@ public class LiveView {
 
     private LiveView(int port) throws IOException {
         this.port = port;
-        sseClientConnections = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
+        sseClientConnections = new ConcurrentHashMap<>();
 
         server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
@@ -80,6 +80,21 @@ public class LiveView {
             }
         });
 
+        server.createContext("/close", exchange -> {
+            if (!exchange.getRequestMethod().equalsIgnoreCase("delete")) {
+                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                return;
+            }
+            
+            String id = exchange.getRequestURI().getQuery().substring(3);
+            sseClientConnections.get(id).close();
+            sseClientConnections.remove(id);
+            
+            exchange.sendResponseHeaders(200, 0);
+            exchange.close();
+            
+        });
+
         // SSE context
         server.createContext("/events", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
@@ -90,7 +105,15 @@ public class LiveView {
             exchange.getResponseHeaders().add("Cache-Control", "no-cache");
             exchange.getResponseHeaders().add("Connection", "keep-alive");
             exchange.sendResponseHeaders(200, 0);
-            sseClientConnections.add(exchange);
+            
+            String id = new Random().ints(10, 0, 36)
+                .mapToObj(i -> Integer.toString(i, 36))
+                .collect(Collectors.joining());
+
+            exchange.getResponseBody().write(("data:" + SSEType.IDENTIFY + ":" + id + "\n\n").getBytes());
+            exchange.getResponseBody().flush();
+
+            sseClientConnections.put(id, exchange);
         });
 
         // initial html site
@@ -118,8 +141,9 @@ public class LiveView {
     }
 
     public void sendServerEvent(SSEType sseType, String data) {
-        List<HttpExchange> deadConnections = new ArrayList<>();
-        for (HttpExchange connection : sseClientConnections) {
+        List<String> deadConnections = new ArrayList<>();
+        for (String id : sseClientConnections.keySet()) {
+            HttpExchange connection = sseClientConnections.get(id);
             System.out.println("SSE-Connection: " + connection);
             if (sseType == SSEType.LOAD) {
                 lock.lock();
@@ -130,7 +154,6 @@ public class LiveView {
                 byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
                 String base64Data = Base64.getEncoder().encodeToString(binaryData);
                 String message = "data: " + sseType + ":" + base64Data + "\n\n";
-                connection.getResponseBody().flush();
                 connection.getResponseBody()
                           .write(message.getBytes());
                 connection.getResponseBody().flush();
@@ -141,7 +164,7 @@ public class LiveView {
                     else System.err.println("LOAD-Timeout: " + data);
                 }
             } catch (IOException e) {
-                deadConnections.add(connection);
+                deadConnections.add(id);
             } catch (InterruptedException e) {
                 System.err.println("LOAD-Interruption: " + data + ", " + e);
             } finally {
@@ -151,7 +174,11 @@ public class LiveView {
                 }
             }
         }
-        sseClientConnections.removeAll(deadConnections); // TODO: need to be closed
+        
+        for (String id : deadConnections) {
+            sseClientConnections.get(id).close();
+            sseClientConnections.remove(id);
+        }
     }
 
     public void createResponseContext(String path, Consumer<String> delegate) {

@@ -21,6 +21,11 @@ function loadScriptWithFallback(mainSrc, alternativeSrc) {
   });
 }
 
+document.onvisibilitychange = function () {
+  if (document.visibilityState === 'hidden')
+    fetch(`/close?${new URLSearchParams({id: id})}`, {method: "delete", keepalive: true}).catch(console.error);
+}
+
 function setUp() {
   if (window.EventSource) {
     const source = new EventSource("/events");
@@ -29,6 +34,15 @@ function setUp() {
       const splitPos = event.data.indexOf(":");
       const action = event.data.slice(0, splitPos);
       const base64Data = event.data.slice(splitPos + 1);
+
+      // Will be improved with the cache rework
+      if (action === "IDENTIFY") {
+        id = base64Data;
+        console.log(id);
+        
+        return;
+      }
+
       const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
       // const data = atob(base64Data);
       // console.log(`Action: ${action}\n`);
@@ -101,6 +115,7 @@ function setUp() {
 }
 
 const Clerk = {}; // not used, yet
+let id;
 let locks = [];
 setUp();
 
