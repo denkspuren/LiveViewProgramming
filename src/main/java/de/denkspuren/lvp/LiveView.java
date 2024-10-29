@@ -87,6 +87,7 @@ public class LiveView {
             }
             
             String id = exchange.getRequestURI().getQuery().substring(3);
+            System.out.println("Closing: " + id);
             sseClientConnections.get(id).close();
             sseClientConnections.remove(id);
             
@@ -106,12 +107,8 @@ public class LiveView {
             exchange.getResponseHeaders().add("Connection", "keep-alive");
             exchange.sendResponseHeaders(200, 0);
             
-            String id = new Random().ints(10, 0, 36)
-                .mapToObj(i -> Integer.toString(i, 36))
-                .collect(Collectors.joining());
-
-            exchange.getResponseBody().write(("data:" + SSEType.IDENTIFY + ":" + id + "\n\n").getBytes());
-            exchange.getResponseBody().flush();
+            String id = exchange.getRequestURI().getQuery().substring(3);
+            System.out.println("New Connection: " + id);
 
             sseClientConnections.put(id, exchange);
         });

@@ -21,27 +21,22 @@ function loadScriptWithFallback(mainSrc, alternativeSrc) {
   });
 }
 
+// https://www.igvita.com/2015/11/20/dont-lose-user-and-app-state-use-page-visibility/
 document.onvisibilitychange = function () {
   if (document.visibilityState === 'hidden')
     fetch(`/close?${new URLSearchParams({id: id})}`, {method: "delete", keepalive: true}).catch(console.error);
 }
 
 function setUp() {
+  id = crypto.randomUUID();
+
   if (window.EventSource) {
-    const source = new EventSource("/events");
+    const source = new EventSource(`/events?${new URLSearchParams({id: id})}`);
 
     source.onmessage = function (event) {
       const splitPos = event.data.indexOf(":");
       const action = event.data.slice(0, splitPos);
       const base64Data = event.data.slice(splitPos + 1);
-
-      // Will be improved with the cache rework
-      if (action === "IDENTIFY") {
-        id = base64Data;
-        console.log(id);
-        
-        return;
-      }
 
       const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
       // const data = atob(base64Data);
