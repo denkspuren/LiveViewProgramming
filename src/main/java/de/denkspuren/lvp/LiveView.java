@@ -141,7 +141,7 @@ public class LiveView {
         List<String> deadConnections = new ArrayList<>();
         for (String id : sseClientConnections.keySet()) {
             HttpExchange connection = sseClientConnections.get(id);
-            System.out.println("SSE-Connection: " + connection);
+            System.out.println("SSE-Connection: " + connection.getRemoteAddress() + " with ID: " + id);
             if (sseType == SSEType.LOAD) {
                 lock.lock();
                 loadEventOccured = false; // NEU
