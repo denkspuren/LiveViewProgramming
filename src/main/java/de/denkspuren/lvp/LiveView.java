@@ -119,8 +119,7 @@ public class LiveView {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
             }
-            final String path = exchange.getRequestURI().getPath().equals("/") ? index
-                    : exchange.getRequestURI().getPath().startsWith("/web") ? exchange.getRequestURI().getPath() : "/de/denkspuren/lvp" + exchange.getRequestURI().getPath();
+            final String path = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
 
             try (final InputStream stream = LiveView.class.getResourceAsStream(path)) {
                 final byte[] bytes = stream.readAllBytes();
