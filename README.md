@@ -1,4 +1,4 @@
-# Live View Programming mit Java und der JShell
+# _Live View Programming_ mit Java und der JShell
 
 Das _Live View Programming_ (LVP) bietet Ihnen für die Java- bzw. JShell-Programmierung _Views_ und _Skills_ an. Views sind dazu da, um mediale Inhalte im Web-Browser darzustellen, also Texte, Bilder, Grafiken, Videos, inteaktive Animationen etc. Skills stellen nützliche Fähigkeiten bereit, die man in Kombination mit Views (z.B. zur Dokumentation von Code) gebrauchen kann.
 
@@ -23,8 +23,6 @@ Mit LVP kann man jedoch noch sehr viel mehr machen. Mit der Markdown-View kann m
 ### Konzeptstudien und Prototyp-Entwicklung
 
 Das LVP kann man auch dafür einsetzen, um Anwendungen zu schreiben. Die Views werden zusammen mit interaktiven Elementen, wie Buttons, Slidern etc. als graphische Oberfläche verstanden und ausgelegt. Damit lassen sich vor allem Konzeptstudien und Prototypen entwickeln.
-
-In der Programmierausbildung an der [THM](https://www.thm.de/) kombiniere ich beides, die Anwendungsentwicklung mit der Code-Dokumentation. Das Ergebnis sind Java-Programme, die eine Anwendung umsetzen _und_ gleichzeitig Anwendungs- und Programmdokumentation sind. Man kann sich also sicher sein, dass der dokumentierte Code genau der Code ist, der auch die Anwendung realisiert. 
 
 ## 🐣 Ursprünge: Clerk als Inspiration
 
@@ -60,27 +58,54 @@ Für Anwendungs- oder Darstellungszwecke kann man z.B. die Turtle-View für die 
 
 All diese Views und Skills nutzt man programmierend mit Java in der IDE oder mittels JShell-Skripten und einem Editor. Es ist – ehrlich gesagt – ziemlich cool, wenn man die Ergebnisse dann im Browser sieht. 
 
-## 💻 _Live View Programming_ für die JShell
+## 🚀 Nutze das _Live View Programming_ mit der JShell
 
-Zum Ausprobieren muss ein aktuelles Java JDK (ich verwende das OpenJDK) installiert und dieses Git-Repository heruntergeladen sein. Wer `git` installiert hat, kann das wie folgt machen.
+Wenn Sie das _Live View Programming_ ausprobieren möchten, ist Folgendes zu tun:
+
+### 1. Lade die `.jar`-Datei herunter
+
+* Stellen Sie sicher, dasss Sie mit einem aktuellen JDK (Java Development Kit) arbeiten; es empfiehlt sich das [OpenJDK](https://openjdk.org/)
+* Laden Sie die aktuelle `.jar`-Datei herunter, die Ihnen als Asset zum [aktuellen Release](https://github.com/denkspuren/LiveViewProgramming/releases) als Download angeboten wird; die Datei hat den Namen `lvp-<Version>.jar`
+* Legen Sie die Datei an einem geeigneten Ort ab, der Klassenpfad muss auf die `.jar`-Datei gesetzt werden können. Am einfachsten ist es, die `jar`-Datei dorthin zu verschieben, wo Sie die JShell oder Java aufrufen
+
+### Die Alternative: `jar`-Datei selber erstellen
+
+Sie können die `.jar`-Datei auch selber generieren, wenn Sie zudem die Versionsverwaltungssoftware [Git](https://git-scm.com/) und das Build-Werkzeug [Maven](https://maven.apache.org/) installiert haben:
+
+* Laden Sie das Git-Repository herunter mit
+  ```
+  git clone https://github.com/denkspuren/LiveViewProgramming.git
+  ```
+* Nach dem Maven-Durchlauf finden Sie die `.jar`-Datei im `target`-Verzeichnis
+  ```
+  mvn clean package
+  ```  
+
+    `git clone https://github.com/denkspuren/LiveViewProgramming.git`
+
+### 2. Setze den Klassenpfad auf die `.jar`-Datei
+
+Wenn Sie mit der JShell arbeiten, rufen Sie die JShell mit dem Argument `--class-path` oder kurz `-c` auf. Das _Live View Programming_ wird auf diese Weise als Softwarepaket bereitgestellt. Passen Sie den Beispielaufruf an die aktuelle Version an:
 
 ```
-git clone https://github.com/denkspuren/LiveViewProgramming.git
+jshell -c lvp-<Version>.jar
 ```
 
-Danach wechselt man in das Verzeichnis und startet die JShell:
+Wenn Sie die Version `lvp-0.4.0.jar` heruntergeladen haben, lautet der Aufruf:
 
 ```
-jshell
+jshell -c lvp-0.4.0.jar
 ```
+
+
 <!-- Zudem aktiviert `-R-ea` die Berücksichtigung von `assert`-Anweisungen. -->
 
-### 🎹 Ein Beispiel zur Live-View-Programmierung
+### 3. So nutzt man das _Live View Programming_
 
-Die Datei `lvp.java` (kurz für _Live View Programming_) wird in die JShell geladen und der Server für die _Live View_ gestartet.
+Importieren Sie das Programmpaket zum einfacheren Zugriff in der JShell. Anschließend kann der _Live View Server_ gestartet werden:
 
 ```
-jshell> /open lvp.java
+jshell> import de.denkspuren.lvp.*;
 
 jshell> Clerk.view()
 Open http://localhost:50001 in your browser
@@ -89,7 +114,7 @@ $38 ==> LiveView@2d38eb89
 
 Öffnen Sie Ihren Browser (bei mir ist es Chrome) mit dieser Webadresse. Im Browser kann man nun mitverfolgen, was passiert, wenn man die _Live View_ nutzt. 
 
-Probieren wir einen einfachen Begrüßungstext im Markdown-Format:
+Erstellen wir einen einfachen Begrüßungstext im Markdown-Format:
 
 ```java
 jshell> Clerk.markdown("Hello, _this_ is **Live View Programming** in action!")
@@ -97,14 +122,14 @@ jshell> Clerk.markdown("Hello, _this_ is **Live View Programming** in action!")
 
 Im Browser ist "Hello, _this_ is **Live View Programming** in action!" zu sehen. 😀
 
-Als nächstes erzeugen wir eine kleine _Turtle_-Grafik. Die Idee, eine Grafik mit einer Schildkröte (_turtle_) zu programmieren, hat die Programmiersprache Logo in die Welt getragen.
+Als nächstes erzeugen wir eine kleine _Turtle_-Grafik. Die Idee, Grafiken mit einer Schildkröte (_turtle_) zu programmieren, stammt von der Programmiersprache [Logo]("https://de.wikipedia.org/wiki/Logo_(Programmiersprache)").
 
 ```java
 jshell> Turtle turtle = new Turtle(200, 200)
 turtle ==> Turtle@3b764bce
 ```
 
-Ein Kästchen, die Zeichenfläche, von 200 x 200 Punkten ist im Browser zu sehen. In der Mitte befindet sich eine unsichtbare Schildkröte, die nach Osten ausgerichtet und mit einem Zeichenstift ausgestattet ist und die wir mit ein paar Anweisungen so umherschicken, dass schrittweise ein Quadrat entsteht.
+Ein Kästchen, die Zeichenfläche, von 200 x 200 Punkten ist im Browser zu sehen. In der Mitte befindet sich eine unsichtbare Schildkröte, die nach Osten (also nach rechts) ausgerichtet und mit einem Zeichenstift ausgestattet ist und die wir mit ein paar Anweisungen so umherschicken, dass schrittweise ein Quadrat entsteht.
 
 Geben Sie die folgende Anweisung vier Mal für die Schildkröte ein.
 
@@ -124,7 +149,7 @@ for (int i = 1; i <= 12; i++)
 
 Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
-![Ein Turtle-Beispiel](/views/Turtle/TurtleExample.png)
+![Ein Turtle-Beispiel](/src/main/java/de/denkspuren/lvp/views/turtle/TurtleExample.png)
 
 > Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen.
 
@@ -134,15 +159,19 @@ Es ist zudem möglich, Views interaktiv zu koppeln. In der Animation sieht man, 
 
 So macht das Programmieren ganz anders Spaß! Und das wird befeuert, wenn man dabei etwas sehen und mit einem optischen Feedback interagieren kann. Die Möglichkeiten des _Live View Programming_ gehen jedoch weit über die "Spielerei" hinaus.
 
-Eine kurze Demo zur Einführung bietet das YouTube-Video [Einführung in das Live View Programming mit Javas JShell](https://www.youtube.com/watch?v=itWU15ywmzA).
+Eine kurze Demo zur Einführung bietet das YouTube-Video [Einführung in das Live View Programming mit Javas JShell](https://www.youtube.com/watch?v=itWU15ywmzA). 
 
-### 📄 Live View Programming zur Dokumentation
+_**Beachten Sie:** Das Video zeigt Ihnen eine frühere LVP-Version, wo es noch keine `.jar`-Datei gab. Das ist aber auch schon alles._
 
-Mit dem _Live View Programming_ kann man -- ganz im Sinne des Literate Programming -- eine _Live View_ zur Dokumentation von Java-Code erzeugen; und das alles aus der Java-Datei heraus, in der man das Programm geschrieben hat. Code und Dokumentation können miteinander kombiniert werden.
+## 🐢-Beispiel: Kombination von Anwendung und Dokumentation
 
-In dem git-Repository findet sich die Datei [`logo.java`](/logo.java). Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung mit Clerk einführt.
+Mit dem _Live View Programming_ kann man _Views_ sowohl zur Dokumentation als auch zur Erzeugung von Anwendungsbeispielen heranziehen. Code und Dokumentation können miteinander kombiniert werden.
 
-Löschen Sie die Inhalte in der aktuellen _Live View_ und führen Sie `logo.java` aus.
+In dem git-Repository findet sich die Datei [`logo.java`](/logo.java). Laden Sie die Datei herunter in das Verzeichnis, in dem Sie die JShell gestartet haben.
+
+Mit der folgenden Eingabe erzeugen Sie im Browser die Dokumentation, die Sie in die Logo-Programmierung einführt. Gleichzeitig werden dabei die Turtle-Beispiele generiert, die in der Dokumentation vorgestellt werden.
+
+Löschen Sie die Inhalte der aktuellen _Views_ und führen Sie `logo.java` aus.
 
 ```java
 jshell> Clerk.clear()
@@ -158,13 +187,13 @@ Ich finde das Ergebnis ziemlich eindrucksvoll, mich begeistert das. Die Bilder w
 
 Um das besser zu verstehen, schauen Sie sich den Code in der Datei [`logo.java`](/logo.java) mit einem Editor Ihrer Wahl an.
 
-# 📝 Skizze zur Arbeitsweise des LVP-Prototypen
+## 📝 Skizze zur Arbeitsweise des LVP-Prototypen
 
-## 🪟 Live Views 
+### Live Views 
 
 Wenn Sie sich die Datei [`lvp.java`](/lvp.java) anschauen, werden Sie feststellen, dass nicht viel Code erforderlich ist, um eine Infrastruktur für das _Live View Programming_ aufzusetzen. In der Datei befindet sich im Wesentlichen eine Klasse und ein Interface:
 
-* Die Klasse `LiveView` setzt mit der Methode `onPort` einen Server auf, der eine _Live View_ im Browser bedient. Diese _Live View_ zeigt die `index.html` aus dem `web`-Verzeichnis an und lädt das notwendige Stückchen Client-Code `script.js`.
+* Die Klasse `LiveViewServer` setzt mit der Methode `onPort` einen Server auf, der eine _Live View_ im Browser bedient. Diese _Live View_ zeigt die `index.html` aus dem `web`-Verzeichnis an und lädt das notwendige Stückchen Client-Code `script.js`.
 
 Der Webserver nutzt _Server Sent Events_ (SSE) als Mittel, um die _Live View_ im Browser beliebig zu erweitern. Man kann mit der Methode `sendServerEvent` entweder HTML-Code, `<script>`-Tags oder JavaScript-Code senden oder JavaScript-Bibliotheken laden.
 
@@ -178,31 +207,33 @@ Der Webserver nutzt _Server Sent Events_ (SSE) als Mittel, um die _Live View_ im
 
 Interessant ist noch die statische Methode `markdown` in `Clerk`, mit der direkt Markdown-Text an den Browser der Standard-View (das ist die View zum default Port 50001) geschickt und gerendet wird.
 
-## 🧑‍💼 Views
+### Views
 
 Im Verzeichnis [`views`](/views/) finden sich ein paar Views. Darunter ist eine View für [`Markdown`](https://de.wikipedia.org/wiki/Markdown) zur Nutzung der Markdown-Notation, eine View für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik) und eine View, die eine GUI für das Spiel [Tic-Tac-Toe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) realisiert.
 
 Views werden immer mit einer _Live View_ assoziiert und stellen zudem den browser-seitig benötigten Code zur Verfügung, um die _View_ zu erzeugen. Als Programmierkonvention implementiert eine View stets das Interface `Clerk`.
 
-## 🤹 Skills
+### Skills
 
 Skills sind im Verzeichnis [`skills`](/skills/) zu finden. Skills haben nichts mit einer _View_ zu tun, sie stellen spezielle oder generelle Fähigkeiten zur Verfügung, die man beim _Live View Programming_ oder im Zusammenspiel mit Views gebrauchen kann. `Text` ist z.B. ein wichtiger Skill, um Text oder Code aus einer Datei "ausschneiden" zu können, was elementar für die Code-Dokumentation ist.
 
 > Solange einzelne Views und Skills nicht weiter dokumentiert sind (das wird noch kommen), studieren Sie am besten den Code der Views und Skills. In der Datei [`logo.java`](/logo.java) sehen Sie ein Beispiel der Verwendung dieser grundlegenden Fähigkeiten. Das Beispiel zeigt, wie Sie mit Java-Code eine Dokumentation des eigenen Programms erstellen können, das zudem beispielhaft seine Verwendung erläutert.
 
-## 👁️ Ein Blick hinter die Kulissen
+### Ein Blick hinter die Kulissen
 
 In dem YouTube-Video ["Live View Programming: Ein Blick hinter die Kulissen"](https://youtu.be/Qj6PEYNSXnM) erkläre ich Ihnen, wie der LVP-Server an den Browser Daten schickt, den HTML-Code im Browser verändert und JavaScript-Programme nachlädt. Die Idee zum LVP besteht aus einem sehr einfachen Kern, der sich einfach erweitern lässt.
 
-# 🚀 Der Prototyp ist erst der Anfang
+## 🚀 Der Prototyp ist erst der Anfang
 
-## 🌴 Vision
+### 🌴 Vision
+
+In der Programmierausbildung an der [THM](https://www.thm.de/) kombiniere ich beides, die Anwendungsentwicklung mit der Code-Dokumentation. Das Ergebnis sind Java-Programme, die eine Anwendung umsetzen _und_ gleichzeitig Anwendungs- und Programmdokumentation sind. Man kann sich also sicher sein, dass der dokumentierte Code genau der Code ist, der auch die Anwendung realisiert. 
 
 Meine Vision für das _Live View Programming_ ist zunächst, dieses Werkzeug in der Programmierungsbildung meiner Informatik-Studierenden an der THM einzusetzen. Damit habe ich im Sommersemester 2024 begonnen. Ich möchte herausfinden, wie das LVP beim Erlernen von Java eine Hilfe und Unterstützung sein kann. Die Entwicklung zum LVP läuft seitdem parallel weiter.
 
 Daneben hoffe ich, dass diese Umsetzung für Java als Blaupause für die Realisierung des _Live View Programming_ in anderen Programmiersprachen dient. Die Idee ist so einfach, dass man sie in ein, zwei Tagen portieren kann für die Lieblingssprache der Wahl.
 
-## 💃🕺 Mitmach-Aufruf
+### 💃🕺 Mitmach-Aufruf
 
 > Sie sind gerne willkommen, sich an der Entwicklung des _Live View Programming_ zu beteiligen. Schreiben Sie neue Views und Skills! Oder entwickeln Sie am Kern der _Live View_ mit.
 
@@ -212,7 +243,7 @@ Zwei Personen haben geholfen, das LVP aus der Taufe zu heben: Ramon und Björn.
 
 * [@BjoernLoetters](https://github.com/BjoernLoetters) war von der Idee des _Live View Programming_ ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/LiveViewProgramming/tree/websockets) hinterlegt. Ich empfehle das Studium seines Codes sehr, man kann viel daran über Websockets lernen!
 
-Seitdem haben auch einige andere, meist Studierende von mir, Beiträge zum LVP geliefert. Die Contributors sind in dem GitHub-Repo ausgewiesen. Vielen Dank dafür!  
+Seitdem haben auch einige andere, meist Studierende von mir, Beiträge zum LVP geliefert. Die Contributors sind in dem GitHub-Repo ausgewiesen. Vielen Dank dafür! 
 
 Wenn Sie Lust haben, beteiligen Sie sich!
 
