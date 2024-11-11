@@ -223,7 +223,7 @@ Skills sind im Verzeichnis [`skills`](/skills/) zu finden. Skills haben nichts m
 
 In dem YouTube-Video ["Live View Programming: Ein Blick hinter die Kulissen"](https://youtu.be/Qj6PEYNSXnM) erkläre ich Ihnen, wie der LVP-Server an den Browser Daten schickt, den HTML-Code im Browser verändert und JavaScript-Programme nachlädt. Die Idee zum LVP besteht aus einem sehr einfachen Kern, der sich einfach erweitern lässt.
 
-## 💃🕺 Das _Live View Programming_ wird weiter entwickelt
+## 💃🕺 Das _Live View Programming_ lebt
 
 ### Das _Live View Programming_ ist im Einsatz
 
