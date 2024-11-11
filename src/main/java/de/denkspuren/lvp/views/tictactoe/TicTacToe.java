@@ -1,18 +1,18 @@
 package de.denkspuren.lvp.views.tictactoe;
 
 import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.LiveView;
+import de.denkspuren.lvp.Server;
 
 public class TicTacToe implements Clerk {
     public final String ID;
     public final int width, height;
     final String libPath = "views/tictactoe/tictactoe.js";
-    LiveView view;
+    Server view;
     
     int[] fields = {0,0,0,0,0,0,0,0,0};
     int turn = 1;
 
-    public TicTacToe(LiveView view, int width, int height) {
+    public TicTacToe(Server view, int width, int height) {
         this.view = view;
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
@@ -34,7 +34,7 @@ public class TicTacToe implements Clerk {
         });
     }
 
-    public TicTacToe(LiveView view) { this(view, 500, 500); }
+    public TicTacToe(Server view) { this(view, 500, 500); }
     public TicTacToe(int width, int height) { this(Clerk.view(), width, height); }
     public TicTacToe() { this(Clerk.view());}
 

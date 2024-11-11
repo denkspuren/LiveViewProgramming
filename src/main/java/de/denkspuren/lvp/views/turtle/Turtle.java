@@ -1,17 +1,17 @@
 package de.denkspuren.lvp.views.turtle;
 
 import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.LiveView;
+import de.denkspuren.lvp.Server;
 
 public class Turtle implements Clerk {
     public final String ID;
-    LiveView view;
+    Server view;
     final int width, height;
     Font textFont = Font.SANSSERIF;
     double textSize = 10;
     Font.Align textAlign = Font.Align.CENTER;
 
-    public Turtle(LiveView view, int width, int height) {
+    public Turtle(Server view, int width, int height) {
         this.view = view;
         this.width  = Math.max(1, Math.abs(width));  // width is at least of size 1
         this.height = Math.max(1, Math.abs(height)); // height is at least of size 1
@@ -21,7 +21,7 @@ public class Turtle implements Clerk {
         Clerk.script(view, "const turtle" + ID + " = new Turtle(document.getElementById('turtleCanvas" + ID + "'));");
     }
 
-    public Turtle(LiveView view) { this(view, 500, 500); }
+    public Turtle(Server view) { this(view, 500, 500); }
     public Turtle(int width, int height) { this(Clerk.view(), width, height); }
     public Turtle() { this(Clerk.view()); }
 

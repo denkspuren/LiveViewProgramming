@@ -22,12 +22,12 @@ import java.util.function.Consumer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
-public class LiveView {
-    public final HttpServer server;
+public class Server {
+    public final HttpServer httpServer;
     final int port;
     static int defaultPort = 50_001;
     static final String index = "/web/index.html";
-    static Map<Integer,LiveView> views = new ConcurrentHashMap<>();
+    static Map<Integer,Server> views = new ConcurrentHashMap<>();
     List<String> paths = new ArrayList<>();
 
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
@@ -41,11 +41,11 @@ public class LiveView {
     boolean loadEventOccured = false;
 
 
-    public static LiveView onPort(int port) {
+    public static Server onPort(int port) {
         port = Math.abs(port);
         try {
             if (!views.containsKey(port))
-                views.put(port, new LiveView(port));
+                views.put(port, new Server(port));
             return views.get(port);
         } catch (IOException e) {
             System.err.printf("Error starting Server: %s\n", e.getMessage());
@@ -54,17 +54,17 @@ public class LiveView {
         }
     }
 
-    public static LiveView onPort() { return onPort(defaultPort); }
+    public static Server onPort() { return onPort(defaultPort); }
 
-    private LiveView(int port) throws IOException {
+    private Server(int port) throws IOException {
         this.port = port;
         sseClientConnections = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
-        server = HttpServer.create(new InetSocketAddress("localhost", port), 0);
+        httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
 
         // loaded-Request to signal successful processing of SSEType.LOAD
-        server.createContext("/loaded", exchange -> {
+        httpServer.createContext("/loaded", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
@@ -81,7 +81,7 @@ public class LiveView {
         });
 
         // SSE context
-        server.createContext("/events", exchange -> {
+        httpServer.createContext("/events", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
@@ -94,14 +94,14 @@ public class LiveView {
         });
 
         // initial html site
-        server.createContext("/", exchange -> {
+        httpServer.createContext("/", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
             }
             final String path = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
 
-            try (final InputStream stream = LiveView.class.getResourceAsStream(path)) {
+            try (final InputStream stream = Server.class.getResourceAsStream(path)) {
                 final byte[] bytes = stream.readAllBytes();
                 exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(path)) + "; charset=utf-8");
                 exchange.sendResponseHeaders(200, bytes.length);
@@ -112,8 +112,8 @@ public class LiveView {
             }
         });
 
-        server.setExecutor(Executors.newFixedThreadPool(5));
-        server.start();
+        httpServer.setExecutor(Executors.newFixedThreadPool(5));
+        httpServer.start();
     }
 
     public void sendServerEvent(SSEType sseType, String data) {
@@ -158,7 +158,7 @@ public class LiveView {
     }
 
     public void createResponseContext(String path, Consumer<String> delegate, String id) {
-        server.createContext(path, exchange -> {
+        httpServer.createContext(path, exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
@@ -189,7 +189,7 @@ public class LiveView {
     public void stop() {
         sseClientConnections.clear();
         views.remove(port);
-        server.stop(0);
+        httpServer.stop(0);
     }
 
     public static void shutdown() {

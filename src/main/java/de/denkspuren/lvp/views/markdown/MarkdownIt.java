@@ -1,8 +1,8 @@
 package de.denkspuren.lvp.views.markdown;
 import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.LiveView;
+import de.denkspuren.lvp.Server;
 
-public record MarkdownIt(LiveView view) implements Clerk {
+public record MarkdownIt(Server view) implements Clerk {
     public MarkdownIt {
         // String onlinePath = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
         // String localPath = "views/markdown/markdown-it.min.js";

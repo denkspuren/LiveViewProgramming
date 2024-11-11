@@ -1,17 +1,17 @@
 package de.denkspuren.lvp.views.dot;
 
 import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.LiveView;
+import de.denkspuren.lvp.Server;
 
 class Dot implements Clerk {
     final String visLibOnlinePath = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
     final String visLibOfflinePath = "views/dot/vis-network.min.js";
     final String dotLibPath = "views/dot/dot.js";
     final String ID;
-    LiveView view;
+    Server view;
     int width, height;
 
-    Dot(LiveView view, int width, int height) {
+    Dot(Server view, int width, int height) {
         this.view = view;
         this.width = width;
         this.height = height;
@@ -25,7 +25,7 @@ class Dot implements Clerk {
         Clerk.script(view, "const dot" + ID + " = new Dot(document.getElementById('dotContainer" + ID + "'), " + this.width + ", " + this.height + ");");
     }
 
-    Dot(LiveView view) { this(view, 500, 500); }
+    Dot(Server view) { this(view, 500, 500); }
     Dot(int width, int height) { this(Clerk.view(), width, height); }
     Dot() { this(Clerk.view());}
 

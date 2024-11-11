@@ -3,13 +3,13 @@ package de.denkspuren.lvp.views.input;
 import java.util.Map;
 import java.util.function.Consumer;
 import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.LiveView;
+import de.denkspuren.lvp.Server;
 import de.denkspuren.lvp.skills.text.Text;
 
 public class Slider implements Clerk {
     public final String ID;
-    LiveView view;
-    public Slider(LiveView view, double min, double max) {
+    Server view;
+    public Slider(Server view, double min, double max) {
         this.view = view;
         ID = Clerk.getHashID(this);
         Clerk.write(view, "<div><input type='range' id='slider" + ID + "' min='" + min + "' max='" + max + "' step='any'/> </div>");
