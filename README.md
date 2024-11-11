@@ -223,29 +223,23 @@ Skills sind im Verzeichnis [`skills`](/skills/) zu finden. Skills haben nichts m
 
 In dem YouTube-Video ["Live View Programming: Ein Blick hinter die Kulissen"](https://youtu.be/Qj6PEYNSXnM) erkläre ich Ihnen, wie der LVP-Server an den Browser Daten schickt, den HTML-Code im Browser verändert und JavaScript-Programme nachlädt. Die Idee zum LVP besteht aus einem sehr einfachen Kern, der sich einfach erweitern lässt.
 
-## 🚀 Der Prototyp ist erst der Anfang
+## 💃🕺 Das _Live View Programming_ lebt
 
-### 🌴 Vision
+### Das _Live View Programming_ ist im Einsatz
 
-In der Programmierausbildung an der [THM](https://www.thm.de/) kombiniere ich beides, die Anwendungsentwicklung mit der Code-Dokumentation. Das Ergebnis sind Java-Programme, die eine Anwendung umsetzen _und_ gleichzeitig Anwendungs- und Programmdokumentation sind. Man kann sich also sicher sein, dass der dokumentierte Code genau der Code ist, der auch die Anwendung realisiert. 
+Das _Live View Programming_ kommt seit dem Sommersemester 2024 in der Programmierausbildung an der [THM](https://www.thm.de/) zum Einsatz. Ich möchte herausfinden, wie das _Live View Programming_ beim Erlernen von Java eine Hilfe und Unterstützung sein kann und wie sich damit Programmierprojekte für die Studierenden gestalten und durchführen lassen. Das sieht alles sehr vielversprechend aus. Die weitere Entwicklung des _Live View Programming_ läuft seitdem parallel weiter, wann immer es die Zeit erlaubt.
 
-Meine Vision für das _Live View Programming_ ist zunächst, dieses Werkzeug in der Programmierungsbildung meiner Informatik-Studierenden an der THM einzusetzen. Damit habe ich im Sommersemester 2024 begonnen. Ich möchte herausfinden, wie das LVP beim Erlernen von Java eine Hilfe und Unterstützung sein kann. Die Entwicklung zum LVP läuft seitdem parallel weiter.
+Daneben hoffe ich, dass die hier umgesetzte Java-Version als Blaupause für die Realisierung des _Live View Programming_ in anderen Programmiersprachen dient. Die Idee ist so einfach, dass man sie in ein, zwei Tagen portieren kann für die Lieblingssprache der Wahl.
 
-Daneben hoffe ich, dass diese Umsetzung für Java als Blaupause für die Realisierung des _Live View Programming_ in anderen Programmiersprachen dient. Die Idee ist so einfach, dass man sie in ein, zwei Tagen portieren kann für die Lieblingssprache der Wahl.
+### Mitmach-Aufruf
 
-### 💃🕺 Mitmach-Aufruf
+> Sie sind gerne willkommen, sich an der Entwicklung des _Live View Programming_ zu beteiligen. Schreiben Sie neue Views und Skills! Oder entwickeln Sie am Kern des _Live View Servers_ mit.
 
-> Sie sind gerne willkommen, sich an der Entwicklung des _Live View Programming_ zu beteiligen. Schreiben Sie neue Views und Skills! Oder entwickeln Sie am Kern der _Live View_ mit.
+Einige haben schon Beiträge zum LVP geliefert, meist sind es Studierende von mir. Die Contributors sind in dem GitHub-Repo ausgewiesen. Vielen Dank dafür!
 
-Zwei Personen haben geholfen, das LVP aus der Taufe zu heben: Ramon und Björn.
+Ramon ist seit den Anfangstagen als Co-Entwickler (💪) an der Umsetzung des _Live View Programming_ beteiligt. Nach einem [_Proof of Concept_](https://github.com/denkspuren/LiveViewProgramming/releases/tag/0.1.0) von mir hat Ramon den _Live View Webserver_ mit Server Sent Events (SSE) gebaut und viele wichtige Beiträge geliefert! Server Sent Events machen die Architektur des Servers sehr einfach und kommen der Idee entgegen, primär _Views_ anzubieten. [@BjoernLoetters](https://github.com/BjoernLoetters) hatte eine alternative Lösung mit [Websockets](https://github.com/denkspuren/LiveViewProgramming/tree/websockets) eingebracht, die jedoch deutlich komplizierter ausfällt. Auch wenn der SSE-Webserver "gewonnen" hat, empfehle ich das Studium des Code von Björn sehr, man kann viel daran über Websockets lernen!
 
-* Nach einem _Proof of Concept_ ([hier](https://github.com/denkspuren/LiveViewProgramming/releases/tag/0.1.0)) ist mit der Hilfe und Unterstützung von @RamonDevPrivate (mittlerweile Co-Entwickler in diesem Repo 💪) eine erste Umsetzung eines Webservers mit Server Sent Events (SSE) entstanden! Von Ramon stammen u.a. die TicTacToe-View, die Dot-View und die ObjectInspector-Skill.
-
-* [@BjoernLoetters](https://github.com/BjoernLoetters) war von der Idee des _Live View Programming_ ebenso angefixt wie ich und lieferte spontan einen beeindruckenden Server-Entwurf mit Websockets bei. Ich habe mich vorerst dennoch für eine einfachere Lösung entschieden, einen Webserver mit Server Sent Events (SSE). Für Interessierte ist der Code von Björn im Branch [websockets](https://github.com/denkspuren/LiveViewProgramming/tree/websockets) hinterlegt. Ich empfehle das Studium seines Codes sehr, man kann viel daran über Websockets lernen!
-
-Seitdem haben auch einige andere, meist Studierende von mir, Beiträge zum LVP geliefert. Die Contributors sind in dem GitHub-Repo ausgewiesen. Vielen Dank dafür! 
-
-Wenn Sie Lust haben, beteiligen Sie sich!
+Also: Wenn Sie Lust haben, beteiligen Sie sich!
 
 Herzlichst,<br>
 Dominikus Herzberg
