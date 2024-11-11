@@ -1,13 +1,13 @@
 const loadedDiv = document.getElementById('loadMessage');
 
 function loadScript(src, onError = () => console.log('script loading failed: ', src)) {
-  console.log('loadScript: ', new Date().toISOString(), ' src: ', src);
+  //console.log('loadScript: ', new Date().toISOString(), ' src: ', src);
   var script = document.createElement('script');
   script.src = src;
   script.onload = function() {
-    console.log('loaded script: ', new Date().toISOString(), ' src: ', src);
+    //console.log('loaded script: ', new Date().toISOString(), ' src: ', src);
     script.classList.add("persistent");
-    console.log('script loaded:', src);
+    //console.log('script loaded:', src);
     fetch("/loaded", {method: "post"}).catch(console.log);
   };
   script.onerror = onError;
@@ -22,10 +22,9 @@ function loadScriptWithFallback(mainSrc, alternativeSrc) {
 }
 
 function setUp() {
-  id = crypto.randomUUID();
 
   if (window.EventSource) {
-    const source = new EventSource(`/events?${new URLSearchParams({id: id})}`);
+    const source = new EventSource(`/events`);
 
     source.onmessage = function (event) {
       const splitPos = event.data.indexOf(":");
@@ -60,7 +59,7 @@ function setUp() {
           // }, 300);
           var srcs = data.split(',');
           srcs = srcs.map(src => src.trim());
-          console.log('LOAD received: ', new Date().toISOString(), ' data: ', data);
+          //console.log('LOAD received: ', new Date().toISOString(), ' data: ', data);
           // if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
           if (srcs.length >= 2) loadScript(srcs[0]);
           else loadScript(data);

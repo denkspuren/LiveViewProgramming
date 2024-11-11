@@ -122,7 +122,6 @@ public class Server {
             if (sseType == SSEType.LOAD) {
                 lock.lock();
                 loadEventOccured = false; // NEU
-                System.out.println("lock.lock(): " + java.time.Instant.now() + " " + data);
             }
             try {
                 byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
@@ -134,7 +133,6 @@ public class Server {
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD) {
                     loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
-                    System.out.println("await(): " + java.time.Instant.now() + " " + data);
                     if (loadEventOccured) paths.add(data);
                     else System.err.println("LOAD-Timeout: " + data);
                 }
