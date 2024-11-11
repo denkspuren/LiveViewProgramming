@@ -119,7 +119,6 @@ public class LiveView {
     public void sendServerEvent(SSEType sseType, String data) {
         List<HttpExchange> deadConnections = new ArrayList<>();
         for (HttpExchange connection : sseClientConnections) {
-            System.out.println("SSE-Connection: " + connection);
             if (sseType == SSEType.LOAD) {
                 lock.lock();
                 loadEventOccured = false; // NEU
@@ -134,13 +133,14 @@ public class LiveView {
                           .write(message.getBytes());
                 connection.getResponseBody().flush();
                 if (sseType == SSEType.LOAD) {
-                    loadEventOccurredCondition.await(10_000, TimeUnit.MILLISECONDS);
+                    loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
                     System.out.println("await(): " + java.time.Instant.now() + " " + data);
                     if (loadEventOccured) paths.add(data);
                     else System.err.println("LOAD-Timeout: " + data);
                 }
             } catch (IOException e) {
                 deadConnections.add(connection);
+                System.out.println("Dead Connection!");
             } catch (InterruptedException e) {
                 System.err.println("LOAD-Interruption: " + data + ", " + e);
             } finally {
