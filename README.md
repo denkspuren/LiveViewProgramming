@@ -1,36 +1,64 @@
 # Live View Programming mit Java und der JShell
 
-Das _Live View Programming_ (LVP) bietet Ihnen für die Programmierung mit Java _Views_ an, die im Web-Browser dargestellt werden. Mit dem Browser steht Ihnen ein mächtiges Ausgabe- bzw. Anzeigegerät für Text, Bilder, Grafiken, Videos, interaktive Animationen etc. zur Verfügung. Auf genau diese Browser-Fähigkeiten greift das _Live View Programming_ zurück.
+Das _Live View Programming_ (LVP) bietet Ihnen für die Java- bzw. JShell-Programmierung _Views_ und _Skills_ an. Views sind dazu da, um mediale Inhalte im Web-Browser darzustellen, also Texte, Bilder, Grafiken, Videos, inteaktive Animationen etc. Skills stellen nützliche Fähigkeiten bereit, die man in Kombination mit Views (z.B. zur Dokumentation von Code) gebrauchen kann.
 
-Zusätzlich zu den Views gibt es noch sogenannte Skills. Skills stellen nützliche LVP-Fähigkeiten bereit, z.B. zur Dokumentation von Code, die mit Views zusammenarbeiten oder mit Ihnen kombiniert genutzt werden.
+## 💟 Motivation: Views bereichern das Programmieren
 
-## 💟 Motivation
+### Was fehlt: Mediale Ausgabe- und Interaktionsformate
 
 Für Programmieranfänger:innen ist es eine echte Herausforderung für das Verständnis in Programmabläufe, wenn man einzig über eingestreute `System.out.println`-Aufrufe Einblicke in die Ausführung eines kompilierten Programms erhält. Ein Debugger ist für Anfängerinnen und Anfänger keine wirkliche Alternative. Verwendet man zum Einstieg in die Programmierung hingegen die JShell, so kommt man praktisch ohne `println` aus. In der JShell interagiert man direkt mit Javas Sprach- und Datenkonstrukten und kann Programme inkrementell aufbauen und erkunden. Dennoch fehlen zusätzliche Ausgabe- und Interaktionsmöglichkeiten, die den Programmiereinstieg interessant und die Effekte und Auswirkungen von Programmabläufen "sichtbar" machen. Hier kommt das _Live View Programming_ ins Spiel.
 
+### Visualisierungen als eigenständiger Programmierzweck
+
 Das _Live View Programming_ versteht sich als ein Angebot, in ein bestehendes Programm _Views_ einzubauen und zu verwenden, die im Web-Browser angezeigt werden. Es macht nicht nur Spaß, wenn man zum Beispiel Grafiken im Browser erzeugen kann -- man sieht auch die Programmierfehler, die einem unterlaufen. Wenn man etwa in der Turtle-View eine Schildkröte mit einem Stift über die Zeichenfläche schickt, zeigt sich unmittelbar, ob man Wiederholungen über Schleifen richtig aufgesetzt oder die Rekursion korrekt umgesetzt hat. Die visuelle Repräsentation gibt über das Auge eine direkte Rückmeldung. Feedback motiviert und hilft beim Verständnis.
+
+### Views und Skills zum Programmverständnis
 
 Für Fortgeschrittene kommen andere Aspekte hinzu, die von einer Visualisierung profitieren. Zum Beispiel lassen sich Datenstrukturen sehr gut mit Hilfe von Graphen darstellen. Mit der Dot-View können Graphen, die in der [DOT-Sprache](https://de.wikipedia.org/wiki/DOT_(Graphviz)) beschrieben sind, im Browser gerendert werden. Die Dot-View wird beispielsweise von dem ObjectInspector genutzt, einem Skill, den das LVP bereitstellt. Der `ObjectInspector` bekommt ein Java-Objekt übergeben, reflektiert das Objekt und erstellt ein Objektdiagramm, das sich von diesem Objekt über die Referenzen zu anderen Objekten ergibt. Das Objektdiagramm wird in der Dot-Sprache beschrieben und mit Hilfe der Dot-View zur Anzeige gebracht. Das ist eine sehr hilfreiche visuelle und leicht zugängliche Form der Objekt-Introspektion.
 
+### Kombination von Anschauungsbeispielen und Programmdokumentation
+
 Mit LVP kann man jedoch noch sehr viel mehr machen. Mit der Markdown-View kann man Markdown-Texte im Browser anzeigen. Zusammen mit der Text-Skill können beispielsweise Code-Abschnitte aus einer Java-Datei ausgeschnitten und im Markdown-Text in einem Code-Block eingefügt werden. Man kann also ein Java-Programm erstellen, das seine eigene Dokumentation in Markdown enthält, wobei die in der Dokumentation angezeigten Code-Fragmente immer aktuell sind. Das ist eine besondere Form des [_Literate Programming_](https://en.wikipedia.org/wiki/Literate_programming).
+
+### Konzeptstudien und Prototyp-Entwicklung
 
 Das LVP kann man auch dafür einsetzen, um Anwendungen zu schreiben. Die Views werden zusammen mit interaktiven Elementen, wie Buttons, Slidern etc. als graphische Oberfläche verstanden und ausgelegt. Damit lassen sich vor allem Konzeptstudien und Prototypen entwickeln.
 
 In der Programmierausbildung an der [THM](https://www.thm.de/) kombiniere ich beides, die Anwendungsentwicklung mit der Code-Dokumentation. Das Ergebnis sind Java-Programme, die eine Anwendung umsetzen _und_ gleichzeitig Anwendungs- und Programmdokumentation sind. Man kann sich also sicher sein, dass der dokumentierte Code genau der Code ist, der auch die Anwendung realisiert. 
 
-## 🐣 Ursprünge: Das will ich auch haben!
+## 🐣 Ursprünge: Clerk als Inspiration
 
-Wer in Python programmiert, hat meist schon von der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface) mit [Jupyter bzw. JupyterLab](https://jupyter.org/) gehört oder sie sogar schon genutzt. Man programmiert direkt im Browser, wo eine Notizbuch-Umgebung über einen Server bereitgestellt wird. Das Notizbuch ermöglicht die Kombination von Programmcode und Dokumentation in beliebiger Abfolge, wobei die Programmentwicklung inkrementell und explorativ, d.h. in kleinen Schritten und im Stil einer Erkundung verläuft. Das Notizbuch zeigt Zwischenausgaben der Programmausführung, wobei Datenplots und andere visuelle und teils interaktive Darstellungen erzeugt und eingebunden werden können. Die Notizbuch-Programmierung ist z.B. in den Datenwissenschaften, im Quantencomputing und in der KI-Entwicklung weit verbreitet.[^1]
+### Ausgangspunkt Notizbuch-Programmierung
+
+Wer in Python programmiert, hat meist schon von der [Notizbuch-Programmierung](https://en.wikipedia.org/wiki/Notebook_interface) mit [Jupyter bzw. JupyterLab](https://jupyter.org/) gehört oder sie sogar schon genutzt. Man programmiert direkt im Webbrowser, wo eine Notizbuch-Umgebung über einen Server bereitgestellt wird. Das Notizbuch ermöglicht die Kombination von Programmcode und Dokumentation in beliebiger Abfolge, wobei die Programmentwicklung inkrementell und explorativ, d.h. in kleinen Schritten und im Stil einer Erkundung verläuft. Das Notizbuch zeigt Zwischenausgaben der Programmausführung, wobei Datenplots und andere visuelle und teils interaktive Darstellungen erzeugt und eingebunden werden können. Die Notizbuch-Programmierung ist z.B. in den Datenwissenschaften, im Quantencomputing und in der KI-Entwicklung weit verbreitet.[^1]
+
+> Die Notizbuch-Programmierung hat die Besonderheit, dass sie mit der Aktualisierung von Dokumentations- und Code-Zellen ein eigenes Ausführungsmodell über das der verwendeten Programmiersprache legt. Das ist nicht immer wünschenswert und gewollt!
 
 [^1]: Wer einen Eindruck von der Notizbuch-Programmierung gewinnen möchte, kann sich z.B. meinen [Simulator für Quantenschaltungen](https://github.com/denkspuren/qcsim/blob/main/qcsim-dev.ipynb) anschauen.
 
-Als ich eine besondere Variante der Notizbuch-Programmierung namens Clerk für die Programmiersprache Clojure entdeckte, war es um mich geschehen: Statt im Browser, d.h. im Notizbuch zu programmieren, bleibt man bei Clerk in der gewohnten Entwicklungsumgebung und die Browseransicht wird währenddessen automatisch und live generiert. Diese Art des Programmierens bezeichnen die Entwickler von Clerk als _Moldable Live Programming_, mehr Infos dazu finden sich unter https://clerk.vision/.
+### Die Idee: Nutze den Browser lediglich zur Darstellung
 
-Clerk für Clojure ist ein mächtiges und eindrucksvolles Werkzeug. Clerk kann man auf eine sehr einfache Idee reduzieren: als einfachen Webserver, den man programmierend ansteuern und erweitern kann, um im Browser Inhalte anzeigen und Interaktionen verarbeiten zu können. Diese Grundidee, die ich als _Live View Programming_ bezeichne, wollte ich so einfach und unkompliziert wie möglich für Java und die JShell realisieren.
+Als ich eine besondere Variante der Notizbuch-Programmierung namens Clerk für die Programmiersprache Clojure entdeckte, war es um mich geschehen: Statt im Browser, d.h. im Notizbuch zu programmieren, bleibt man bei Clerk in der gewohnten Entwicklungsumgebung. Die Browseransicht wird während des Programmierens automatisch und live generiert. Diese Art des Programmierens bezeichnen die Entwickler von Clerk als _Moldable Live Programming_, mehr Infos dazu finden sich unter https://clerk.vision/.
 
-Der entstandene _Live View Server_ kann über ein Interface namens `Clerk` (engl. für Sachbearbeiter, Büroangestellter, Schreibkraft) angesteuert werden; der Name soll an die Inspirationsquelle erinnern. Der _Live View Server_ ist denkbar einfach. Die Views nutzen den Server, um Inhalte an den Browser durchzureichen. Und die Skills bieten zudem nützliche Hilfsmittel an.
+Clerk für Clojure ist ein mächtiges und eindrucksvolles Werkzeug. Auch hier stülpt Clerk der Sprache Clojure auf sehr elegante Weise ein Ausführungsmodell über. Aber davon kann man absehen, und es offenbart sich eine ganz einfache Idee: Es bedarf eines einfachen Webservers, den man programmierend ansteuern und erweitern kann, um im Webbrowser Inhalte anzeigen und Interaktionen verarbeiten zu können. Diese Grundidee, die ich als _Live View Programming_ bezeichne, wollte ich so einfach und unkompliziert wie möglich für Java und die JShell realisieren.
 
-Es braucht nur wenige Mittel, um damit eine Notizbuch-Programmierung umzusetzen. Aber es geht noch viel mehr, wie ich es anfangs beschrieben habe! Ein Beispiel ist das [Literate Programming](https://en.wikipedia.org/wiki/Literate_programming), das ganz andere Wege bei der Kombination von Code und Dokumentation geht. Ein anderes Beispiel ist eine View für [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik), was zur Grafik-Programmierung animiert. Ein weiteres Beispiel ist eine View, die eine GUI für das Spiel [TicTacToe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) bereitstellt. In all diesen Beispielen programmiert man wie gewohnt mit Java in der IDE oder mittels JShell-Skripten und einem Editor und instruiert den Browser, was er anzeigen soll. Das ist -- ehrlich gesagt -- ziemlich cool!
+> Das _Live View Programming_ belässt die Kontrolle, was wann im Browser wie angezeigt wird, bei der Programmiersprache. Das macht das _Live View Programming_ leicht verstehbar und stellt die Notizbuch-Programmierung nicht in den Mittelpunkt. Man gewinnt Freiheiten, kann aber, wenn man möchte, mit LVP auch Notizbuch-Programme schreiben, nur eben auf etwas andere Art.
+
+### Was es braucht: einen minimalen _Live View Server_
+
+Der entstandene _Live View Server_ kann nach seinem Start über ein Interface namens Clerk (engl. für Sachbearbeiter, Büroangestellter, Schreibkraft) angesteuert werden; der Name soll an die Inspirationsquelle erinnern.
+
+Der _Live View Server_ ist denkbar einfach konzipiert. Über das Clerk-Interface können bereitgestellte oder selbst programmierte Views aktiviert und anschließend genutzt werden. Und die Skills bieten zudem nützliche Hilfsmittel an. Auch hier kann man auf bereitgestellte Skills zurückgreifen oder eigene programmieren.
+
+### Das _Live View Programming_ bietet unzählige Möglichkeiten
+
+Wenn man Programme in Notizbuch-Form oder als [Literate Program](https://en.wikipedia.org/wiki/Literate_programming) dokumentieren möchte, bedarf es nicht mehr als der Markdown-View und der Text-Skill.
+
+Für Anwendungs- oder Darstellungszwecke kann man z.B. die Turtle-View für die Erstellung von [Turtle-Grafiken](https://de.wikipedia.org/wiki/Turtle-Grafik) nutzen. Für das Spiel [TicTacToe](https://de.wikipedia.org/wiki/Tic-Tac-Toe) steht eine einfache, interaktive graphische Darstellung bereit. Für die Abbildung von [Graphen]("https://de.wikipedia.org/wiki/Graph_(Graphentheorie)"), die mit ihren Kanten und Knoten oft in der Informatik verwendet werden, gibt es die Dot-View. Zum Beispiel nutzt der Skill zur Objekt-Introspektion die Dot-View.
+
+> Da das _Live View Programming_ nicht wie die Notizbuch-Programmierung eine bestimmte Art der Dokumentation und des Gebrauchs vorgibt, ist es an einem selbst, die Views und Skills in geeigneter Weise für einen bestimmten Zweck zu verwenden. 
+
+All diese Views und Skills nutzt man programmierend mit Java in der IDE oder mittels JShell-Skripten und einem Editor. Es ist – ehrlich gesagt – ziemlich cool, wenn man die Ergebnisse dann im Browser sieht. 
 
 ## 💻 _Live View Programming_ für die JShell
 
