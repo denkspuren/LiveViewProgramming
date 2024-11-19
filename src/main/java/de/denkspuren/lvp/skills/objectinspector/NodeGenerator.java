@@ -131,6 +131,7 @@ public class NodeGenerator {
 
     /**
      * Inspect the object using reflections and store it in a tree structure of Nodes
+     * IMPORTANT: Only public properties can be inspected!
      * @param objectToBeInspected - root object of the tree structure; 
      * @param identifier - variable name referencing the object 
      * @return instance of NodeGenerator
@@ -141,6 +142,7 @@ public class NodeGenerator {
 
      /**
      * Inspect the object using reflections and store it in a tree structure of Nodes
+     * IMPORTANT: Only public properties can be inspected!
      * @param objectToBeInspected - root object of the tree structure; 
      * @param identifier - variable name referencing the object 
      * @param inspectSuperClasses - true -> super class fields are inspected too
@@ -152,6 +154,7 @@ public class NodeGenerator {
 
     /**
      * Inspect the object using reflections and store it in a tree structure of Nodes
+     * IMPORTANT: Only public properties can be inspected!
      * @param objectToBeInspected - root object of the tree structure; 
      * @param identifier - variable name referencing the object 
      * @param inspectSuperClasses - true -> super class fields are inspected too
