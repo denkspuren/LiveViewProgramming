@@ -27,7 +27,7 @@ public class Server {
     final int port;
     static int defaultPort = 50_001;
     static final String index = "/web/index.html";
-    static Map<Integer,Server> views = new ConcurrentHashMap<>();
+    static Map<Integer,Server> serverInstances = new ConcurrentHashMap<>();
     List<String> paths = new ArrayList<>();
 
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
@@ -44,9 +44,9 @@ public class Server {
     public static Server onPort(int port) {
         port = Math.abs(port);
         try {
-            if (!views.containsKey(port))
-                views.put(port, new Server(port));
-            return views.get(port);
+            if (!serverInstances.containsKey(port))
+                serverInstances.put(port, new Server(port));
+            return serverInstances.get(port);
         } catch (IOException e) {
             System.err.printf("Error starting Server: %s\n", e.getMessage());
             e.printStackTrace();
@@ -186,11 +186,11 @@ public class Server {
 
     public void stop() {
         sseClientConnections.clear();
-        views.remove(port);
+        serverInstances.remove(port);
         httpServer.stop(0);
     }
 
     public static void shutdown() {
-        views.forEach((k, v) -> v.stop());
+        serverInstances.forEach((k, v) -> v.stop());
     }
 }

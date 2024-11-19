@@ -8,16 +8,16 @@ import de.denkspuren.lvp.skills.text.Text;
 
 public class Slider implements Clerk {
     public final String ID;
-    Server view;
-    public Slider(Server view, double min, double max) {
-        this.view = view;
+    Server server;
+    public Slider(Server server, double min, double max) {
+        this.server = server;
         ID = Clerk.getHashID(this);
-        Clerk.write(view, "<div><input type='range' id='slider" + ID + "' min='" + min + "' max='" + max + "' step='any'/> </div>");
-        Clerk.script(view, "const slider" + ID + " = document.getElementById('slider" + ID + "');");
+        Clerk.write(server, "<div><input type='range' id='slider" + ID + "' min='" + min + "' max='" + max + "' step='any'/> </div>");
+        Clerk.script(server, "const slider" + ID + " = document.getElementById('slider" + ID + "');");
     }
     public Slider attachTo(Consumer<String> delegate) {
-        this.view.createResponseContext("/slider" + ID, delegate, ID);
-        Clerk.script(view, Text.fillOut(
+        this.server.createResponseContext("/slider" + ID, delegate, ID);
+        Clerk.script(server, Text.fillOut(
             """
             slider${0}.addEventListener('input', (event) => {
                 if (locks.includes('${0}')) return;

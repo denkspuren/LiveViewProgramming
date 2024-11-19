@@ -15,7 +15,7 @@ void drawing(Turtle turtle, double size) {
 
 drawing(turtle, 210.0/2);
 
-Slider slider = new Slider(Clerk.view(), 10, 200);
+Slider slider = new Slider(Clerk.serve(), 10, 200);
 slider.attachTo(response -> {
     double size = Double.parseDouble(response);
     turtle.reset();

@@ -2,22 +2,22 @@ package de.denkspuren.lvp.views.markdown;
 import de.denkspuren.lvp.Clerk;
 import de.denkspuren.lvp.Server;
 
-public record MarkdownIt(Server view) implements Clerk {
+public record MarkdownIt(Server server) implements Clerk {
     public MarkdownIt {
         // String onlinePath = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
         // String localPath = "views/markdown/markdown-it.min.js";
-        // Clerk.load(view, onlinePath, localPath);
-        Clerk.load(view, "views/markdown/markdown-it.min.js");
-        Clerk.load(view, "views/markdown/highlight.min.js");
-        Clerk.load(view, "views/markdown/mathjax3.js");
-        // Clerk.script(view, """
+        // Clerk.load(server, onlinePath, localPath);
+        Clerk.load(server, "views/markdown/markdown-it.min.js");
+        Clerk.load(server, "views/markdown/highlight.min.js");
+        Clerk.load(server, "views/markdown/mathjax3.js");
+        // Clerk.script(server, """
         //     var md = markdownit({
         //         html: true,
         //         linkify: true,
         //         typographer: true
         //     });
         //     """);
-        Clerk.script(view, """
+        Clerk.script(server, """
             var md = markdownit({
                 highlight: function (str, lang) {
                     if (lang && hljs.getLanguage(lang)) {
@@ -37,8 +37,8 @@ public record MarkdownIt(Server view) implements Clerk {
     public String write(String markdownText) {
         String ID = Clerk.generateID(10);
         // Using `preformatted` is a hack to get a Java String into the Browser without interpretation
-        Clerk.write(view, "<script id='" + ID + "' type='preformatted'>" + markdownText + "</script>");
-        Clerk.call(view, "var scriptElement = document.getElementById('" + ID  + "');"
+        Clerk.write(server, "<script id='" + ID + "' type='preformatted'>" + markdownText + "</script>");
+        Clerk.call(server, "var scriptElement = document.getElementById('" + ID  + "');"
         +
         """
         var divElement = document.createElement('div');

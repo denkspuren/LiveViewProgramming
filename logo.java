@@ -189,7 +189,7 @@ turtle = new Turtle(300, 350);
 
 drawing(turtle, (200.0 + 10.0) / 2.0);
 
-Slider slider = new Slider(Clerk.view(), 10, 200);
+Slider slider = new Slider(Clerk.serve(), 10, 200);
 slider.attachTo(response -> {
     double size = Double.parseDouble(response);
     turtle.reset();

@@ -107,7 +107,7 @@ Importieren Sie das Programmpaket zum einfacheren Zugriff in der JShell. Anschli
 ```
 jshell> import de.denkspuren.lvp.*;
 
-jshell> Clerk.view()
+jshell> Clerk.serve()
 Open http://localhost:50001 in your browser
 $38 ==> LiveView@2d38eb89
 ```
