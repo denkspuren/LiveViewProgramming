@@ -3,7 +3,7 @@ package de.denkspuren.lvp.views.dot;
 import de.denkspuren.lvp.Clerk;
 import de.denkspuren.lvp.Server;
 
-class Dot implements Clerk {
+public class Dot implements Clerk {
     final String visLibOnlinePath = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
     final String visLibOfflinePath = "views/dot/vis-network.min.js";
     final String dotLibPath = "views/dot/dot.js";
@@ -11,7 +11,7 @@ class Dot implements Clerk {
     Server server;
     int width, height;
 
-    Dot(Server server, int width, int height) {
+    public Dot(Server server, int width, int height) {
         this.server = server;
         this.width = width;
         this.height = height;
@@ -25,11 +25,11 @@ class Dot implements Clerk {
         Clerk.script(server, "const dot" + ID + " = new Dot(document.getElementById('dotContainer" + ID + "'), " + this.width + ", " + this.height + ");");
     }
 
-    Dot(Server server) { this(server, 500, 500); }
-    Dot(int width, int height) { this(Clerk.serve(), width, height); }
-    Dot() { this(Clerk.serve());}
+    public Dot(Server server) { this(server, 500, 500); }
+    public Dot(int width, int height) { this(Clerk.serve(), width, height); }
+    public Dot() { this(Clerk.serve());}
 
-    Dot draw(String dotString) {
+    public Dot draw(String dotString) {
         String escaped = dotString.replaceAll("\\\"", "\\\\\"").replaceAll("\\n", "");
         Clerk.script(server, "dot" + ID + ".draw(\"dinetwork{" + escaped + "}\")");
         return this;
