@@ -125,8 +125,10 @@ Im Browser ist "Hello, _this_ is **Live View Programming** in action!" zu sehen.
 Als nächstes erzeugen wir eine kleine _Turtle_-Grafik. Die Idee, Grafiken mit einer Schildkröte (_turtle_) zu programmieren, stammt von der Programmiersprache [Logo]("https://de.wikipedia.org/wiki/Logo_(Programmiersprache)").
 
 ```java
+jshell> import de.denkspuren.lvp.views.turtle.Turtle;
+
 jshell> Turtle turtle = new Turtle(200, 200)
-turtle ==> Turtle@3b764bce
+turtle ==> de.denkspuren.lvp.views.turtle.Turtle@33f88ab
 ```
 
 Ein Kästchen, die Zeichenfläche, von 200 x 200 Punkten ist im Browser zu sehen. In der Mitte befindet sich eine unsichtbare Schildkröte, die nach Osten (also nach rechts) ausgerichtet und mit einem Zeichenstift ausgestattet ist und die wir mit ein paar Anweisungen so umherschicken, dass schrittweise ein Quadrat entsteht.
@@ -140,7 +142,7 @@ turtle.forward(80).left(90);
 turtle.forward(80).left(90);
 ```
 
-Sie sollten nun ein Quadrat im Zeichenfeld sehen. Die Schildkröte blickt am Schluss ihres Wegs wieder gen Osten. Ergänzen wir einen "Kreis", den wir aus 12 Strichen zusammensetzen.
+Sie sollten nun ein Quadrat im rechten oberen Zeichenfeld sehen. Die Schildkröte blickt am Schluss ihres Wegs wieder gen Osten. Ergänzen wir einen "Kreis", den wir aus 12 Strichen zusammensetzen.
 
 ```java
 for (int i = 1; i <= 12; i++)
