@@ -1,8 +1,9 @@
-package de.denkspuren.lvp;
+package lvp;
 
 import java.util.Random;
 import java.util.stream.Collectors;
-import de.denkspuren.lvp.views.markdown.MarkdownIt;
+
+import lvp.views.MarkdownIt;
 
 public interface Clerk {
     static String generateID(int n) { // random alphanumeric string of size n

@@ -1,4 +1,4 @@
-package de.denkspuren.lvp.skills.rgb;
+package lvp.skills;
 
 public enum RGB { // https://w3schools.sinsixx.com/css/css_colornames.asp.htm
     AQUA(0x00FFFF),

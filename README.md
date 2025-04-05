@@ -105,7 +105,7 @@ jshell -c lvp-0.4.0.jar
 Importieren Sie das Programmpaket zum einfacheren Zugriff in der JShell. Anschließend kann der _Live View Server_ gestartet werden:
 
 ```
-jshell> import de.denkspuren.lvp.*;
+jshell> import lvp.*;
 
 jshell> Clerk.serve()
 Open http://localhost:50001 in your browser
@@ -125,10 +125,10 @@ Im Browser ist "Hello, _this_ is **Live View Programming** in action!" zu sehen.
 Als nächstes erzeugen wir eine kleine _Turtle_-Grafik. Die Idee, Grafiken mit einer Schildkröte (_turtle_) zu programmieren, stammt von der Programmiersprache [Logo]("https://de.wikipedia.org/wiki/Logo_(Programmiersprache)").
 
 ```java
-jshell> import de.denkspuren.lvp.views.turtle.Turtle;
+jshell> import lvp.views.Turtle;
 
 jshell> Turtle turtle = new Turtle(200, 200)
-turtle ==> de.denkspuren.lvp.views.turtle.Turtle@33f88ab
+turtle ==> lvp.views.turtle.Turtle@33f88ab
 ```
 
 Ein Kästchen, die Zeichenfläche, von 200 x 200 Punkten ist im Browser zu sehen. In der Mitte befindet sich eine unsichtbare Schildkröte, die nach Osten (also nach rechts) ausgerichtet und mit einem Zeichenstift ausgestattet ist und die wir mit ein paar Anweisungen so umherschicken, dass schrittweise ein Quadrat entsteht.

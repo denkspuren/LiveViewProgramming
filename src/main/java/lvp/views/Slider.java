@@ -1,10 +1,10 @@
-package de.denkspuren.lvp.views.input;
+package lvp.views;
 
 import java.util.Map;
 import java.util.function.Consumer;
-import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.Server;
-import de.denkspuren.lvp.skills.text.Text;
+import lvp.Clerk;
+import lvp.Server;
+import lvp.skills.Text;
 
 public class Slider implements Clerk {
     public final String ID;

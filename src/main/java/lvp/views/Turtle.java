@@ -1,7 +1,8 @@
-package de.denkspuren.lvp.views.turtle;
+package lvp.views;
 
-import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.Server;
+import lvp.Clerk;
+import lvp.Server;
+import lvp.views.turtle.Font;
 
 public class Turtle implements Clerk {
     public final String ID;

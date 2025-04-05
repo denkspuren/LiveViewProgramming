@@ -1,7 +1,7 @@
-import de.denkspuren.lvp.skills.text.Text;
-import de.denkspuren.lvp.views.markdown.MarkdownIt;
-import de.denkspuren.lvp.views.input.Slider;
-import de.denkspuren.lvp.views.turtle.Turtle;
+import lvp.skills.Text;
+import lvp.views.MarkdownIt;
+import lvp.views.Slider;
+import lvp.views.Turtle;
 
 Clerk.markdown(
     Text.fillOut(

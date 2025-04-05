@@ -1,4 +1,4 @@
-package de.denkspuren.lvp;
+package lvp;
 
 import java.io.IOException;
 import java.io.InputStream;

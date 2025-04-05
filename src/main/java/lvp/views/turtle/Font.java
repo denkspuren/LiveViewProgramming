@@ -1,4 +1,4 @@
-package de.denkspuren.lvp.views.turtle;
+package lvp.views.turtle;
 
 public enum Font { 
     ARIAL("Arial"),

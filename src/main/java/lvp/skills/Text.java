@@ -1,4 +1,4 @@
-package de.denkspuren.lvp.skills.text;
+package lvp.skills;
 
 import java.io.IOException;
 import java.nio.file.Files;

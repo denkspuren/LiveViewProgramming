@@ -1,6 +1,6 @@
-package de.denkspuren.lvp.views.markdown;
-import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.Server;
+package lvp.views;
+import lvp.Clerk;
+import lvp.Server;
 
 public record Marked(Server server) implements Clerk {
     public Marked {

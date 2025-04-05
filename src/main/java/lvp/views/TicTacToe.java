@@ -1,7 +1,7 @@
-package de.denkspuren.lvp.views.tictactoe;
+package lvp.views;
 
-import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.Server;
+import lvp.Clerk;
+import lvp.Server;
 
 public class TicTacToe implements Clerk {
     public final String ID;

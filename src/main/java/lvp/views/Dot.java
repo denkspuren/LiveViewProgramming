@@ -1,7 +1,7 @@
-package de.denkspuren.lvp.views.dot;
+package lvp.views;
 
-import de.denkspuren.lvp.Clerk;
-import de.denkspuren.lvp.Server;
+import lvp.Clerk;
+import lvp.Server;
 
 public class Dot implements Clerk {
     final String visLibOnlinePath = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
