@@ -1,6 +1,6 @@
 // https://gist.github.com/RamonDevPrivate/3bb187ef89b2666b1b1d00232100f5ee
 // Author: https://github.com/RamonDevPrivate, Version 1, CC BY-NC-SA
-
+package lvp.skills;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -117,7 +117,7 @@ class ArrayNode extends ObjectNode_425 {
     }
 }
 
-class NodeGenerator {
+public class NodeGenerator {
     private int nodeCounter = 0; //used to generate an unique node name
         
     // save inspected objects to prevent infinite loops in case of recursion and identify already used objects 
@@ -131,6 +131,7 @@ class NodeGenerator {
 
     /**
      * Inspect the object using reflections and store it in a tree structure of Nodes
+     * IMPORTANT: Only public properties can be inspected!
      * @param objectToBeInspected - root object of the tree structure; 
      * @param identifier - variable name referencing the object 
      * @return instance of NodeGenerator
@@ -141,6 +142,7 @@ class NodeGenerator {
 
      /**
      * Inspect the object using reflections and store it in a tree structure of Nodes
+     * IMPORTANT: Only public properties can be inspected!
      * @param objectToBeInspected - root object of the tree structure; 
      * @param identifier - variable name referencing the object 
      * @param inspectSuperClasses - true -> super class fields are inspected too
@@ -152,6 +154,7 @@ class NodeGenerator {
 
     /**
      * Inspect the object using reflections and store it in a tree structure of Nodes
+     * IMPORTANT: Only public properties can be inspected!
      * @param objectToBeInspected - root object of the tree structure; 
      * @param identifier - variable name referencing the object 
      * @param inspectSuperClasses - true -> super class fields are inspected too
