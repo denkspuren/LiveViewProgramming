@@ -1,6 +1,4 @@
-package lvp.skills;
-
-public enum RGB { // https://w3schools.sinsixx.com/css/css_colornames.asp.htm
+enum RGB { // https://w3schools.sinsixx.com/css/css_colornames.asp.htm
     AQUA(0x00FFFF),
     BLACK(0x000000),
     BLUE(0, 0, 255),
@@ -23,18 +21,18 @@ public enum RGB { // https://w3schools.sinsixx.com/css/css_colornames.asp.htm
     private RGB(int red, int green, int blue) { colorCode = color(red, green, blue); }
     private RGB(int code) { this(red(code), green(code), blue(code)); }
 
-    public static int color(int code) {
+    static int color(int code) {
         return color(red(code), green(code), blue(code));
     }
 
-    public static int color(int red, int green, int blue) {
+    static int color(int red, int green, int blue) {
         return ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF);
     }
 
-    public static int red(int colorCode)   { return (colorCode & 0b11111111_00000000_00000000) >> 16; }
-    public static int green(int colorCode) { return (colorCode & 0b11111111_00000000) >> 8;           }
-    public static int blue(int colorCode)  { return  colorCode & 0b11111111;                          }
+    static int red(int colorCode)   { return (colorCode & 0b11111111_00000000_00000000) >> 16; }
+    static int green(int colorCode) { return (colorCode & 0b11111111_00000000) >> 8;           }
+    static int blue(int colorCode)  { return  colorCode & 0b11111111;                          }
 
-    public static String hex(int code) { return String.format("0x%06x", color(code)); }
-    public String hex() { return hex(this.colorCode); }
+    static String hex(int code) { return String.format("0x%06x", color(code)); }
+    String hex() { return hex(this.colorcode); }
 }

@@ -1,30 +1,27 @@
 const loadedDiv = document.getElementById('loadMessage');
 
 function loadScript(src, onError = () => console.log('script loading failed: ', src)) {
-  //console.log('loadScript: ', new Date().toISOString(), ' src: ', src);
   var script = document.createElement('script');
   script.src = src;
   script.onload = function() {
-    //console.log('loaded script: ', new Date().toISOString(), ' src: ', src);
     script.classList.add("persistent");
-    //console.log('script loaded:', src);
+    console.log('script loaded:', src);
     fetch("/loaded", {method: "post"}).catch(console.log);
   };
   script.onerror = onError;
   document.body.appendChild(script);
 }
 
-function loadScriptWithFallback(mainSrc, alternativeSrc) {
-  loadScript(mainSrc, function() {
-    console.log('loading', mainSrc, 'failed, trying', alternativeSrc);
-    loadScript(alternativeSrc);
+function loadScriptWithFallback(onlineSrc, offlineSrc) {
+  loadScript(onlineSrc, function() {
+    console.log('loading', onlineSrc, 'failed, trying', offlineSrc);
+    loadScript(offlineSrc);
   });
 }
 
 function setUp() {
-
   if (window.EventSource) {
-    const source = new EventSource(`/events`);
+    const source = new EventSource("/events");
 
     source.onmessage = function (event) {
       const splitPos = event.data.indexOf(":");
@@ -54,14 +51,12 @@ function setUp() {
         }
         case "LOAD": {
           loadedDiv.style.display = 'block';
-          //setTimeout(() => {
-          //  loadedDiv.style.display = 'none';
-          // }, 300);
+          setTimeout(() => {
+            loadedDiv.style.display = 'none';
+          }, 300);
           var srcs = data.split(',');
           srcs = srcs.map(src => src.trim());
-          //console.log('LOAD received: ', new Date().toISOString(), ' data: ', data);
-          // if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
-          if (srcs.length >= 2) loadScript(srcs[0]);
+          if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
           else loadScript(data);
           break;
         }

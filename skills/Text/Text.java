@@ -1,5 +1,3 @@
-package lvp.skills;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,10 +11,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
-public class Text { // Class with static methods for file operations
-    private Text(){}
-    
-    public static void write(String fileName, String text) {
+class Text { // Class with static methods for file operations
+    static void write(String fileName, String text) {
         try {
             Files.writeString(Path.of(fileName), text);
         } catch (IOException e) {
@@ -26,7 +22,7 @@ public class Text { // Class with static methods for file operations
     }
 
     // core method
-    public static String cutOut(Path path, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
+    static String cutOut(Path path, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
         List<String> snippet = new ArrayList<>();
         boolean skipLines = true;
         boolean isInLabels;
@@ -54,20 +50,20 @@ public class Text { // Class with static methods for file operations
     }
     // end
 
-    public static String cutOut(Path path, String... labels) { return cutOut(path, false, false, labels); }
-    public static String read(Path path) { return cutOut(path, true, true, ""); }
+    static String cutOut(Path path, String... labels) { return cutOut(path, false, false, labels); }
+    static String read(Path path) { return cutOut(path, true, true, ""); }
 
-    public static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
+    static String cutOut(String fileName, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
         return cutOut(Path.of(fileName), includeStartLabel, includeEndLabel, labels);
     }
-    public static String cutOut(String fileName, String... labels) {
+    static String cutOut(String fileName, String... labels) {
         return cutOut(fileName, false, false, labels);
     }
-    public static String read(String fileName) {
+    static String read(String fileName) {
         return cutOut(fileName, true, true, "");
     }
 
-    public static String escapeHtml(String text) {
+    static String escapeHtml(String text) {
         return text.replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;");
@@ -76,7 +72,7 @@ public class Text { // Class with static methods for file operations
     // Method `fillOut` emulates String interpolation, since String Templates
     // have been removed in Java 23 (they were a preview feature in Java 21 and 22).
 
-    public static String fillOut(Map<String, Object> replacements, String template) {
+    static String fillOut(Map<String, Object> replacements, String template) {
         Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}"); // `${<key>}`
         Matcher matcher = pattern.matcher(template);
         StringBuffer result = new StringBuffer();
@@ -93,11 +89,11 @@ public class Text { // Class with static methods for file operations
         return result.toString();
     }
 
-    public static String fillOut(String template, Map<String, Object> replacements) {
+    static String fillOut(String template, Map<String, Object> replacements) {
         return fillOut(replacements, template);
     }
 
-    public static String fillOut(String template, Object... replacements) {
+    static String fillOut(String template, Object... replacements) {
         Map<String, Object> m = new HashMap<>();
         IntStream.range(0, replacements.length)
             .forEach(i -> m.put(Integer.toString(i), replacements[i]));

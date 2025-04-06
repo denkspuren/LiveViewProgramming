@@ -49,30 +49,30 @@ ${Resultat}
 Das sieht dann, wenn man die Zeichenkette im Markdown einfügt (mit `Text.fillOut`), so aus: ${Resultat}
 
 Diese Technik der Einbettung von dynamischen Inhalten in eine Zeichenkette lässt sich ausreizen mit der Text-Skill. Damit kann der Java-Quelltext sich zur Laufzeit selbst ausschneiden zur Einbettung in Markdown! Das ist der Schlüssel zu sich selbst dokumentierendem Programmcode.
-""", Map.of("Beispiel", Text.cutOut("examples/CodeDokuMitMarkdown.java", "// Beispiel"),
+""", Map.of("Beispiel", Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// Beispiel"),
             "Resultat", s)));
 
 Clerk.markdown(Text.fillOut(Map.of(
 "LabelCff",
-Text.cutOut("examples/CodeDokuMitMarkdown.java", "// LabelCff"),
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelCff"),
 "ResultLabelCff",
 // LabelCff
-Text.cutOut("examples/CodeDokuMitMarkdown.java", false, false, "// LabelC")
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", false, false, "// LabelC")
 // LabelCff
 , "LabelCft",
-Text.cutOut("examples/CodeDokuMitMarkdown.java", "// LabelCft"),
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelCft"),
 "ResultLabelCft",
 // LabelCft
-Text.cutOut("examples/CodeDokuMitMarkdown.java", false, true, "// LabelC")
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", false, true, "// LabelC")
 // LabelCft
 , "LabelAB",
-Text.cutOut("examples/CodeDokuMitMarkdown.java", "// LabelAB"),
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelAB"),
 "ResultLabelAB",
 // LabelAB
-Text.cutOut("examples/CodeDokuMitMarkdown.java", "// LabelA", "// LabelB")
+Text.cutOut("views/Markdown/CodeDokuMitMarkdown.java", "// LabelA", "// LabelB")
 // LabelAB
 , "TextCutOut",
-Text.cutOut("src/main/java/lvp/skills/Text.java", "// core method", "// end")
+Text.cutOut("skills/Text/Text.java", "// core method", "// end")
 ), """
 ## Texte ausschneiden mit `Text.cut`
 
