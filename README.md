@@ -151,7 +151,7 @@ for (int i = 1; i <= 12; i++)
 
 Links unten ist nun außerdem ein kantiger "Kreis" zu sehen. 😊
 
-![Ein Turtle-Beispiel](/src/main/java/de/denkspuren/lvp/views/turtle/TurtleExample.png)
+![Ein Turtle-Beispiel](/src/main/java/lvp/views/turtle/TurtleExample.png)
 
 > Das ist also die Idee des _Live View Programming_: Man kann mit Java-Code sichtbare Effekte in der Browseransicht erzeugen.
 
