@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turtle Graphics</title>
+</head>
+<body>
+    <canvas id="turtleCanvas" width="500" height="500" style="border:1px solid #000;"></canvas>
+    <script src="turtle.js"></script>
+    <script>
+        // Example usage:
+        const canvas = document.getElementById('turtleCanvas');
+        const turtle = new Turtle(canvas);
+
+        // Draw a square
+        turtle.penDown();
+        for (let i = 0; i < 4; i++) {
+            turtle.forward(100);
+            turtle.right(90);
+        }
+        turtle.penUp();
+    </script>
+</body>
+</html>
