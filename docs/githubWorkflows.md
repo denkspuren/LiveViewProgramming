@@ -7,7 +7,7 @@ Der zweite Workflow wird nur bei einem Push auf den main-Branch ausgelöst. Er k
 
 ## Build-Workflow (`build.yml`)
 
-Dieser Workflow sorgt dafür, dass bei jedem Push auf einen beliebigen Branch (außer main) sowie bei manueller Auslösung ein lauffähiges JAR-Build erstellt und als Artefakt gespeichert wird.
+Dieser Workflow sorgt dafür, dass bei jedem Push auf einen beliebigen Branch (außer main) sowie bei manueller Auslösung eine lauffähige JAR erstellt und als Artefakt gespeichert wird.
 
 ### Trigger
 - **push (branches-ignore: "main")**: Der Workflow wird bei jedem Push auf einen Branch ausgeführt, außer auf main. Damit werden nur Entwicklungs-Branches automatisch gebaut.
@@ -23,7 +23,7 @@ Der Workflow definiert einen Job namens build, der auf einer frischen Ubuntu-Umg
 
 - **Build JAR**: Mit Maven (`mvn clean package`) wird das Projekt gebaut.
 
-- **Upload JAR as artifact**: Die gebaute JAR-Datei (`target/lvp-*.jar`) wird als Artefakt hochgeladen. Sollte keine Datei gefunden werden, schlägt der Workflow fehl. Das Artefakt bleibt für 14 Tage gespeichert.
+- **Upload JAR as artifact**: Die JAR-Datei (`target/lvp-*.jar`) wird als Artefakt hochgeladen. Wird keine Datei gefunden werden, schlägt der Workflow fehl. Das Artefakt bleibt für 14 Tage gespeichert.
 
 ## Release-Workflow (`release.yml`)
 Dieser Workflow sorgt dafür, dass beim Push auf den main-Branch automatisch die Version angepasst wird, ein neuer Git-Tag erstellt wird und ein GitHub Release inklusive JAR-File generiert wird.
@@ -39,7 +39,7 @@ Dieser Job kümmert sich um das Erhöhen der Maven-Version und das Erstellen ein
 
 - **Set up Java**: Es wird Java 24 (Temurin-Distribution) installiert.
 
-- **Determine version bump**: Liest die aktuelle Version aus der `pom.xml` aus und entscheidet basierend auf der Commit-Message (#major, #minor, oder Standard) welche Version erhöht wird.
+- **Determine version bump**: Liest die aktuelle Version aus der `pom.xml` aus und entscheidet basierend auf der Commit-Message (#major, #minor, oder Standard), welche Version erhöht wird.
 Die neue Version wird als Output version für nachfolgende Jobs gespeichert.
 
 - **Set new version in pom.xml**: Setzt die neue Version in der `pom.xml` mittels `mvn versions:set` und `mvn versions:commit`.
@@ -81,13 +81,13 @@ Dieser Befehl ruft die aktuelle Version des Maven-Projekts aus der `pom.xml` ab.
 ```bash
 IFS='.' read -r major minor patch <<< "$old_version"
 ```
-Dieser Befehl liest die Version ein und teilt ist mit dem Punkt als Trenner in major, minor und patch auf und speichert sie in den entsprechenden Variablen ab.
+Dieser Befehl liest die Version ein und teilt sie mit dem Punkt als Trenner in major, minor und patch auf und speichert sie in den entsprechenden Variablen ab.
 
 #### 3. Lesen der Commit-Nachricht
 ```bash
 msg=$(git log -1)
 ```
-Dieser Befehl liest die letzte Commit-Nachricht und speichert sie in der Variable `msg`
+Dieser Befehl liest die letzte Commit-Nachricht und speichert sie in der Variable `msg`.
 
 #### 4. Entscheidung der Versionserhöhung
 ```bash
@@ -107,7 +107,7 @@ Dieser Abschnitt prüft die Commit-Nachricht auf #major oder #minor. Wird #major
 last_version=$(git tag --sort=-committerdate | head -2 | awk '{split($0, tags, "\n")} END {print tags[1]}')
 ```
 - `git tag --sort=-committerdate`: Listet alle Git-Tags in absteigender Reihenfolge des letzten Commit-Datums auf.
-- `head -2`: Zeigen die obersten beiden Einträge an.
+- `head -2`: Zeigt die obersten beiden Einträge an.
 - `awk '{split($0, tags, "\n")} END {print tags[1]}'`: Dieser Befehl teilt die Tags in einzelne Zeilen auf und gibt das zweite Tag (das vorletzte) aus. Das erste Tag, also das neueste Tag, ist das gerade neu erstellte Tag. Dieses neueste Tag wird in der Variable `last_version` gespeichert, um das Changelog von diesem Tag bis zum aktuellen Commit zu generieren.
 
 #### 2. Erstellung des Changelogs:
