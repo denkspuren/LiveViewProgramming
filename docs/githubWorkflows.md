@@ -55,7 +55,7 @@ Die neue Version wird als Output version für nachfolgende Jobs gespeichert.
 
 ### Job 2: release
 Dieser Job erstellt ein neues GitHub Release basierend auf dem Tag und nutzt das gebaute Artefakt.
-Der Release-Job startet erst, nachdem der bump-Job erfolgreich abgeschlossen ist.
+Der Release-Job startet erst, nachdem der Bump-Job erfolgreich abgeschlossen ist.
 
 - **Checkout code**: Der aktuelle Stand des Repositorys wird in den GitHub-Runner geladen, diesmal mit allen Tags (fetch-depth: 0).
 
@@ -67,7 +67,7 @@ Der Release-Job startet erst, nachdem der bump-Job erfolgreich abgeschlossen ist
     - Erstellt einen neuen Release auf GitHub basierend auf dem neuen Tag.
     - Setzt den Release auf Draft, damit er manuell überprüft werden kann.
     - Der Changelog wird in den Beschreibungstext des Releases eingefügt.
-    - Die gebaute JAR-Datei wird als Anhang hinzugefügt.
+    - Die JAR-Datei wird als Anhang hinzugefügt.
 
 
 ### Erklärung der Versionserhöhung
