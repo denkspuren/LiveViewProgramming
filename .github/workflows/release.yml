@@ -72,25 +72,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - name: Download built artifact
         uses: actions/download-artifact@v4
         with:
           name: release
           path: target
-      - name: Get last tag
-        id: version
-        run: |
-          last_version=$(git tag --sort=-committerdate | head -2 | awk '{split($0, tags, "\n")} END {print tags[1]}')
-          echo "last_version=$last_version" >> $GITHUB_OUTPUT    
-      - name: Generate changelog since last tag
-        id: changelog
-        run: |
-          changelog=$(git log --pretty="- %s by %an" --no-merges ${steps.version.outputs.last_version}..HEAD)
-          echo "changelog<<EOF" >> $GITHUB_OUTPUT
-          echo "$changelog" >> $GITHUB_OUTPUT
-          echo EOF >> $GITHUB_OUTPUT
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2.2.2
         with:
@@ -98,11 +84,6 @@ jobs:
           name: Release ${{ needs.bump.outputs.version }}
           draft: true
           prerelease: false
-          body: |            
-            ## What's Changed
-            ${{ steps.changelog.outputs.changelog }}
-
-            **Full Changelog**: ${{ github.server_url }}/${{ github.repository }}/compare/${{ steps.version.outputs.last_version }}...${{ needs.bump.outputs.version }}
           files: |
             target/*.jar
         env:
