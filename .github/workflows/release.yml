@@ -1,0 +1,105 @@
+name: Bump Version and Release
+
+on:
+  push:
+    branches: "main"
+
+jobs:
+  bump:
+    name: Bump Version and Push Tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+
+      - name: Determine version bump
+        id: bump
+        run: |
+          old_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          IFS='.' read -r major minor patch <<< "$old_version"
+          msg=$(git log -1)
+
+          if echo "$msg" | grep -iq "#major"; then
+            new_version="$((major + 1)).0.0"
+          elif echo "$msg" | grep -iq "#minor"; then
+            new_version="$major.$((minor + 1)).0"
+          else
+            new_version="$major.$minor.$((patch + 1))"
+          fi
+
+          echo "New Version: $new_version"
+          echo "version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Set new version in pom.xml
+        run: |
+          mvn versions:set -DnewVersion=${{ steps.bump.outputs.version }}
+          mvn versions:commit
+
+      - name: Commit version bump and tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore: bump version to ${{ steps.bump.outputs.version }}"
+          git push
+          
+          git tag v${{ steps.bump.outputs.version }}
+          git push --tags
+      - name: Build JAR with new version
+        run: mvn clean package -DskipTests
+      - name: Upload JAR as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: target/lvp-*.jar
+          if-no-files-found: error
+          retention-days: 1
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: bump
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release
+          path: target
+      - name: Generate changelog since last tag
+        id: changelog
+        run: |
+          last_version=$(git tag --sort=-committerdate | head -2 | awk '{split($0, tags, "\n")} END {print tags[1]}')
+          changelog=$(git log --pretty="- %s" --no-merges $last_version..HEAD)
+          
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "$changelog" >> $GITHUB_OUTPUT
+          echo EOF >> $GITHUB_OUTPUT
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2.2.2
+        with:
+          tag_name: v${{ needs.bump.outputs.version }}
+          name: Release ${{ needs.bump.outputs.version }}
+          draft: true
+          prerelease: false
+          body: |            
+            ## What's Changed
+            ${{ steps.changelog.outputs.changelog }}
+            
+          files: |
+            target/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

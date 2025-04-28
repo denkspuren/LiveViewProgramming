@@ -1,0 +1,30 @@
+name: Build Jar
+
+on:
+  push:
+    branches-ignore: "main"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build JAR and Upload Artifact
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '24'
+
+      - name: Build JAR
+        run: mvn clean package -DskipTests
+
+      - name: Upload JAR as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: target/lvp-*.jar
+          if-no-files-found: error
+          retention-days: 14
