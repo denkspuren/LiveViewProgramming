@@ -61,7 +61,9 @@ Der Release-Job startet erst, nachdem der Bump-Job erfolgreich abgeschlossen ist
 
 - **Download built artifact**: Lädt das zuvor hochgeladene JAR-Artefakt herunter und speichert es unter `target/`.
 
-- **Generate changelog since last tag**: Erstellt einen Changelog aus allen Commits seit dem letzten Tag.
+- **Get last tag**: Ermittelt das letzte Git-Tag
+
+- **Generate changelog since last tag**: Erstellt einen Changelog aus allen Commits seit dem letzten Git-Tag.
 
 - **Create GitHub Release**:
     - Erstellt einen neuen Release auf GitHub basierend auf dem neuen Tag.

@@ -79,12 +79,15 @@ jobs:
         with:
           name: release
           path: target
+      - name: Get last tag
+        id: version
+        run: |
+          last_version=$(git tag --sort=-committerdate | head -2 | awk '{split($0, tags, "\n")} END {print tags[1]}')
+          echo "last_version=$last_version" >> $GITHUB_OUTPUT    
       - name: Generate changelog since last tag
         id: changelog
         run: |
-          last_version=$(git tag --sort=-committerdate | head -2 | awk '{split($0, tags, "\n")} END {print tags[1]}')
-          changelog=$(git log --pretty="- %s by %an" --no-merges $last_version..HEAD)
-          
+          changelog=$(git log --pretty="- %s by %an" --no-merges ${steps.version.outputs.last_version}..HEAD)
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$changelog" >> $GITHUB_OUTPUT
           echo EOF >> $GITHUB_OUTPUT
@@ -98,7 +101,8 @@ jobs:
           body: |            
             ## What's Changed
             ${{ steps.changelog.outputs.changelog }}
-            
+
+            **Full Changelog**: ${{ github.server_url }}/${{ github.repository }}/compare/${{ steps.version.outputs.last_version }}...${{ needs.bump.outputs.version }}
           files: |
             target/*.jar
         env:
