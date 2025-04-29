@@ -22,6 +22,9 @@ import java.util.function.Consumer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
+import lvp.logging.Logger;
+
+
 public class Server {
     public final HttpServer httpServer;
     final int port;
@@ -44,7 +47,7 @@ public class Server {
     public static Server onPort(int port) {
         port = Math.abs(port);
         try {
-            if (!serverInstances.containsKey(port))
+            if (!serverInstances.containsKey(port)) 
                 serverInstances.put(port, new Server(port));
             return serverInstances.get(port);
         } catch (IOException e) {
@@ -66,6 +69,7 @@ public class Server {
         // loaded-Request to signal successful processing of SSEType.LOAD
         httpServer.createContext("/loaded", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
+                Logger.logError("Method not allowed in '/loaded'");
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
             }
@@ -84,8 +88,10 @@ public class Server {
         httpServer.createContext("/events", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                Logger.logError("Method not allowed in '/events'");
                 return;
             }
+            Logger.logInfo("New SSE Exchange for '" + exchange.getLocalAddress() + "' at '" + exchange.getRemoteAddress() + "'");
             exchange.getResponseHeaders().add("Content-Type", "text/event-stream");
             exchange.getResponseHeaders().add("Cache-Control", "no-cache");
             exchange.getResponseHeaders().add("Connection", "keep-alive");
@@ -97,10 +103,13 @@ public class Server {
         httpServer.createContext("/", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                Logger.logError("Method not allowed in '/'");
                 return;
             }
-            final String resourcePath = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
 
+            final String resourcePath = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
+            Logger.logDebug("Sending '" + resourcePath + "'");
+            
             try (final InputStream stream = Server.class.getResourceAsStream(resourcePath)) {
                 final byte[] bytes = stream.readAllBytes();
                 exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(resourcePath)) + "; charset=utf-8");
@@ -118,16 +127,25 @@ public class Server {
 
     public void sendServerEvent(SSEType sseType, String data) {
         List<HttpExchange> deadConnections = new ArrayList<>();
+        if (sseClientConnections.size() == 0) {
+            System.out.println("Open http://localhost:" + port + " in your browser");
+            return;
+        }
+
+        Logger.logInfo("New '" + sseType + "' Event");
+        Logger.logDebug("Data: " + data);
+        
+        byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
+        String base64Data = Base64.getEncoder().encodeToString(binaryData);
+        String message = "data: " + sseType + ":" + base64Data + "\n\n";
+        Logger.logDebug("Event Message: " + message.trim());
+
         for (HttpExchange connection : sseClientConnections) {
             if (sseType == SSEType.LOAD) {
                 lock.lock();
                 loadEventOccured = false;
             }
-            try {
-                byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
-                String base64Data = Base64.getEncoder().encodeToString(binaryData);
-                String message = "data: " + sseType + ":" + base64Data + "\n\n";
-
+            try {                
                 connection.getResponseBody().flush();
                 connection.getResponseBody().write(message.getBytes());
                 connection.getResponseBody().flush();
@@ -139,9 +157,9 @@ public class Server {
                 }
             } catch (IOException e) {
                 deadConnections.add(connection);
-                System.out.println("Dead Connection!");
+                Logger.logError("Exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");    
             } catch (InterruptedException e) {
-                System.err.println("LOAD-Interruption: " + data + ", " + e);
+                Logger.logError("LOAD-Interruption: " + data + ", ", e);
             } finally {
                 if (sseType == SSEType.LOAD) {
                     lock.unlock();
@@ -167,23 +185,27 @@ public class Server {
         httpServer.createContext(path, exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                Logger.logError("Method not allowed in '" + path + "'");
                 return;
             }
 
             String content_length = exchange.getRequestHeaders().getFirst("Content-length");
             if (content_length == null) {
                 exchange.sendResponseHeaders(400, -1); // Bad Request
+                Logger.logError(id + ": content-length header in '" + path + "' is missing");
                 return;
             }
 
             try {
                 int length = Integer.parseInt(content_length);
                 byte[] data = new byte[length];
-                exchange.getRequestBody().read(data);
+                exchange.getRequestBody().read(data);   // Reads the request body into the byte array 'data'
                 delegate.accept(new String(data));
+
                 sendServerEvent(SSEType.RELEASE, id);
             } catch (NumberFormatException e) {
                 exchange.sendResponseHeaders(400, -1); // Bad Request
+                Logger.logError(id + ": illegal content-length header in '" + path + "'");
                 return;
             }
 
@@ -193,12 +215,13 @@ public class Server {
     }
 
     public void stop() {
+        Logger.logInfo("Closing Server on port '" + port + "'");
         sseClientConnections.clear();
         serverInstances.remove(port);
         httpServer.stop(0);
     }
 
     public static void shutdown() {
-        serverInstances.forEach((k, v) -> v.stop());
+        serverInstances.forEach((_, v) -> v.stop());
     }
 }

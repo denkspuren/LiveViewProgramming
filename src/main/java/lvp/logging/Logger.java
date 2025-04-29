@@ -10,23 +10,20 @@ import java.util.function.Function;
 
 
 public class Logger {
-    static {
-        Logger.addDestination(ConsoleDestination.of());
-    }
-
-    private Logger() {}
-
     // Formatting of log messages
     public static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     public static final Function<LogEntry, String> stringFormatter = entry -> String.format("[%s] [%s] %s", entry.time(), entry.level(), entry.message());
 
     // Configuration
     private static LogLevel minLogLevel = LogLevel.Error;
-    private static final List<LogDestination> destinations = new CopyOnWriteArrayList<>();
+    private static final List<LogDestination> destinations = new CopyOnWriteArrayList<>(List.of(ConsoleDestination.of()));  // Initializes with ConsoleDestination as the default logging output
 
+    private Logger() {}
+
+    
+    // Configuration
     public static void setLogLevel(LogLevel level) { minLogLevel = level; }
     public static void addDestination(LogDestination destination) { destinations.add(destination); }
-
 
     // Logging
     public static void log(LogLevel level, String message) {
