@@ -99,11 +99,11 @@ public class Server {
                 exchange.sendResponseHeaders(405, -1); // Method Not Allowed
                 return;
             }
-            final String path = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
+            final String resourcePath = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
 
-            try (final InputStream stream = Server.class.getResourceAsStream(path)) {
+            try (final InputStream stream = Server.class.getResourceAsStream(resourcePath)) {
                 final byte[] bytes = stream.readAllBytes();
-                exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(path)) + "; charset=utf-8");
+                exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(resourcePath)) + "; charset=utf-8");
                 exchange.sendResponseHeaders(200, bytes.length);
                 exchange.getResponseBody().write(bytes);
                 exchange.getResponseBody().flush();
