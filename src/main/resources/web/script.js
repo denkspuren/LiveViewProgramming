@@ -21,6 +21,21 @@ function loadScriptWithFallback(mainSrc, alternativeSrc) {
   });
 }
 
+/**
+ * Attempts to lock an event listener for the given ID until the associated callback 
+ * is executed on the server. Prevents duplicate event handling.
+ * 
+ * @param {string} id - Unique identifier for the event listener.
+ * @returns {boolean} - false if the listener is already locked;
+ *                      true if the lock was successfully acquired.
+ */
+
+function lockAndCheck(id) {
+  if (locks.includes(id)) return false;
+  locks.push(id);
+  return true;
+}
+
 function setUp() {
 
   if (window.EventSource) {

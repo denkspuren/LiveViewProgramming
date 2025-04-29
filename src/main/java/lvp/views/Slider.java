@@ -20,8 +20,7 @@ public class Slider implements Clerk {
         Clerk.script(server, Text.fillOut(
             """
             slider${0}.addEventListener('input', (event) => {
-                if (locks.includes('${0}')) return;
-                locks.push('${0}');
+                if (!lockAndCheck('${0}')) return;  // Prevents callback execution until server response unlocks it
                 const value = event.target.value;
                 console.log(`slider${0}: value = ${value}`);
                 fetch('slider${0}', {
