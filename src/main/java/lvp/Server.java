@@ -125,6 +125,24 @@ public class Server {
         httpServer.start();
     }
 
+    public void load(String data) {
+        lock.lock();
+        loadEventOccured = false;
+
+        try {
+            sendServerEvent(SSEType.LOAD, data);
+
+            loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
+            if (loadEventOccured) paths.add(data);
+            else System.err.println("LOAD-Timeout: " + data);
+
+        } catch (InterruptedException e) {
+            Logger.logError("LOAD-Interruption: " + data, e);
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public void sendServerEvent(SSEType sseType, String data) {
         List<HttpExchange> deadConnections = new ArrayList<>();
         if (sseClientConnections.size() == 0) {
@@ -141,29 +159,13 @@ public class Server {
         Logger.logDebug("Event Message: " + message.trim());
 
         for (HttpExchange connection : sseClientConnections) {
-            if (sseType == SSEType.LOAD) {
-                lock.lock();
-                loadEventOccured = false;
-            }
             try {                
                 connection.getResponseBody().flush();
                 connection.getResponseBody().write(message.getBytes());
                 connection.getResponseBody().flush();
-
-                if (sseType == SSEType.LOAD) {
-                    loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
-                    if (loadEventOccured) paths.add(data);
-                    else System.err.println("LOAD-Timeout: " + data);
-                }
             } catch (IOException e) {
                 deadConnections.add(connection);
                 Logger.logError("Exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");    
-            } catch (InterruptedException e) {
-                Logger.logError("LOAD-Interruption: " + data + ", ", e);
-            } finally {
-                if (sseType == SSEType.LOAD) {
-                    lock.unlock();
-                }
             }
         }
 

@@ -21,7 +21,7 @@ public interface Clerk {
     static void call(Server server, String javascript)   { server.sendServerEvent(SSEType.CALL, javascript); }
     static void script(Server server, String javascript) { server.sendServerEvent(SSEType.SCRIPT, javascript); }
     static void load(Server server, String path) {
-        if (!server.paths.contains(path.trim())) server.sendServerEvent(SSEType.LOAD, path);
+        if (!server.paths.contains(path.trim())) server.load(path);
     }
     static void load(Server server, String onlinePath, String offlinePath) {
         load(server, offlinePath + ", " + onlinePath);
