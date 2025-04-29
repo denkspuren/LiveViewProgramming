@@ -121,16 +121,17 @@ public class Server {
         for (HttpExchange connection : sseClientConnections) {
             if (sseType == SSEType.LOAD) {
                 lock.lock();
-                loadEventOccured = false; // NEU
+                loadEventOccured = false;
             }
             try {
                 byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
                 String base64Data = Base64.getEncoder().encodeToString(binaryData);
                 String message = "data: " + sseType + ":" + base64Data + "\n\n";
+
                 connection.getResponseBody().flush();
-                connection.getResponseBody()
-                          .write(message.getBytes());
+                connection.getResponseBody().write(message.getBytes());
                 connection.getResponseBody().flush();
+
                 if (sseType == SSEType.LOAD) {
                     loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
                     if (loadEventOccured) paths.add(data);
@@ -143,12 +144,19 @@ public class Server {
                 System.err.println("LOAD-Interruption: " + data + ", " + e);
             } finally {
                 if (sseType == SSEType.LOAD) {
-                    // loadEventOccured = false; // REMOVED
                     lock.unlock();
                 }
             }
         }
-        sseClientConnections.removeAll(deadConnections); // TODO: need to be closed
+
+        closeConnections(deadConnections);
+        sseClientConnections.removeAll(deadConnections);
+    }
+
+    private void closeConnections(List<HttpExchange> connections) {
+        for (HttpExchange connection : connections) {
+            connection.close();
+        }
     }
 
     public void createResponseContext(String path, Consumer<String> delegate) {
@@ -164,7 +172,7 @@ public class Server {
 
             String content_length = exchange.getRequestHeaders().getFirst("Content-length");
             if (content_length == null) {
-                exchange.sendResponseHeaders(400, -1);
+                exchange.sendResponseHeaders(400, -1); // Bad Request
                 return;
             }
 
@@ -175,7 +183,7 @@ public class Server {
                 delegate.accept(new String(data));
                 sendServerEvent(SSEType.RELEASE, id);
             } catch (NumberFormatException e) {
-                exchange.sendResponseHeaders(400, -1);
+                exchange.sendResponseHeaders(400, -1); // Bad Request
                 return;
             }
 
