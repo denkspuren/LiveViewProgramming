@@ -152,10 +152,8 @@ public class Server {
 
         Logger.logInfo("New '" + sseType + "' Event");
         Logger.logDebug("Data: " + data);
-        
-        byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
-        String base64Data = Base64.getEncoder().encodeToString(binaryData);
-        String message = "data: " + sseType + ":" + base64Data + "\n\n";
+                
+        String message = "data: " + sseType + ":" + encodeData(data) + "\n\n";
         Logger.logDebug("Event Message: " + message.trim());
 
         for (HttpExchange connection : sseClientConnections) {
@@ -171,6 +169,11 @@ public class Server {
 
         closeConnections(deadConnections);
         sseClientConnections.removeAll(deadConnections);
+    }
+
+    private String encodeData(String data) {
+        byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
+        return Base64.getEncoder().encodeToString(binaryData);
     }
 
     private void closeConnections(List<HttpExchange> connections) {
