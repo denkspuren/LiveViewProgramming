@@ -3,10 +3,10 @@ import lvp.Clerk;
 import lvp.Server;
 
 public record Marked(Server server) implements Clerk {
+    static final String markedUrl = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
+    
     public Marked {
-        String onlinePath = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
-        String localPath = "views/markdown/marked.min.js";
-        Clerk.load(server, onlinePath, localPath);
+        Clerk.load(server, markedUrl, "views/markdown/marked.min.js");
         Clerk.script(server, """
             var md = marked.use({
                 gfm: true

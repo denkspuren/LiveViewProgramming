@@ -24,7 +24,7 @@ public interface Clerk {
         if (!server.paths.contains(path.trim())) server.load(path);
     }
     static void load(Server server, String onlinePath, String offlinePath) {
-        load(server, offlinePath + ", " + onlinePath);
+        load(server, onlinePath + ", " + offlinePath);
     }
     static void clear(Server server) { server.sendServerEvent(SSEType.CLEAR, ""); }
     static void clear() { clear(serve()); };

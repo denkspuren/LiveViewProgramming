@@ -1,14 +1,22 @@
 const loadedDiv = document.getElementById('loadMessage');
+const debug = false;
 
-function loadScript(src, onError = () => console.log('script loading failed: ', src)) {
-  //console.log('loadScript: ', new Date().toISOString(), ' src: ', src);
+let locks = [];
+
+
+function loadScript(src, onError = () => {
+  errorLog(`script loading failed: ${src}`);
+  loadedDiv.style.display = 'none';
+}) {
+  loadedDiv.style.display = 'block';
+  
   var script = document.createElement('script');
   script.src = src;
   script.onload = function() {
-    //console.log('loaded script: ', new Date().toISOString(), ' src: ', src);
     script.classList.add("persistent");
-    //console.log('script loaded:', src);
-    fetch("/loaded", {method: "post"}).catch(console.log);
+    fetch("/loaded", {method: "post"}).catch(console.error);
+    debugLog(`script loaded: ${src}`);
+    loadedDiv.style.display = 'none';
   };
   script.onerror = onError;
   document.body.appendChild(script);
@@ -81,15 +89,9 @@ function setUp() {
           break;
         }
         case "LOAD": {
-          loadedDiv.style.display = 'block';
-          //setTimeout(() => {
-          //  loadedDiv.style.display = 'none';
-          // }, 300);
           var srcs = data.split(',');
           srcs = srcs.map(src => src.trim());
-          //console.log('LOAD received: ', new Date().toISOString(), ' data: ', data);
-          // if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
-          if (srcs.length >= 2) loadScript(srcs[0]);
+          if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
           else loadScript(data);
           break;
         }
@@ -129,9 +131,6 @@ function setUp() {
   }
 }
 
-
-let locks = [];
-const debug = false;
 setUp();
 
 // https://samthor.au/2020/understanding-load/
