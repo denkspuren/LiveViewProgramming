@@ -22,7 +22,7 @@ public class Slider implements Clerk {
             slider${0}.addEventListener('input', (event) => {
                 if (!lockAndCheck('${0}')) return;  // Prevents callback execution until server response unlocks it
                 const value = event.target.value;
-                console.log(`slider${0}: value = ${value}`);
+                debugLog(`slider${0}: value = ${value}`);
                 fetch('slider${0}', {
                    method: 'post',
                     body: value.toString()

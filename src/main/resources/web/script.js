@@ -1,6 +1,6 @@
 const loadedDiv = document.getElementById('loadMessage');
-const debug = false;
 
+let debug = false;
 let locks = [];
 
 
@@ -44,9 +44,11 @@ function lockAndCheck(id) {
   return true;
 }
 
-// Always send debug logs to the server; log to browser console only if debug mode is enabled
+// Logs debug messages to both server and browser console when debug mode is active
 function debugLog(message) {
-  if(debug) console.debug(message);
+  if(!debug) return;
+  
+  console.debug(message);
   fetch('log', { method: 'post', body: `debug:${message}` })
     .catch(console.error);
 }
@@ -113,6 +115,9 @@ function setUp() {
         }
         case "RELEASE":
           locks = locks.filter(lock => lock !== data);
+          break;
+        case "DEBUG":
+          debug = true;
           break;
         default:
           errorLog("Unknown Action");
