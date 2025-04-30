@@ -84,6 +84,26 @@ public class Server {
             }
         });
 
+        //logging
+        httpServer.createContext("/log", exchange -> {
+            String message = readRequestBody(exchange);
+            if(message == null) return;
+            String[] parts = message.split(":", 2);
+            if(parts.length != 2) return;
+
+            switch (parts[0]) {
+                case "debug":
+                    Logger.logDebug("(Client) " + parts[1]);       
+                    break;
+                case "info":
+                    Logger.logInfo("(Client) " + parts[1]);
+                    break;
+                default:
+                    Logger.logError("(Client) " + parts[1]);
+                    break;
+            }
+        });
+
         // SSE context
         httpServer.createContext("/events", exchange -> {
             if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
@@ -169,6 +189,28 @@ public class Server {
 
         closeConnections(deadConnections);
         sseClientConnections.removeAll(deadConnections);
+    }public void createResponseContext(String path, Consumer<String> delegate) {
+        createResponseContext(path, delegate, "-1");
+    }
+
+    public void createResponseContext(String path, Consumer<String> delegate, String id) {
+        httpServer.createContext(path, exchange -> {
+           String data = readRequestBody(exchange);
+           if(data == null) return;
+           delegate.accept(new String(data));
+           sendServerEvent(SSEType.RELEASE, id);   
+        });
+    }
+
+    public void stop() {
+        Logger.logInfo("Closing Server on port '" + port + "'");
+        sseClientConnections.clear();
+        serverInstances.remove(port);
+        httpServer.stop(0);
+    }
+
+    public static void shutdown() {
+        serverInstances.forEach((_, v) -> v.stop());
     }
 
     private String encodeData(String data) {
@@ -182,51 +224,32 @@ public class Server {
         }
     }
 
-    public void createResponseContext(String path, Consumer<String> delegate) {
-        createResponseContext(path, delegate, "-1");
-    }
+    private String readRequestBody(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
+            Logger.logError("Method not allowed in '" + exchange.getRequestURI().getPath() + "'");
+            exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+            return null;
+        }
 
-    public void createResponseContext(String path, Consumer<String> delegate, String id) {
-        httpServer.createContext(path, exchange -> {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
-                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-                Logger.logError("Method not allowed in '" + path + "'");
-                return;
-            }
+        String content_length = exchange.getRequestHeaders().getFirst("Content-length");
+        if (content_length == null) {
+            exchange.sendResponseHeaders(400, -1); // Bad Request
+            Logger.logError("content-length header in '" + exchange.getRequestURI().getPath() + "' is missing");
+            return null;
+        }
 
-            String content_length = exchange.getRequestHeaders().getFirst("Content-length");
-            if (content_length == null) {
-                exchange.sendResponseHeaders(400, -1); // Bad Request
-                Logger.logError(id + ": content-length header in '" + path + "' is missing");
-                return;
-            }
-
-            try {
-                int length = Integer.parseInt(content_length);
-                byte[] data = new byte[length];
-                exchange.getRequestBody().read(data);   // Reads the request body into the byte array 'data'
-                delegate.accept(new String(data));
-
-                sendServerEvent(SSEType.RELEASE, id);
-            } catch (NumberFormatException e) {
-                exchange.sendResponseHeaders(400, -1); // Bad Request
-                Logger.logError(id + ": illegal content-length header in '" + path + "'");
-                return;
-            }
-
+        try {
+            int length = Integer.parseInt(content_length);
+            byte[] data = new byte[length];
+            exchange.getRequestBody().read(data);   // Reads the request body into the byte array 'data'
             exchange.sendResponseHeaders(200, 0);
             exchange.close();
-        });
-    }
-
-    public void stop() {
-        Logger.logInfo("Closing Server on port '" + port + "'");
-        sseClientConnections.clear();
-        serverInstances.remove(port);
-        httpServer.stop(0);
-    }
-
-    public static void shutdown() {
-        serverInstances.forEach((_, v) -> v.stop());
+            return new String(data);
+        } catch (NumberFormatException e) {
+            Logger.logError("illegal content-length header in '" + exchange.getRequestURI().getPath() + "'");
+            exchange.sendResponseHeaders(400, -1); // Bad Request
+            exchange.close();
+        }
+        return null;
     }
 }

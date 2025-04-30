@@ -16,7 +16,7 @@ function loadScript(src, onError = () => console.log('script loading failed: ', 
 
 function loadScriptWithFallback(mainSrc, alternativeSrc) {
   loadScript(mainSrc, function() {
-    console.log('loading', mainSrc, 'failed, trying', alternativeSrc);
+    debugLog('loading', mainSrc, 'failed, trying', alternativeSrc);
     loadScript(alternativeSrc);
   });
 }
@@ -36,6 +36,20 @@ function lockAndCheck(id) {
   return true;
 }
 
+// Always send debug logs to the server; log to browser console only if debug mode is enabled
+function debugLog(message) {
+  if(debug) console.debug(message);
+  fetch('log', { method: 'post', body: `debug:${message}` })
+    .catch(console.error);
+}
+
+// Send error logs to the server and log to browser console
+function errorLog(message) {
+  console.error(message);
+  fetch('log', { method: 'post', body: `error:${message}` })
+    .catch(console.error);
+}
+
 function setUp() {
 
   if (window.EventSource) {
@@ -46,9 +60,8 @@ function setUp() {
       const action = event.data.slice(0, splitPos);
       const base64Data = event.data.slice(splitPos + 1);
       const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
-      // const data = atob(base64Data);
-      // console.log(`Action: ${action}\n`);
-      // console.log(`Data: ${data}\n`);
+      
+      debugLog(`Action: ${action}\nData: ${data}`);
 
       switch (action) {
         case "CALL": {
@@ -100,7 +113,7 @@ function setUp() {
           locks = locks.filter(lock => lock !== data);
           break;
         default:
-          console.log("Unknown Action");
+          errorLog("Unknown Action");
           break;
       }
     };
@@ -116,8 +129,9 @@ function setUp() {
   }
 }
 
-const Clerk = {}; // not used, yet
+
 let locks = [];
+const debug = false;
 setUp();
 
 // https://samthor.au/2020/understanding-load/
