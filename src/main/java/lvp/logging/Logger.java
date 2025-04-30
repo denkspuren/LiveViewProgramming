@@ -11,8 +11,8 @@ import java.util.function.Function;
 
 public class Logger {
     // Formatting of log messages
-    public static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-    public static final Function<LogEntry, String> stringFormatter = entry -> String.format("[%s] [%s] %s", entry.time(), entry.level(), entry.message());
+    public static DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+    public static Function<LogEntry, String> stringFormatter = entry -> String.format("[%s] [%s] %s", entry.time(), entry.level(), entry.message());
 
     // Configuration
     private static LogLevel minLogLevel = LogLevel.Error;
