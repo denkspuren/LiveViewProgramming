@@ -31,12 +31,12 @@ public class Server {
     static int defaultPort = 50_001;
     static final String index = "/web/index.html";
     static Map<Integer,Server> serverInstances = new ConcurrentHashMap<>();
-    List<String> paths = new ArrayList<>();
 
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
     static int getDefaultPort() { return defaultPort; }
 
     public List<HttpExchange> sseClientConnections;
+    List<String> paths = new CopyOnWriteArrayList<>();
 
     // lock required to temporarily block processing of `SSEType.LOAD`
     Lock lock = new ReentrantLock();
@@ -117,6 +117,7 @@ public class Server {
             exchange.getResponseHeaders().add("Connection", "keep-alive");
             exchange.sendResponseHeaders(200, 0);
             sseClientConnections.add(exchange);
+            sendLoads(exchange);
         });
 
         // initial html site
@@ -189,7 +190,37 @@ public class Server {
 
         closeConnections(deadConnections);
         sseClientConnections.removeAll(deadConnections);
-    }public void createResponseContext(String path, Consumer<String> delegate) {
+    }
+
+    public void sendLoads(HttpExchange connection) {
+        if(paths.size() == 0) return;
+
+        Logger.logInfo("Sending " + paths.size() + " paths to '" + connection.getRemoteAddress() + "'...");
+        lock.lock();
+        for (String path : paths) {
+            loadEventOccured = false;
+            String message = "data: " + SSEType.LOAD + ":" + encodeData(path) + "\n\n";
+            Logger.logDebug("Event Message: " + message.trim());
+            
+            try {
+                connection.getResponseBody().flush();
+                connection.getResponseBody().write(message.getBytes());
+                connection.getResponseBody().flush();
+
+                loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
+                if (!loadEventOccured) System.err.println("LOAD-Timeout: " + path);
+            } catch (InterruptedException e) {
+                Logger.logError("LOAD-Interruption: " + path, e);
+            } catch (IOException e) {
+                Logger.logError("Exchange '" + connection.getRemoteAddress() + "' did not respond.");
+                break;
+            }
+        }
+        lock.unlock();
+        Logger.logInfo("Successfully sent " + paths.size() + " paths to '" + connection.getRemoteAddress() + "'");
+    }
+    
+    public void createResponseContext(String path, Consumer<String> delegate) {
         createResponseContext(path, delegate, "-1");
     }
 
