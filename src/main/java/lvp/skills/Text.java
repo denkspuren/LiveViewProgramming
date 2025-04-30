@@ -25,6 +25,39 @@ public class Text { // Class with static methods for file operations
         }
     }
 
+    
+    public static String blockCutOut(String fileName, String name) { return blockCutOut(fileName, name, 0); }
+    public static String blockCutOut(String fileName, String name, int skip) { return blockCutOut(Path.of(fileName), name, skip); }
+    public static String blockCutOut(Path path, String name) { return blockCutOut(path, name, 0); }
+    public static String blockCutOut(Path path, String name, int skip) {
+        List<String> snippet = new ArrayList<>();
+        boolean isInLabels = false;
+        int spaces = 0;
+        int skipped = 0;
+
+        try {
+            List<String> lines = Files.readAllLines(path);
+            for (String line : lines) {
+                if(line.contains(name) && line.endsWith("{")) {
+                    if(skipped++ != skip) continue;
+                    isInLabels = true;
+                    spaces = (int) IntStream.range(0, line.length())
+                        .takeWhile(i -> line.charAt(i) == ' ')
+                        .count();
+                }
+
+                if (!isInLabels) continue;
+
+                snippet.add(line);
+                if(line.equals(" ".repeat(spaces) + "}")) break;
+            }
+        } catch (IOException e) {
+            System.err.printf("Error reading %s\n", e.getMessage());
+            System.exit(1);
+        }
+        return snippet.stream().collect(Collectors.joining("\n"));
+    }
+
     // core method
     public static String cutOut(Path path, boolean includeStartLabel, boolean includeEndLabel, String... labels) {
         List<String> snippet = new ArrayList<>();
