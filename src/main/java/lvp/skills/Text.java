@@ -31,25 +31,27 @@ public class Text { // Class with static methods for file operations
     public static String blockCutOut(Path path, String name) { return blockCutOut(path, name, 0); }
     public static String blockCutOut(Path path, String name, int skip) {
         List<String> snippet = new ArrayList<>();
-        boolean isInLabels = false;
+        boolean isInBlock = false;
+        boolean isOneLiner = false;
         int spaces = 0;
         int skipped = 0;
 
         try {
             List<String> lines = Files.readAllLines(path);
             for (String line : lines) {
-                if(line.contains(name) && line.endsWith("{")) {
+                if(line.contains(name) && (line.endsWith("{") || line.contains("{") && line.endsWith("}"))) {
                     if(skipped++ != skip) continue;
-                    isInLabels = true;
+                    isInBlock = true;
+                    isOneLiner = line.contains("{") && line.endsWith("}");
                     spaces = (int) IntStream.range(0, line.length())
                         .takeWhile(i -> line.charAt(i) == ' ')
                         .count();
                 }
 
-                if (!isInLabels) continue;
+                if (!isInBlock) continue;
 
                 snippet.add(line);
-                if(line.equals(" ".repeat(spaces) + "}")) break;
+                if(line.trim().equals("}") && line.indexOf('}') == spaces || isOneLiner) break;
             }
         } catch (IOException e) {
             System.err.printf("Error reading %s\n", e.getMessage());
