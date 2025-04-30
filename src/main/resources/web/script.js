@@ -1,14 +1,22 @@
 const loadedDiv = document.getElementById('loadMessage');
 
-function loadScript(src, onError = () => console.log('script loading failed: ', src)) {
-  //console.log('loadScript: ', new Date().toISOString(), ' src: ', src);
+let debug = false;
+let locks = [];
+
+
+function loadScript(src, onError = () => {
+  errorLog(`script loading failed: ${src}`);
+  loadedDiv.style.display = 'none';
+}) {
+  loadedDiv.style.display = 'block';
+  
   var script = document.createElement('script');
   script.src = src;
   script.onload = function() {
-    //console.log('loaded script: ', new Date().toISOString(), ' src: ', src);
     script.classList.add("persistent");
-    //console.log('script loaded:', src);
-    fetch("/loaded", {method: "post"}).catch(console.log);
+    fetch("/loaded", {method: "post"}).catch(console.error);
+    debugLog(`script loaded: ${src}`);
+    loadedDiv.style.display = 'none';
   };
   script.onerror = onError;
   document.body.appendChild(script);
@@ -16,9 +24,40 @@ function loadScript(src, onError = () => console.log('script loading failed: ', 
 
 function loadScriptWithFallback(mainSrc, alternativeSrc) {
   loadScript(mainSrc, function() {
-    console.log('loading', mainSrc, 'failed, trying', alternativeSrc);
+    debugLog('loading', mainSrc, 'failed, trying', alternativeSrc);
     loadScript(alternativeSrc);
   });
+}
+
+/**
+ * Attempts to lock an event listener for the given ID until the associated callback 
+ * is executed on the server. Prevents duplicate event handling.
+ * 
+ * @param {string} id - Unique identifier for the event listener.
+ * @returns {boolean} - false if the listener is already locked;
+ *                      true if the lock was successfully acquired.
+ */
+
+function lockAndCheck(id) {
+  if (locks.includes(id)) return false;
+  locks.push(id);
+  return true;
+}
+
+// Logs debug messages to both server and browser console when debug mode is active
+function debugLog(message) {
+  if(!debug) return;
+  
+  console.debug(message);
+  fetch('log', { method: 'post', body: `debug:${message}` })
+    .catch(console.error);
+}
+
+// Send error logs to the server and log to browser console
+function errorLog(message) {
+  console.error(message);
+  fetch('log', { method: 'post', body: `error:${message}` })
+    .catch(console.error);
 }
 
 function setUp() {
@@ -31,9 +70,8 @@ function setUp() {
       const action = event.data.slice(0, splitPos);
       const base64Data = event.data.slice(splitPos + 1);
       const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
-      // const data = atob(base64Data);
-      // console.log(`Action: ${action}\n`);
-      // console.log(`Data: ${data}\n`);
+      
+      debugLog(`Action: ${action}\nData: ${data}`);
 
       switch (action) {
         case "CALL": {
@@ -53,15 +91,9 @@ function setUp() {
           break;
         }
         case "LOAD": {
-          loadedDiv.style.display = 'block';
-          //setTimeout(() => {
-          //  loadedDiv.style.display = 'none';
-          // }, 300);
           var srcs = data.split(',');
           srcs = srcs.map(src => src.trim());
-          //console.log('LOAD received: ', new Date().toISOString(), ' data: ', data);
-          // if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
-          if (srcs.length >= 2) loadScript(srcs[0]);
+          if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
           else loadScript(data);
           break;
         }
@@ -84,8 +116,11 @@ function setUp() {
         case "RELEASE":
           locks = locks.filter(lock => lock !== data);
           break;
+        case "DEBUG":
+          debug = true;
+          break;
         default:
-          console.log("Unknown Action");
+          errorLog("Unknown Action");
           break;
       }
     };
@@ -101,8 +136,6 @@ function setUp() {
   }
 }
 
-const Clerk = {}; // not used, yet
-let locks = [];
 setUp();
 
 // https://samthor.au/2020/understanding-load/

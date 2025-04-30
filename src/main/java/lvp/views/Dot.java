@@ -4,9 +4,8 @@ import lvp.Clerk;
 import lvp.Server;
 
 public class Dot implements Clerk {
-    final String visLibOnlinePath = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
-    final String visLibOfflinePath = "views/dot/vis-network.min.js";
-    final String dotLibPath = "views/dot/dot.js";
+    static final String visLibUrl = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
+    
     final String ID;
     Server server;
     int width, height;
@@ -16,8 +15,8 @@ public class Dot implements Clerk {
         this.width = width;
         this.height = height;
 
-        Clerk.load(server, visLibOnlinePath, visLibOfflinePath);
-        Clerk.load(server, dotLibPath);
+        Clerk.load(server, visLibUrl, "views/dot/vis-network.min.js");
+        Clerk.load(server,  "views/dot/dot.js");
 
         ID = Clerk.getHashID(this);
 

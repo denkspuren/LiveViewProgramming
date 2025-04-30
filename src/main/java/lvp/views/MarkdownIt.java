@@ -3,20 +3,13 @@ import lvp.Clerk;
 import lvp.Server;
 
 public record MarkdownIt(Server server) implements Clerk {
+    static final String mardownItUrl = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
+
     public MarkdownIt {
-        // String onlinePath = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
-        // String localPath = "views/markdown/markdown-it.min.js";
-        // Clerk.load(server, onlinePath, localPath);
-        Clerk.load(server, "views/markdown/markdown-it.min.js");
+        Clerk.load(server, mardownItUrl, "views/markdown/markdown-it.min.js");
         Clerk.load(server, "views/markdown/highlight.min.js");
         Clerk.load(server, "views/markdown/mathjax3.js");
-        // Clerk.script(server, """
-        //     var md = markdownit({
-        //         html: true,
-        //         linkify: true,
-        //         typographer: true
-        //     });
-        //     """);
+
         Clerk.script(server, """
             var md = markdownit({
                 highlight: function (str, lang) {

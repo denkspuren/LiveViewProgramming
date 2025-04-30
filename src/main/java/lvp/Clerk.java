@@ -1,6 +1,9 @@
 package lvp;
 
 import java.util.Random;
+
+import lvp.logging.LogLevel;
+import lvp.logging.Logger;
 import java.util.stream.Collectors;
 
 import lvp.views.MarkdownIt;
@@ -21,13 +24,19 @@ public interface Clerk {
     static void call(Server server, String javascript)   { server.sendServerEvent(SSEType.CALL, javascript); }
     static void script(Server server, String javascript) { server.sendServerEvent(SSEType.SCRIPT, javascript); }
     static void load(Server server, String path) {
-        if (!server.paths.contains(path.trim())) server.sendServerEvent(SSEType.LOAD, path);
+        if (!server.paths.contains(path.trim())) server.load(path);
     }
     static void load(Server server, String onlinePath, String offlinePath) {
-        load(server, offlinePath + ", " + onlinePath);
+        load(server, onlinePath + ", " + offlinePath);
     }
     static void clear(Server server) { server.sendServerEvent(SSEType.CLEAR, ""); }
     static void clear() { clear(serve()); };
 
     static void markdown(String text) { new MarkdownIt(serve()).write(text); }
+
+    static void debugMode(Server server) { debugMode(server, false); }
+    static void debugMode(Server server, boolean isVerbose) {
+        Logger.setLogLevel(isVerbose ? LogLevel.Debug : LogLevel.Info);
+        if(isVerbose) server.sendServerEvent(SSEType.DEBUG, "");
+    }
 }
