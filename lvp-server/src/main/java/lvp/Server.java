@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
+import lvp.logging.LogLevel;
 import lvp.logging.Logger;
 
 
@@ -43,6 +44,11 @@ public class Server {
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
 
+    public static void main(String[] args) {
+        Server.onPort();
+        Logger.setLogLevel(LogLevel.Debug);
+
+    }
 
     public static Server onPort(int port) {
         port = Math.abs(port);
@@ -101,6 +107,22 @@ public class Server {
                 default:
                     Logger.logError("(Client) " + parts[1]);
                     break;
+            }
+        });
+
+        httpServer.createContext("/emit", exchange -> {
+            String message = readRequestBody(exchange);
+            if(message == null) return;
+            String[] parts = message.split(":", 2);
+            if(parts.length != 2) return;
+
+            SSEType event = SSEType.valueOf(parts[0]);
+            Logger.logDebug("Received '" + event + "' Event!");
+            if (event.equals(SSEType.LOAD)) {
+                if (paths.contains(parts[1])) return;
+                load(parts[1]);
+            } else {
+                sendServerEvent(event, parts[1]);
             }
         });
 

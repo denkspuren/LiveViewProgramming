@@ -9,33 +9,20 @@
 
   <name>LiveViewProgramming</name>
   <url>https://github.com/denkspuren/LiveViewProgramming</url>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>24</maven.compiler.release>
   </properties>
 
+  <modules>
+    <module>lvp-server</module>
+    <module>lvp-client-lib</module>
+  </modules>
+
 
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/java/lvp</directory>
-        <includes>
-          <include>**/*.js</include>
-          <include>**/*.css</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**/*.js</include>
-          <include>**/*.css</include>
-          <include>**/*.html</include>
-          <include>**/*.ico</include>
-        </includes>
-      </resource>
-    </resources>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
