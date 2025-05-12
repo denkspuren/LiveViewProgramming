@@ -34,8 +34,8 @@ public interface Clerk {
 
     static void markdown(String text) { new MarkdownIt(serve()).write(text); }
 
-    static void debugMode(Server server) { debugMode(server, false); }
-    static void debugMode(Server server, boolean isVerbose) {
+    static void logMode(Server server) { logMode(server, false); }
+    static void logMode(Server server, boolean isVerbose) {
         Logger.setLogLevel(isVerbose ? LogLevel.Debug : LogLevel.Info);
         if(isVerbose) server.sendServerEvent(SSEType.DEBUG, "");
     }
