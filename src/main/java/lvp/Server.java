@@ -219,7 +219,6 @@ public class Server {
     }
 
     public void sendServerEvent(SSEType sseType, String data) {
-        List<HttpExchange> deadConnections = new ArrayList<>();
         if (sseClientConnections.size() == 0) {
             System.out.println("Open http://localhost:" + port + " in your browser");
             return;
@@ -231,19 +230,19 @@ public class Server {
         String message = "data: " + sseType + ":" + encodeData(data) + "\n\n";
         Logger.logDebug("Event Message: " + message.trim());
 
-        for (HttpExchange connection : sseClientConnections) {
+        sseClientConnections.removeIf(connection -> {
             try {                
                 connection.getResponseBody().flush();
                 connection.getResponseBody().write(message.getBytes());
                 connection.getResponseBody().flush();
+                return false;
             } catch (IOException e) {
-                deadConnections.add(connection);
-                Logger.logError("Exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");    
-            }
-        }
+                Logger.logError("Exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...", e);
+                connection.close();
+                return true;
 
-        closeConnections(deadConnections);
-        sseClientConnections.removeAll(deadConnections);
+            }
+        });
     }
 
     public void sendLoads(HttpExchange connection) {
