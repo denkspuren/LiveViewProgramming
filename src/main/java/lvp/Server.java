@@ -196,6 +196,7 @@ public class Server {
         });
 
         httpServer.setExecutor(Executors.newFixedThreadPool(5));
+        addShutdownHook();
         httpServer.start();
     }
 
@@ -330,5 +331,12 @@ public class Server {
             exchange.close();
         }
         return null;
+    }
+
+    private void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("Shutting...");
+            stop();
+        }));
     }
 }
