@@ -6,7 +6,7 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -22,15 +22,18 @@ import java.util.function.Consumer;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
+import lvp.logging.LogLevel;
 import lvp.logging.Logger;
 
 
 public class Server {
-    public final HttpServer httpServer;
+    private record Config(Path path, String fileNamePattern, int port, LogLevel logLevel){}
+
+    private final HttpServer httpServer;
+
     final int port;
     static int defaultPort = 50_001;
     static final String index = "/web/index.html";
-    static Map<Integer,Server> serverInstances = new ConcurrentHashMap<>();
 
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
     static int getDefaultPort() { return defaultPort; }
@@ -43,21 +46,71 @@ public class Server {
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
 
+    public static void main(String[] args) {
+        Config cfg = parseArgs(args);
+        Logger.setLogLevel(cfg.logLevel());
 
-    public static Server onPort(int port) {
-        port = Math.abs(port);
         try {
-            if (!serverInstances.containsKey(port)) 
-                serverInstances.put(port, new Server(port));
-            return serverInstances.get(port);
+            Server server = new Server(Math.abs(cfg.port()));
         } catch (IOException e) {
-            System.err.printf("Error starting Server: %s\n", e.getMessage());
+            System.err.println("Fehler beim Starten des Servers: " + e.getMessage());
             e.printStackTrace();
-            return null;
+            System.exit(1);
         }
     }
 
-    public static Server onPort() { return onPort(defaultPort); }
+    private static Config parseArgs(String[] args) {
+        String fileNamePattern = null;
+        Path fileName = null;
+        Path path = null;
+        int port = defaultPort;
+        LogLevel logLevel = LogLevel.Error;
+
+        for (String arg : args) {
+            String[] parts = arg.split("=", 2);
+            String key = parts[0].trim();
+            String value = parts.length > 1 ? parts[1].trim() : "";
+
+            switch (key) {
+                case "-l":
+                case "--log":
+                    logLevel = value.isBlank() ? LogLevel.Info : LogLevel.fromString(value);
+                    break;
+                case "-p":
+                case "--pattern":
+                    fileNamePattern = value.isBlank() ? "*" : value;
+                    break;
+                case "--watch":
+                case "-w":
+                    path = value.isBlank() ? Paths.get(".") : Paths.get(value).normalize();
+                    break;
+                default:
+                    try { port = Integer.parseInt(arg.trim()); } catch(NumberFormatException _) {}
+                    break;
+            }
+        }
+
+        if (path == null) return new Config(null, null, port, logLevel);
+
+        if (!Files.exists(path)) {
+            System.err.println("Error: Path not found " + path);
+            System.exit(1);
+        }
+
+        if(!Files.isDirectory(path)) {
+            if (path.getFileName().toString().endsWith(".java")) fileName = path.getFileName();
+            path = path.getParent() != null ?  path.getParent() : Paths.get(".");
+        }
+
+        if (fileName == null && fileNamePattern == null) {
+            System.err.println("Error: No Java file or pattern specified.");
+            System.exit(1);
+        }
+
+        return new Config(path, fileNamePattern != null ? fileNamePattern : fileName.toString(), port, logLevel);
+    }
+
+    
 
     private Server(int port) throws IOException {
         this.port = port;
@@ -235,13 +288,8 @@ public class Server {
 
     public void stop() {
         Logger.logInfo("Closing Server on port '" + port + "'");
-        sseClientConnections.clear();
-        serverInstances.remove(port);
+        closeConnections(sseClientConnections);
         httpServer.stop(0);
-    }
-
-    public static void shutdown() {
-        serverInstances.forEach((_, v) -> v.stop());
     }
 
     private String encodeData(String data) {
