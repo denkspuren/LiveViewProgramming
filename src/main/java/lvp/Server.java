@@ -1,19 +1,28 @@
 package lvp;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.Base64;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -30,6 +39,9 @@ public class Server {
     private record Config(Path path, String fileNamePattern, int port, LogLevel logLevel){}
 
     private final HttpServer httpServer;
+    private WatchService watcher;
+    private ScheduledExecutorService debounceExecutor;
+    private final AtomicReference<ScheduledFuture<?>> pendingTask = new AtomicReference<>();
 
     final int port;
     static int defaultPort = 50_001;
@@ -49,9 +61,13 @@ public class Server {
     public static void main(String[] args) {
         Config cfg = parseArgs(args);
         Logger.setLogLevel(cfg.logLevel());
-
+        
         try {
             Server server = new Server(Math.abs(cfg.port()));
+            if(cfg.path() != null) {
+                server.initWatcher(cfg.path());
+                server.watchLoop(cfg);
+            }
         } catch (IOException e) {
             System.err.println("Fehler beim Starten des Servers: " + e.getMessage());
             e.printStackTrace();
@@ -110,7 +126,66 @@ public class Server {
         return new Config(path, fileNamePattern != null ? fileNamePattern : fileName.toString(), port, logLevel);
     }
 
-    
+    public void initWatcher(Path path) throws IOException{
+        watcher = FileSystems.getDefault().newWatchService();
+        path.register(watcher,
+            StandardWatchEventKinds.ENTRY_CREATE,
+            StandardWatchEventKinds.ENTRY_MODIFY);
+        Logger.logInfo("Watching in " + path.normalize().toAbsolutePath() + "");
+    }
+
+    private void watchLoop(Config cfg) {
+        debounceExecutor = Executors.newSingleThreadScheduledExecutor();
+        long debounceDelay = 200;            
+        while (true) {
+            WatchKey key;
+            try {
+                key = watcher.take();
+            } catch (InterruptedException | ClosedWatchServiceException e) {
+                break; // sauber beenden
+            }
+            for (WatchEvent<?> ev : key.pollEvents()) {
+                Path changed = (Path) ev.context();
+                if (FileSystems.getDefault().getPathMatcher("glob:" + cfg.fileNamePattern()).matches(changed)) {
+                    Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
+                    ScheduledFuture<?> prev = pendingTask.getAndSet(
+                        debounceExecutor.schedule(() -> runJava(cfg, changed), debounceDelay, TimeUnit.MILLISECONDS)
+                    );
+                    if (prev != null && !prev.isDone()) prev.cancel(false);
+                }
+            }
+            
+            if (!key.reset()) break;
+        }
+    }
+
+    private void runJava(Config cfg, Path path) {
+        Logger.logInfo("Executing java --enable-preview " + path.toString() + " in " + cfg.path().normalize().toAbsolutePath());
+        
+        ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", path.toString())
+            .directory(cfg.path().toFile())
+            .redirectErrorStream(true);
+        try {
+            Process process = pb.start();
+
+            try(BufferedReader reader = new BufferedReader(
+                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        Logger.logInfo(line);
+                    }
+                }
+
+            boolean finished = process.waitFor(30, TimeUnit.SECONDS);
+            if (!finished) {
+                process.destroyForcibly();
+                Logger.logError("Timeout: process killed");
+            }
+
+        } catch (Exception e) {
+            Logger.logError("Error in Java Process", e);
+        }
+    }
 
     private Server(int port) throws IOException {
         this.port = port;
@@ -231,7 +306,7 @@ public class Server {
         Logger.logDebug("Event Message: " + message.trim());
 
         sseClientConnections.removeIf(connection -> {
-            try {                
+            try {
                 connection.getResponseBody().flush();
                 connection.getResponseBody().write(message.getBytes());
                 connection.getResponseBody().flush();
@@ -334,8 +409,10 @@ public class Server {
 
     private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Shutting...");
+            System.out.println("Shutting down...");
             stop();
+            if (watcher != null) try { watcher.close(); } catch (IOException e) { e.printStackTrace(); }
+            if (debounceExecutor != null) debounceExecutor.shutdownNow();
         }));
     }
 }
