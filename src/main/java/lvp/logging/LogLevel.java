@@ -10,7 +10,7 @@ public enum LogLevel {
             case "debug", "dbg", "verbose" -> Debug;
             case "info" -> Info;
             case "error", "err" -> Error;
-            default -> throw new IllegalArgumentException("Unknown log level: " + input);
+            default -> Error;
         };
     }
 }

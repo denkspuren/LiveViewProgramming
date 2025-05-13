@@ -3,24 +3,24 @@ package lvp.views;
 import java.util.Map;
 import java.util.function.Consumer;
 import lvp.Clerk;
-import lvp.Server;
+import lvp.Client;
 import lvp.skills.Text;
 
-public class Slider implements Clerk {
+public class Slider {
     public final String ID;
-    Server server;
-    public Slider(Server server, double min, double max) {
-        this.server = server;
+    Client client;
+    public Slider(Client client, double min, double max) {
+        this.client = client;
         ID = Clerk.getHashID(this);
-        Clerk.write(server, "<div><input type='range' id='slider" + ID + "' min='" + min + "' max='" + max + "' step='any'/> </div>");
-        Clerk.script(server, "const slider" + ID + " = document.getElementById('slider" + ID + "');");
+        Clerk.write(client, "<div><input type='range' id='slider" + ID + "' min='" + min + "' max='" + max + "' step='any'/> </div>");
+        Clerk.script(client, "const slider" + ID + " = document.getElementById('slider" + ID + "');");
     }
     public Slider attachTo(Consumer<String> delegate) {
-        this.server.createResponseContext("/slider" + ID, delegate, ID);
-        Clerk.script(server, Text.fillOut(
+        this.client.createResponseContext("/slider" + ID, delegate, ID);
+        Clerk.script(client, Text.fillOut(
             """
             slider${0}.addEventListener('input', (event) => {
-                if (!lockAndCheck('${0}')) return;  // Prevents callback execution until server response unlocks it
+                if (!lockAndCheck('${0}')) return;  // Prevents callback execution until client response unlocks it
                 const value = event.target.value;
                 debugLog(`slider${0}: value = ${value}`);
                 fetch('slider${0}', {

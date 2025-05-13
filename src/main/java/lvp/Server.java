@@ -160,19 +160,20 @@ public class Server {
     }
 
     private void runJava(Config cfg, Path path) {
-        Logger.logInfo("Executing java --enable-preview " + path.toString() + " in " + cfg.path().normalize().toAbsolutePath());
-        
-        ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", path.toString())
-            .directory(cfg.path().toFile())
-            .redirectErrorStream(true);
         try {
+            Path jarLocation = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
+            
+            Logger.logInfo("Executing java --enable-preview --class-path " + jarLocation + " " + path.toString() + " in " + cfg.path().normalize().toAbsolutePath());
+            ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", "--class-path", jarLocation.toString(), path.toString())
+                .directory(cfg.path().toFile())
+                .redirectErrorStream(true);
             Process process = pb.start();
 
             try(BufferedReader reader = new BufferedReader(
                 new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        Logger.logInfo(line);
+                        Logger.logInfo("(JavaClient) " + line);
                     }
                 }
 
@@ -219,18 +220,25 @@ public class Server {
             String[] parts = message.split(":", 2);
             if(parts.length != 2) return;
 
-            switch (parts[0]) {
-                case "debug":
-                    Logger.logDebug("(Client) " + parts[1]);       
-                    break;
-                case "info":
-                    Logger.logInfo("(Client) " + parts[1]);
-                    break;
-                default:
-                    Logger.logError("(Client) " + parts[1]);
-                    break;
+            Logger.log(LogLevel.fromString(parts[0]), parts[1]);
+        });
+
+        httpServer.createContext("/emit", exchange -> {
+            String message = readRequestBody(exchange);
+            if(message == null) return;
+            String[] parts = message.split(":", 2);
+            if(parts.length != 2) return;
+
+            SSEType event = SSEType.valueOf(parts[0]);
+            Logger.logDebug("Received '" + event + "' Event!");
+            if (event.equals(SSEType.LOAD)) {
+                if (paths.contains(parts[1])) return;
+                load(parts[1]);
+            } else {
+                sendServerEvent(event, parts[1]);
             }
         });
+
 
         // SSE context
         httpServer.createContext("/events", exchange -> {
@@ -276,6 +284,7 @@ public class Server {
     }
 
     public void load(String data) {
+        if (paths.contains(data)) return;
         lock.lock();
         loadEventOccured = false;
 
@@ -311,8 +320,8 @@ public class Server {
                 connection.getResponseBody().write(message.getBytes());
                 connection.getResponseBody().flush();
                 return false;
-            } catch (IOException e) {
-                Logger.logError("Exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...", e);
+            } catch (IOException _) {
+                Logger.logError("Exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");
                 connection.close();
                 return true;
 

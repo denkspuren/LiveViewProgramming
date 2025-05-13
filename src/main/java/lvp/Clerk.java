@@ -1,42 +1,31 @@
 package lvp;
 
 import java.util.Random;
-
-import lvp.logging.LogLevel;
-import lvp.logging.Logger;
 import java.util.stream.Collectors;
 
 import lvp.views.MarkdownIt;
 
-public interface Clerk {
-    static String generateID(int n) { // random alphanumeric string of size n
+public class Clerk {
+    public static Client client;
+    public static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
                             mapToObj(i -> Integer.toString(i, 36)).
                             collect(Collectors.joining());
     }
 
-    static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
+    public static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
 
-    static Server serve(int port) { return Server.onPort(port); }
-    static Server serve() { return serve(Server.getDefaultPort()); }
+    public static Client connect(int port) { return client = Client.of(port); }
+    public static Client connect() { return connect(Client.defaultPort); }
 
-    static void write(Server server, String html)        { server.sendServerEvent(SSEType.WRITE, html); }
-    static void call(Server server, String javascript)   { server.sendServerEvent(SSEType.CALL, javascript); }
-    static void script(Server server, String javascript) { server.sendServerEvent(SSEType.SCRIPT, javascript); }
-    static void load(Server server, String path) {
-        if (!server.paths.contains(path.trim())) server.load(path);
+    public static void write(Client client, String html)        { client.emit(SSEType.WRITE, html); }
+    public static void call(Client client, String javascript)   { client.emit(SSEType.CALL, javascript); }
+    public static void script(Client client, String javascript) { client.emit(SSEType.SCRIPT, javascript); }
+    public static void load(Client client, String path) { client.emit(SSEType.LOAD, path); }
+    public static void load(Client client, String onlinePath, String offlinePath) {
+        load(client, onlinePath + ", " + offlinePath);
     }
-    static void load(Server server, String onlinePath, String offlinePath) {
-        load(server, onlinePath + ", " + offlinePath);
-    }
-    static void clear(Server server) { server.sendServerEvent(SSEType.CLEAR, ""); }
-    static void clear() { clear(serve()); };
+    public static void clear(Client client) { client.emit(SSEType.CLEAR, ""); }
 
-    static void markdown(String text) { new MarkdownIt(serve()).write(text); }
-
-    static void logMode(Server server) { logMode(server, false); }
-    static void logMode(Server server, boolean isVerbose) {
-        Logger.setLogLevel(isVerbose ? LogLevel.Debug : LogLevel.Info);
-        if(isVerbose) server.sendServerEvent(SSEType.DEBUG, "");
-    }
+    public static void markdown(String text) { new MarkdownIt(client).write(text); }
 }

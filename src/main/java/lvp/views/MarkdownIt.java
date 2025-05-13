@@ -1,16 +1,16 @@
 package lvp.views;
 import lvp.Clerk;
-import lvp.Server;
+import lvp.Client;
 
-public record MarkdownIt(Server server) implements Clerk {
+public record MarkdownIt(Client client) {
     static final String mardownItUrl = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
 
     public MarkdownIt {
-        Clerk.load(server, mardownItUrl, "views/markdown/markdown-it.min.js");
-        Clerk.load(server, "views/markdown/highlight.min.js");
-        Clerk.load(server, "views/markdown/mathjax3.js");
+        Clerk.load(client, mardownItUrl, "views/markdown/markdown-it.min.js");
+        Clerk.load(client, "views/markdown/highlight.min.js");
+        Clerk.load(client, "views/markdown/mathjax3.js");
 
-        Clerk.script(server, """
+        Clerk.script(client, """
             var md = markdownit({
                 highlight: function (str, lang) {
                     if (lang && hljs.getLanguage(lang)) {
@@ -30,8 +30,8 @@ public record MarkdownIt(Server server) implements Clerk {
     public String write(String markdownText) {
         String ID = Clerk.generateID(10);
         // Using `preformatted` is a hack to get a Java String into the Browser without interpretation
-        Clerk.write(server, "<script id='" + ID + "' type='preformatted'>" + markdownText + "</script>");
-        Clerk.call(server, "var scriptElement = document.getElementById('" + ID  + "');"
+        Clerk.write(client, "<script id='" + ID + "' type='preformatted'>" + markdownText + "</script>");
+        Clerk.call(client, "var scriptElement = document.getElementById('" + ID  + "');"
         +
         """
         var divElement = document.createElement('div');
