@@ -16,7 +16,7 @@ public class Slider {
         Clerk.script(client, "const slider" + ID + " = document.getElementById('slider" + ID + "');");
     }
     public Slider attachTo(Consumer<String> delegate) {
-        this.client.createCallback("/slider" + ID, delegate);
+        this.client.createCallback("/slider" + ID, ID, delegate);
         Clerk.script(client, Text.fillOut(
             """
             slider${0}.addEventListener('input', (event) => {

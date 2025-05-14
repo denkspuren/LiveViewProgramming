@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -55,7 +54,7 @@ public class Server {
     static int getDefaultPort() { return defaultPort; }
 
     public List<HttpExchange> webClients;
-    public Map<String, HttpExchange> javaClients = new ConcurrentHashMap<>();
+    public HttpExchange javaClient;
     List<String> paths = new CopyOnWriteArrayList<>();
 
     // lock required to temporarily block processing of `SSEType.LOAD`
@@ -153,6 +152,8 @@ public class Server {
                 Path changed = (Path) ev.context();
                 if (FileSystems.getDefault().getPathMatcher("glob:" + cfg.fileNamePattern()).matches(changed)) {
                     Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
+                    
+                    if (javaClient != null) javaClient.close();
                     ScheduledFuture<?> prev = pendingTask.getAndSet(
                         debounceExecutor.schedule(() -> runJava(cfg, changed), debounceDelay, TimeUnit.MILLISECONDS)
                     );
@@ -283,13 +284,12 @@ public class Server {
             exchange.sendResponseHeaders(200, 0);
             
             String type = queryParams.getOrDefault("type", "web");
-            if (type.equalsIgnoreCase("web")) {
+            if (type.equalsIgnoreCase("web")) { //TODO: Reverse
                 webClients.add(exchange);
                 sendLoads(exchange);
             }
             else {
-                String id = queryParams.get("clientId");
-                if (id != null) javaClients.put(id, exchange);
+                javaClient = exchange;
             }
         });
 
@@ -387,16 +387,15 @@ public class Server {
         String message = "data: " + path + ":" + encodeData(data) + "\n\n";
         Logger.logDebug("Event Message: " + message.trim());
 
-        HttpExchange connection = javaClients.get(id);
-        if (connection != null) {
+        if (javaClient != null) {
             try {
-                connection.getResponseBody().flush();
-                connection.getResponseBody().write(message.getBytes());
-                connection.getResponseBody().flush();
+                javaClient.getResponseBody().flush();
+                javaClient.getResponseBody().write(message.getBytes());
+                javaClient.getResponseBody().flush();
             }  catch (IOException _) {
-                Logger.logError("Java exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");
-                connection.close();
-                javaClients.remove(id);
+                Logger.logError("Java exchange '" + javaClient.getRemoteAddress() + "' did not respond. Closing...");
+                javaClient.close();
+                javaClient = null;
 
             }
         }
@@ -437,7 +436,7 @@ public class Server {
            exchange.sendResponseHeaders(200, 0);
            exchange.close();
            sendResponse(id, path, data);
-           sendServerEvent(SSEType.RELEASE, path); 
+           //sendServerEvent(SSEType.RELEASE, id); // TODO: Send release through client
         });
     }
 
@@ -488,6 +487,8 @@ public class Server {
     private void addShutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Shutting down...");
+            closeConnections(webClients);
+            if (javaClient != null) javaClient.close();
             stop();
             if (watcher != null) try { watcher.close(); } catch (IOException e) { e.printStackTrace(); }
             if (debounceExecutor != null) debounceExecutor.shutdownNow();

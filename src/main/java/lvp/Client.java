@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class Client {
-    public final String ID;
     final int port;
     final String address;
     static int defaultPort = 50_001;
@@ -34,7 +33,6 @@ public class Client {
 
     private Client(int port) {
         this.port = port;
-        ID = Clerk.getHashID(this);
         address = baseAddress + ":" + port;
         client = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
@@ -49,7 +47,7 @@ public class Client {
         }));
 
         worker = new Thread(this::sseLoop, "SSE-Client-Thread");
-        worker.setDaemon(true);
+        worker.setDaemon(false);
         worker.start();
     }
 
@@ -66,10 +64,10 @@ public class Client {
             }
     }
 
-    public void createCallback(String path, Consumer<String> delegate) {
+    public void createCallback(String path, String id, Consumer<String> delegate) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(address + "/new"))
-            .POST(BodyPublishers.ofString(path + ":" + ID))
+            .POST(BodyPublishers.ofString(path + ":" + id))
             .build();
         
             try {
@@ -81,44 +79,37 @@ public class Client {
     }
 
     private void sseLoop() {
-        URI uri = URI.create(address + "/events?type=java&clientId=" + ID);
-        while (running) {
-            try {
-                System.out.println("[SSE] Connecting to " + uri);
+        URI uri = URI.create(address + "/events?type=java");
+        try {
+            System.out.println("[SSE] Connecting to " + uri);
 
-                HttpRequest request = HttpRequest.newBuilder()
-                    .uri(uri)
-                    .header("Accept", "text/event-stream")
-                    .GET()
-                    .build();
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Accept", "text/event-stream")
+                .GET()
+                .build();
 
-                HttpResponse<InputStream> response = client.send(request, BodyHandlers.ofInputStream());
+            HttpResponse<InputStream> response = client.send(request, BodyHandlers.ofInputStream());
 
-                if (response.statusCode() != 200) {
-                    System.err.println("[SSE] Failed to connect: HTTP " + response.statusCode());
-                    Thread.sleep(5000);
-                    continue;
-                }
+            if (response.statusCode() != 200) {
+                System.err.println("[SSE] Failed to connect: HTTP " + response.statusCode());
+                return;
+            }
 
-                try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
+            try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
 
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        System.out.println("[SSE] Data: " + line);
-                    }
-                    
-                } catch (Exception e) {
-                    System.err.println("[SSE] Connection lost: " + e.getMessage());
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    System.out.println("[SSE] Data: " + line);
                 }
                 
-                Thread.sleep(2000);
             } catch (Exception e) {
-                if (running) {
-                    System.err.println("[SSE] Unexpected error: " + e.getMessage());
-                    try { Thread.sleep(5000); }
-                    catch (InterruptedException _) {}
-                }
+                System.err.println("[SSE] Connection lost: " + e.getMessage());
+            }
+        } catch (Exception e) {
+            if (running) {
+                System.err.println("[SSE] Unexpected error: " + e.getMessage());
             }
         }
     }
