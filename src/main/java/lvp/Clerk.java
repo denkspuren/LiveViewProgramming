@@ -18,14 +18,14 @@ public class Clerk {
     public static Client connect(int port) { return client = Client.of(port); }
     public static Client connect() { return connect(Client.defaultPort); }
 
-    public static void write(Client client, String html)        { client.emit(SSEType.WRITE, html); }
-    public static void call(Client client, String javascript)   { client.emit(SSEType.CALL, javascript); }
-    public static void script(Client client, String javascript) { client.emit(SSEType.SCRIPT, javascript); }
-    public static void load(Client client, String path) { client.emit(SSEType.LOAD, path); }
+    public static void write(Client client, String html)        { client.send(SSEType.WRITE, html); }
+    public static void call(Client client, String javascript)   { client.send(SSEType.CALL, javascript); }
+    public static void script(Client client, String javascript) { client.send(SSEType.SCRIPT, javascript); }
+    public static void load(Client client, String path) { client.send(SSEType.LOAD, path); }
     public static void load(Client client, String onlinePath, String offlinePath) {
         load(client, onlinePath + ", " + offlinePath);
     }
-    public static void clear(Client client) { client.emit(SSEType.CLEAR, ""); }
+    public static void clear(Client client) { client.send(SSEType.CLEAR, ""); }
 
     public static void markdown(String text) { new MarkdownIt(client).write(text); }
 }

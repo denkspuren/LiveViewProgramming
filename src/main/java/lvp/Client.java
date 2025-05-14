@@ -1,17 +1,32 @@
 package lvp;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class Client {
+    public final String ID;
     final int port;
+    final String address;
     static int defaultPort = 50_001;
     static String baseAddress = "http://localhost";
 
-    HttpClient client = HttpClient.newHttpClient();
+    private volatile boolean running = true;
+    private Thread worker;
+    private final HttpClient client;
+
+    Map<String, Consumer<String>> callbacks = new HashMap<>();
 
     public static Client of(int port) {
         return new Client(port);
@@ -19,11 +34,28 @@ public class Client {
 
     private Client(int port) {
         this.port = port;
+        ID = Clerk.getHashID(this);
+        address = baseAddress + ":" + port;
+        client = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .build();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("[SSE] Stopping client...");
+            running = false;
+            if (worker != null) {
+                worker.interrupt();
+            }
+        }));
+
+        worker = new Thread(this::sseLoop, "SSE-Client-Thread");
+        worker.setDaemon(true);
+        worker.start();
     }
 
-    public void emit(SSEType event, String data) {
+    public void send(SSEType event, String data) {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(baseAddress + ":" + port + "/emit"))
+            .uri(URI.create(baseAddress + ":" + port + "/receive"))
             .POST(BodyPublishers.ofString(event.toString() + ":" + data))
             .build();
         
@@ -33,4 +65,67 @@ public class Client {
                 System.err.println("Request not sent!");
             }
     }
+
+    public void createCallback(String path, Consumer<String> delegate) {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(address + "/new"))
+            .POST(BodyPublishers.ofString(path + ":" + ID))
+            .build();
+        
+            try {
+                client.send(request, BodyHandlers.discarding());
+                callbacks.put(path, delegate); //TODO: if 200
+            } catch (Exception e) {
+                System.err.println("Request not sent!");
+            }
+    }
+
+    private void sseLoop() {
+        URI uri = URI.create(address + "/events?type=java&clientId=" + ID);
+        while (running) {
+            try {
+                System.out.println("[SSE] Connecting to " + uri);
+
+                HttpRequest request = HttpRequest.newBuilder()
+                    .uri(uri)
+                    .header("Accept", "text/event-stream")
+                    .GET()
+                    .build();
+
+                HttpResponse<InputStream> response = client.send(request, BodyHandlers.ofInputStream());
+
+                if (response.statusCode() != 200) {
+                    System.err.println("[SSE] Failed to connect: HTTP " + response.statusCode());
+                    Thread.sleep(5000);
+                    continue;
+                }
+
+                try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
+
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println("[SSE] Data: " + line);
+                    }
+                    
+                } catch (Exception e) {
+                    System.err.println("[SSE] Connection lost: " + e.getMessage());
+                }
+                
+                Thread.sleep(2000);
+            } catch (Exception e) {
+                if (running) {
+                    System.err.println("[SSE] Unexpected error: " + e.getMessage());
+                    try { Thread.sleep(5000); }
+                    catch (InterruptedException _) {}
+                }
+            }
+        }
+    }
+
+    public void onEvent(String data) {
+        System.out.println("[SSE] Received: " + data);
+    }
+
+
 }

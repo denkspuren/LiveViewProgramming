@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
@@ -16,7 +17,10 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -50,7 +54,8 @@ public class Server {
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
     static int getDefaultPort() { return defaultPort; }
 
-    public List<HttpExchange> sseClientConnections;
+    public List<HttpExchange> webClients;
+    public Map<String, HttpExchange> javaClients = new ConcurrentHashMap<>();
     List<String> paths = new CopyOnWriteArrayList<>();
 
     // lock required to temporarily block processing of `SSEType.LOAD`
@@ -190,7 +195,7 @@ public class Server {
 
     private Server(int port) throws IOException {
         this.port = port;
-        sseClientConnections = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
+        webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
         httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
@@ -217,13 +222,16 @@ public class Server {
         httpServer.createContext("/log", exchange -> {
             String message = readRequestBody(exchange);
             if(message == null) return;
+            
+            exchange.sendResponseHeaders(200, 0);
+            exchange.close();
             String[] parts = message.split(":", 2);
             if(parts.length != 2) return;
 
             Logger.log(LogLevel.fromString(parts[0]), parts[1]);
         });
 
-        httpServer.createContext("/emit", exchange -> {
+        httpServer.createContext("/receive", exchange -> {
             String message = readRequestBody(exchange);
             if(message == null) return;
             String[] parts = message.split(":", 2);
@@ -232,11 +240,29 @@ public class Server {
             SSEType event = SSEType.valueOf(parts[0]);
             Logger.logDebug("Received '" + event + "' Event!");
             if (event.equals(SSEType.LOAD)) {
-                if (paths.contains(parts[1])) return;
-                load(parts[1]);
+                if (!paths.contains(parts[1])) load(parts[1]);
             } else {
                 sendServerEvent(event, parts[1]);
             }
+
+            exchange.sendResponseHeaders(200, 0);
+            exchange.close();
+        });
+
+        httpServer.createContext("/new", exchange -> {
+            if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
+                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+                Logger.logError("Method not allowed in '/new'");
+                return;
+            }
+            String message = readRequestBody(exchange);
+            if(message == null) return;
+            exchange.sendResponseHeaders(200, 0);
+            exchange.close();
+            String[] parts = message.split(":", 2);
+            if(parts.length != 2) return;
+            
+            createResponseContext(parts[0], parts[1]);
         });
 
 
@@ -247,13 +273,24 @@ public class Server {
                 Logger.logError("Method not allowed in '/events'");
                 return;
             }
+            
+            Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getRawQuery());
+
             Logger.logInfo("New SSE Exchange for '" + exchange.getLocalAddress() + "' at '" + exchange.getRemoteAddress() + "'");
             exchange.getResponseHeaders().add("Content-Type", "text/event-stream");
             exchange.getResponseHeaders().add("Cache-Control", "no-cache");
             exchange.getResponseHeaders().add("Connection", "keep-alive");
             exchange.sendResponseHeaders(200, 0);
-            sseClientConnections.add(exchange);
-            sendLoads(exchange);
+            
+            String type = queryParams.getOrDefault("type", "web");
+            if (type.equalsIgnoreCase("web")) {
+                webClients.add(exchange);
+                sendLoads(exchange);
+            }
+            else {
+                String id = queryParams.get("clientId");
+                if (id != null) javaClients.put(id, exchange);
+            }
         });
 
         // initial html site
@@ -283,6 +320,20 @@ public class Server {
         httpServer.start();
     }
 
+    private static Map<String, String> parseQueryParams(String query) {
+        Map<String, String> result = new HashMap<>();
+        if (query == null || query.isEmpty()) return result;
+
+        String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            String[] parts = pair.split("=", 2);
+            String key = URLDecoder.decode(parts[0], StandardCharsets.UTF_8);
+            String value = parts.length > 1 ? URLDecoder.decode(parts[1], StandardCharsets.UTF_8) : "";
+            result.put(key, value);
+        }
+        return result;
+    }
+
     public void load(String data) {
         if (paths.contains(data)) return;
         lock.lock();
@@ -303,30 +354,52 @@ public class Server {
     }
 
     public void sendServerEvent(SSEType sseType, String data) {
-        if (sseClientConnections.size() == 0) {
+        if (webClients.size() == 0) {
             System.out.println("Open http://localhost:" + port + " in your browser");
             return;
         }
 
-        Logger.logInfo("New '" + sseType + "' Event");
+        Logger.logDebug("New '" + sseType + "' Event");
         Logger.logDebug("Data: " + data);
                 
         String message = "data: " + sseType + ":" + encodeData(data) + "\n\n";
         Logger.logDebug("Event Message: " + message.trim());
 
-        sseClientConnections.removeIf(connection -> {
+        webClients.removeIf(connection -> {
             try {
                 connection.getResponseBody().flush();
                 connection.getResponseBody().write(message.getBytes());
                 connection.getResponseBody().flush();
                 return false;
             } catch (IOException _) {
-                Logger.logError("Exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");
+                Logger.logError("Web exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");
                 connection.close();
                 return true;
 
             }
         });
+    }
+
+    public void sendResponse(String id, String path, String data) {
+        Logger.logInfo("Sending Response from '" + path + "'");
+        Logger.logDebug("Data: " + data);
+                
+        String message = "data: " + path + ":" + encodeData(data) + "\n\n";
+        Logger.logDebug("Event Message: " + message.trim());
+
+        HttpExchange connection = javaClients.get(id);
+        if (connection != null) {
+            try {
+                connection.getResponseBody().flush();
+                connection.getResponseBody().write(message.getBytes());
+                connection.getResponseBody().flush();
+            }  catch (IOException _) {
+                Logger.logError("Java exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");
+                connection.close();
+                javaClients.remove(id);
+
+            }
+        }
     }
 
     public void sendLoads(HttpExchange connection) {
@@ -356,23 +429,21 @@ public class Server {
         lock.unlock();
         Logger.logInfo("Successfully sent " + paths.size() + " paths to '" + connection.getRemoteAddress() + "'");
     }
-    
-    public void createResponseContext(String path, Consumer<String> delegate) {
-        createResponseContext(path, delegate, "-1");
-    }
 
-    public void createResponseContext(String path, Consumer<String> delegate, String id) {
+    public void createResponseContext(String path, String id) {
         httpServer.createContext(path, exchange -> {
            String data = readRequestBody(exchange);
            if(data == null) return;
-           delegate.accept(new String(data));
-           sendServerEvent(SSEType.RELEASE, id);   
+           exchange.sendResponseHeaders(200, 0);
+           exchange.close();
+           sendResponse(id, path, data);
+           sendServerEvent(SSEType.RELEASE, path); 
         });
     }
 
     public void stop() {
         Logger.logInfo("Closing Server on port '" + port + "'");
-        closeConnections(sseClientConnections);
+        closeConnections(webClients);
         httpServer.stop(0);
     }
 
@@ -387,6 +458,7 @@ public class Server {
         }
     }
 
+    //TODO: Sauberes schließen im Fall von Fehlern
     private String readRequestBody(HttpExchange exchange) throws IOException {
         if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
             Logger.logError("Method not allowed in '" + exchange.getRequestURI().getPath() + "'");
@@ -405,13 +477,10 @@ public class Server {
             int length = Integer.parseInt(content_length);
             byte[] data = new byte[length];
             exchange.getRequestBody().read(data);   // Reads the request body into the byte array 'data'
-            exchange.sendResponseHeaders(200, 0);
-            exchange.close();
             return new String(data);
         } catch (NumberFormatException e) {
             Logger.logError("illegal content-length header in '" + exchange.getRequestURI().getPath() + "'");
             exchange.sendResponseHeaders(400, -1); // Bad Request
-            exchange.close();
         }
         return null;
     }
