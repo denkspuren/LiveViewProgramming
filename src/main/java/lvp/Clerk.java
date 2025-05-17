@@ -5,8 +5,7 @@ import java.util.stream.Collectors;
 
 import lvp.views.MarkdownIt;
 
-public class Clerk {
-    public static Client client;
+public interface Clerk {
     public static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
                             mapToObj(i -> Integer.toString(i, 36)).
@@ -15,7 +14,7 @@ public class Clerk {
 
     public static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
 
-    public static Client connect(int port) { return client = Client.of(port); }
+    public static Client connect(int port) { return Client.of(port); }
     public static Client connect() { return connect(Client.defaultPort); }
 
     public static void write(Client client, String html)        { client.send(SSEType.WRITE, html); }
@@ -27,5 +26,5 @@ public class Clerk {
     }
     public static void clear(Client client) { client.send(SSEType.CLEAR, ""); }
 
-    public static void markdown(String text) { new MarkdownIt(client).write(text); }
+    public static void markdown(String text) { new MarkdownIt(connect()).write(text); }
 }

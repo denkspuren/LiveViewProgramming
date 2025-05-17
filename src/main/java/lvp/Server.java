@@ -20,7 +20,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -384,7 +383,7 @@ public class Server {
         Logger.logInfo("Sending Response from '" + path + "'");
         Logger.logDebug("Data: " + data);
                 
-        String message = "data: " + path + ":" + encodeData(data) + "\n\n";
+        String message = "data: " + id + ":" + encodeData(data) + "\n\n";
         Logger.logDebug("Event Message: " + message.trim());
 
         if (javaClient != null) {

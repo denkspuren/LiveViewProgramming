@@ -2,7 +2,7 @@ package lvp.views;
 import lvp.Clerk;
 import lvp.Client;
 
-public record MarkdownIt(Client client) {
+public record MarkdownIt(Client client) implements Clerk {
     static final String mardownItUrl = "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js";
 
     public MarkdownIt {

@@ -4,7 +4,7 @@ import lvp.Clerk;
 import lvp.Client;
 import lvp.views.turtle.Font;
 
-public class Turtle {
+public class Turtle implements Clerk {
     public final String ID;
     Client client;
     final int width, height;
@@ -23,8 +23,8 @@ public class Turtle {
     }
 
     public Turtle(Client client) { this(client, 500, 500); }
-    public Turtle(int width, int height) { this(Clerk.client, width, height); }
-    public Turtle() { this(Clerk.client); }
+    public Turtle(int width, int height) { this(Clerk.connect(), width, height); }
+    public Turtle() { this(Clerk.connect()); }
 
     public Turtle penDown() {
         Clerk.call(client, "turtle" + ID + ".penDown();");

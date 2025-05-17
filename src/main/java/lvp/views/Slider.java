@@ -6,7 +6,7 @@ import lvp.Clerk;
 import lvp.Client;
 import lvp.skills.Text;
 
-public class Slider {
+public class Slider implements Clerk {
     public final String ID;
     Client client;
     public Slider(Client client, double min, double max) {

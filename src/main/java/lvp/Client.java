@@ -11,11 +11,13 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
 public class Client {
+    public static Client instance;
     final int port;
     final String address;
     static int defaultPort = 50_001;
@@ -28,7 +30,7 @@ public class Client {
     Map<String, Consumer<String>> callbacks = new HashMap<>();
 
     public static Client of(int port) {
-        return new Client(port);
+        return instance == null ? (instance = new Client(port)) : instance;
     }
 
     private Client(int port) {
@@ -72,7 +74,7 @@ public class Client {
         
             try {
                 client.send(request, BodyHandlers.discarding());
-                callbacks.put(path, delegate); //TODO: if 200
+                callbacks.put(id, delegate); //TODO: if 200
             } catch (Exception e) {
                 System.err.println("Request not sent!");
             }
@@ -101,7 +103,14 @@ public class Client {
 
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println("[SSE] Data: " + line);
+                    if (!line.startsWith("data:")) continue;
+                    System.out.println("[SSE] " + line);
+                    String[] parts = line.split(":", 3);
+                    if (parts.length != 3) continue;
+                    Consumer<String> callback = callbacks.get(parts[1].trim());
+                    if (callback == null) continue;                    
+                    callback.accept(new String(Base64.getDecoder().decode(parts[2])));
+                    send(SSEType.RELEASE, parts[1].trim());
                 }
                 
             } catch (Exception e) {
