@@ -1,6 +1,7 @@
 package lvp;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
@@ -22,8 +23,7 @@ public class Client {
     final String address;
     static int defaultPort = 50_001;
     static String baseAddress = "http://localhost";
-
-    private volatile boolean running = true;
+    
     private Thread worker;
     private final HttpClient client;
 
@@ -36,96 +36,97 @@ public class Client {
     private Client(int port) {
         this.port = port;
         address = baseAddress + ":" + port;
+
         client = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("[SSE] Stopping client...");
-            running = false;
-            if (worker != null) {
-                worker.interrupt();
-            }
-        }));
-
-        worker = new Thread(this::sseLoop, "SSE-Client-Thread");
-        worker.setDaemon(false);
-        worker.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
+        worker = Thread.ofVirtual().name("SSE-Client").start(this::startSseWorker);
     }
 
+    // Trigger Server-Sent Events (SSE) by sending data to the server
     public void send(SSEType event, String data) {
         HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(baseAddress + ":" + port + "/receive"))
+            .uri(URI.create(address + "/receive"))
             .POST(BodyPublishers.ofString(event.toString() + ":" + data))
             .build();
-        
-            try {
-                client.send(request, BodyHandlers.discarding());
-            } catch (Exception e) {
-                System.err.println("Request not sent!");
-            }
+        sendRequest(request);            
     }
 
+    // Create a new server route and register a callback to handle requests to it
     public void createCallback(String path, String id, Consumer<String> delegate) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(address + "/new"))
             .POST(BodyPublishers.ofString(path + ":" + id))
             .build();
         
-            try {
-                client.send(request, BodyHandlers.discarding());
-                callbacks.put(id, delegate); //TODO: if 200
-            } catch (Exception e) {
-                System.err.println("Request not sent!");
-            }
+        if (sendRequest(request)) callbacks.put(id, delegate);
     }
 
-    private void sseLoop() {
-        URI uri = URI.create(address + "/events?type=java");
+    // Stop the SSE thread
+    public void stop() {
+        System.out.println("[SSE] Stopping client...");
+        if (worker != null) {
+            worker.interrupt();
+        }
+        System.out.println("[SSE] Client stopped.");
+    }
+
+    private boolean sendRequest(HttpRequest request) {
         try {
-            System.out.println("[SSE] Connecting to " + uri);
-
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(uri)
-                .header("Accept", "text/event-stream")
-                .GET()
-                .build();
-
-            HttpResponse<InputStream> response = client.send(request, BodyHandlers.ofInputStream());
-
-            if (response.statusCode() != 200) {
-                System.err.println("[SSE] Failed to connect: HTTP " + response.statusCode());
-                return;
-            }
-
-            try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    if (!line.startsWith("data:")) continue;
-                    System.out.println("[SSE] " + line);
-                    String[] parts = line.split(":", 3);
-                    if (parts.length != 3) continue;
-                    Consumer<String> callback = callbacks.get(parts[1].trim());
-                    if (callback == null) continue;                    
-                    callback.accept(new String(Base64.getDecoder().decode(parts[2])));
-                    send(SSEType.RELEASE, parts[1].trim());
-                }
-                
-            } catch (Exception e) {
-                System.err.println("[SSE] Connection lost: " + e.getMessage());
-            }
+            HttpResponse<Void> response = client.send(request, BodyHandlers.discarding());
+            return response.statusCode() == 200;
         } catch (Exception e) {
-            if (running) {
-                System.err.println("[SSE] Unexpected error: " + e.getMessage());
-            }
+            System.err.println("[HTTP] Request failed: " + e.getMessage());
+            return false;
         }
     }
 
-    public void onEvent(String data) {
-        System.out.println("[SSE] Received: " + data);
+    private void startSseWorker() {
+        int attempts = 0;
+        while (attempts < 2) {
+            try {
+                connectToSse();
+            } catch (Exception e) {
+                System.err.println("[SSE] (" + attempts +") Unexpected Exception: " + e.getMessage());
+            }
+            attempts++;
+        }
+        stop();
     }
 
+    private void connectToSse() throws InterruptedException, IOException {
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(address + "/events?type=java"))
+            .header("Accept", "text/event-stream")
+            .GET()
+            .build();
 
+        HttpResponse<InputStream> response = client.send(request, BodyHandlers.ofInputStream());
+
+        if (response.statusCode() != 200) {
+            System.err.println("[SSE] Failed to connect: HTTP " + response.statusCode());
+            return;
+        }
+
+        System.out.println("[SSE] Connected");
+        try (BufferedReader reader = new BufferedReader(
+            new InputStreamReader(response.body(), StandardCharsets.UTF_8))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (!line.startsWith("data:")) continue;
+
+                String[] parts = line.split(":", 3);
+                if (parts.length != 3) continue;
+
+                String id = parts[1].trim();
+                String data = new String(Base64.getDecoder().decode(parts[2]));
+
+                callbacks.getOrDefault(id, _ -> {}).accept(data);
+                send(SSEType.RELEASE, id);
+            }       
+        }
+    }
 }
