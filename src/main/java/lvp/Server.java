@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -41,7 +43,9 @@ public class Server {
     private record Config(Path path, String fileNamePattern, int port, LogLevel logLevel){}
 
     private final HttpServer httpServer;
+    private final List<String> createdContexts = new CopyOnWriteArrayList<>();
     private WatchService watcher;
+    private Thread watchThread;
     private ScheduledExecutorService debounceExecutor;
     private final AtomicReference<ScheduledFuture<?>> pendingTask = new AtomicReference<>();
 
@@ -61,6 +65,8 @@ public class Server {
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
 
+
+    // ---- Main Entry & Configuration ----
     public static void main(String[] args) {
         Config cfg = parseArgs(args);
         Logger.setLogLevel(cfg.logLevel());
@@ -68,8 +74,7 @@ public class Server {
         try {
             Server server = new Server(Math.abs(cfg.port()));
             if(cfg.path() != null) {
-                server.initWatcher(cfg.path());
-                server.watchLoop(cfg);
+                server.initWatcher(cfg);
             }
         } catch (IOException e) {
             System.err.println("Fehler beim Starten des Servers: " + e.getMessage());
@@ -129,12 +134,140 @@ public class Server {
         return new Config(path, fileNamePattern != null ? fileNamePattern : fileName.toString(), port, logLevel);
     }
 
-    public void initWatcher(Path path) throws IOException{
+    private Server(int port) throws IOException {
+        this.port = port;
+        webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
+
+        httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
+        System.out.println("Open http://localhost:" + port + " in your browser");
+
+        httpServer.createContext("/loaded", exchange -> handlePostRequest(exchange, this::processLoaded));
+        httpServer.createContext("/log", exchange -> handlePostRequest(exchange, this::processLog));
+        httpServer.createContext("/receive", exchange -> handlePostRequest(exchange, this::processReceive));
+        httpServer.createContext("/new", exchange -> handlePostRequest(exchange, this::processNew));
+        httpServer.createContext("/events", this::handleEvents);
+        httpServer.createContext("/", this::handleRoot);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop, "ShutdownHook"));
+
+        httpServer.setExecutor(Executors.newFixedThreadPool(5));
+        httpServer.start();
+    }
+
+    private void handleEvents(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
+            exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+            Logger.logError("Method not allowed in '/events'");
+            return;
+        }
+
+        Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getRawQuery());
+
+        Logger.logInfo("New SSE Exchange for '" + exchange.getLocalAddress() + "' at '" + exchange.getRemoteAddress() + "'");
+        exchange.getResponseHeaders().add("Content-Type", "text/event-stream");
+        exchange.getResponseHeaders().add("Cache-Control", "no-cache");
+        exchange.getResponseHeaders().add("Connection", "keep-alive");
+        exchange.sendResponseHeaders(200, 0);
+
+        String type = queryParams.getOrDefault("type", "web");
+        if (type.equalsIgnoreCase("java")) {
+            javaClient = exchange;
+        } else {
+            webClients.add(exchange);
+            sendLoads(exchange);
+        }
+    }
+
+    private void handleRoot(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
+            exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+            Logger.logError("Method not allowed in '/'");
+            return;
+        }
+
+        final String resourcePath = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
+        Logger.logDebug("Sending '" + resourcePath + "'");
+
+        try (final InputStream stream = Server.class.getResourceAsStream(resourcePath)) {
+            final byte[] bytes = stream.readAllBytes();
+            exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(resourcePath)) + "; charset=utf-8");
+            exchange.sendResponseHeaders(200, bytes.length);
+            exchange.getResponseBody().write(bytes);
+            exchange.getResponseBody().flush();
+        } finally {
+            exchange.close();
+        }
+    }
+
+    private void handlePostRequest(HttpExchange exchange, Consumer<String> processor) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
+            Logger.logError("Method not allowed in '" + exchange.getRequestURI().getPath() + "'");
+            exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+            return;
+        }
+        String message = readRequestBody(exchange);
+        if (message == null) return;
+
+        exchange.sendResponseHeaders(200, 0);
+        exchange.close();
+        processor.accept(message);
+    }
+
+    private void processLoaded(String message) {
+        lock.lock();
+        try {
+            loadEventOccured = true;
+            loadEventOccurredCondition.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void processLog(String message) {
+        String[] parts = message.split(":", 2);
+        if (parts.length != 2) return;
+
+        Logger.log(LogLevel.fromString(parts[0]), parts[1]);
+    }
+
+    private void processReceive(String message) {
+        String[] parts = message.split(":", 2);
+        if (parts.length != 2) return;
+
+        SSEType event = SSEType.valueOf(parts[0]);
+        Logger.logDebug("Received '" + event + "' Event!");
+        if (event.equals(SSEType.LOAD)) {
+            if (!paths.contains(parts[1])) load(parts[1]);
+        } else {
+            sendServerEvent(event, parts[1]);
+        }
+    }
+
+    private void processNew(String message) {
+        String[] parts = message.split(":", 2);
+        if (parts.length != 2) return;
+
+        createResponseContext(parts[0], parts[1]);
+    }
+    
+    // ---- File Watching ----
+    public void initWatcher(Config cfg) throws IOException{
         watcher = FileSystems.getDefault().newWatchService();
-        path.register(watcher,
+        cfg.path().register(watcher,
             StandardWatchEventKinds.ENTRY_CREATE,
             StandardWatchEventKinds.ENTRY_MODIFY);
-        Logger.logInfo("Watching in " + path.normalize().toAbsolutePath() + "");
+        Logger.logInfo("Watching in " + cfg.path().normalize().toAbsolutePath() + "");
+
+        watchThread = new Thread(() -> {
+            try {
+                watchLoop(cfg);
+            } catch (Exception e) {
+                Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
+            }
+        }, "Wachter");
+        watchThread.setDaemon(true);
+        watchThread.start();
+        Logger.logInfo("Watcher started");
     }
 
     private void watchLoop(Config cfg) {
@@ -145,6 +278,7 @@ public class Server {
             try {
                 key = watcher.take();
             } catch (InterruptedException | ClosedWatchServiceException e) {
+                Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
                 break; // sauber beenden
             }
             for (WatchEvent<?> ev : key.pollEvents()) {
@@ -156,11 +290,17 @@ public class Server {
                     ScheduledFuture<?> prev = pendingTask.getAndSet(
                         debounceExecutor.schedule(() -> runJava(cfg, changed), debounceDelay, TimeUnit.MILLISECONDS)
                     );
-                    if (prev != null && !prev.isDone()) prev.cancel(false);
+                    if (prev != null && !prev.isDone()) {
+                        prev.cancel(false);
+                        Logger.logDebug("Previous task cancelled");
+                    }
                 }
             }
             
-            if (!key.reset()) break;
+            if (!key.reset()) {
+                Logger.logInfo("Watch key could not be reset. Exiting watch loop.");
+                break;
+            }
         }
     }
 
@@ -193,146 +333,7 @@ public class Server {
         }
     }
 
-    private Server(int port) throws IOException {
-        this.port = port;
-        webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
-
-        httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
-        System.out.println("Open http://localhost:" + port + " in your browser");
-
-        // loaded-Request to signal successful processing of SSEType.LOAD
-        httpServer.createContext("/loaded", exchange -> {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
-                Logger.logError("Method not allowed in '/loaded'");
-                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-                return;
-            }
-            exchange.sendResponseHeaders(200, 0);
-            exchange.close();
-            lock.lock();
-            try { // try/finally pattern for locks
-                loadEventOccured = true;
-                loadEventOccurredCondition.signalAll();
-            } finally {
-                lock.unlock();
-            }
-        });
-
-        //logging
-        httpServer.createContext("/log", exchange -> {
-            String message = readRequestBody(exchange);
-            if(message == null) return;
-            
-            exchange.sendResponseHeaders(200, 0);
-            exchange.close();
-            String[] parts = message.split(":", 2);
-            if(parts.length != 2) return;
-
-            Logger.log(LogLevel.fromString(parts[0]), parts[1]);
-        });
-
-        httpServer.createContext("/receive", exchange -> {
-            String message = readRequestBody(exchange);
-            if(message == null) return;
-            String[] parts = message.split(":", 2);
-            if(parts.length != 2) return;
-
-            SSEType event = SSEType.valueOf(parts[0]);
-            Logger.logDebug("Received '" + event + "' Event!");
-            if (event.equals(SSEType.LOAD)) {
-                if (!paths.contains(parts[1])) load(parts[1]);
-            } else {
-                sendServerEvent(event, parts[1]);
-            }
-
-            exchange.sendResponseHeaders(200, 0);
-            exchange.close();
-        });
-
-        httpServer.createContext("/new", exchange -> {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
-                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-                Logger.logError("Method not allowed in '/new'");
-                return;
-            }
-            String message = readRequestBody(exchange);
-            if(message == null) return;
-            exchange.sendResponseHeaders(200, 0);
-            exchange.close();
-            String[] parts = message.split(":", 2);
-            if(parts.length != 2) return;
-            
-            createResponseContext(parts[0], parts[1]);
-        });
-
-
-        // SSE context
-        httpServer.createContext("/events", exchange -> {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
-                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-                Logger.logError("Method not allowed in '/events'");
-                return;
-            }
-            
-            Map<String, String> queryParams = parseQueryParams(exchange.getRequestURI().getRawQuery());
-
-            Logger.logInfo("New SSE Exchange for '" + exchange.getLocalAddress() + "' at '" + exchange.getRemoteAddress() + "'");
-            exchange.getResponseHeaders().add("Content-Type", "text/event-stream");
-            exchange.getResponseHeaders().add("Cache-Control", "no-cache");
-            exchange.getResponseHeaders().add("Connection", "keep-alive");
-            exchange.sendResponseHeaders(200, 0);
-            
-            String type = queryParams.getOrDefault("type", "web");
-            if (type.equalsIgnoreCase("web")) { //TODO: Reverse
-                webClients.add(exchange);
-                sendLoads(exchange);
-            }
-            else {
-                javaClient = exchange;
-            }
-        });
-
-        // initial html site
-        httpServer.createContext("/", exchange -> {
-            if (!exchange.getRequestMethod().equalsIgnoreCase("get")) {
-                exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-                Logger.logError("Method not allowed in '/'");
-                return;
-            }
-
-            final String resourcePath = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
-            Logger.logDebug("Sending '" + resourcePath + "'");
-            
-            try (final InputStream stream = Server.class.getResourceAsStream(resourcePath)) {
-                final byte[] bytes = stream.readAllBytes();
-                exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(resourcePath)) + "; charset=utf-8");
-                exchange.sendResponseHeaders(200, bytes.length);
-                exchange.getResponseBody().write(bytes);
-                exchange.getResponseBody().flush();
-            } finally {
-                exchange.close();
-            }
-        });
-
-        httpServer.setExecutor(Executors.newFixedThreadPool(5));
-        addShutdownHook();
-        httpServer.start();
-    }
-
-    private static Map<String, String> parseQueryParams(String query) {
-        Map<String, String> result = new HashMap<>();
-        if (query == null || query.isEmpty()) return result;
-
-        String[] pairs = query.split("&");
-        for (String pair : pairs) {
-            String[] parts = pair.split("=", 2);
-            String key = URLDecoder.decode(parts[0], StandardCharsets.UTF_8);
-            String value = parts.length > 1 ? URLDecoder.decode(parts[1], StandardCharsets.UTF_8) : "";
-            result.put(key, value);
-        }
-        return result;
-    }
-
+    // ---- SSE Interaction ----
     public void load(String data) {
         if (paths.contains(data)) return;
         lock.lock();
@@ -366,9 +367,11 @@ public class Server {
 
         webClients.removeIf(connection -> {
             try {
-                connection.getResponseBody().flush();
-                connection.getResponseBody().write(message.getBytes());
-                connection.getResponseBody().flush();
+                synchronized (connection) {
+                    OutputStream os = connection.getResponseBody();
+                    os.write(message.getBytes(StandardCharsets.UTF_8));
+                    os.flush();
+                }
                 return false;
             } catch (IOException _) {
                 Logger.logError("Web exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");
@@ -427,70 +430,99 @@ public class Server {
         lock.unlock();
         Logger.logInfo("Successfully sent " + paths.size() + " paths to '" + connection.getRemoteAddress() + "'");
     }
-
+        
     public void createResponseContext(String path, String id) {
+        if (createdContexts.contains(path)) {
+            Logger.logDebug("Context '" + path + "' already exists");
+            return;
+        }
+        
+        createdContexts.add(path);
         httpServer.createContext(path, exchange -> {
            String data = readRequestBody(exchange);
            if(data == null) return;
            exchange.sendResponseHeaders(200, 0);
            exchange.close();
            sendResponse(id, path, data);
-           //sendServerEvent(SSEType.RELEASE, id); // TODO: Send release through client
         });
     }
 
-    public void stop() {
-        Logger.logInfo("Closing Server on port '" + port + "'");
-        closeConnections(webClients);
-        httpServer.stop(0);
+    // ---- HTTP Request Handling ----
+    private static Map<String, String> parseQueryParams(String query) {
+        Map<String, String> result = new HashMap<>();
+        if (query == null || query.isEmpty()) return result;
+
+        String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            String[] parts = pair.split("=", 2);
+            String key = URLDecoder.decode(parts[0], StandardCharsets.UTF_8);
+            String value = parts.length > 1 ? URLDecoder.decode(parts[1], StandardCharsets.UTF_8) : "";
+            result.put(key, value);
+        }
+        return result;
     }
 
-    private String encodeData(String data) {
-        byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
-        return Base64.getEncoder().encodeToString(binaryData);
+
+    private String readRequestBody(HttpExchange exchange) throws IOException {
+        if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
+            Logger.logError("Method not allowed in '" + exchange.getRequestURI().getPath() + "'");
+            exchange.sendResponseHeaders(405, -1); // Method Not Allowed
+            exchange.close();
+            return null;
+        }
+
+        String content_length = exchange.getRequestHeaders().getFirst("Content-length");
+        if (content_length == null) {
+            Logger.logError("content-length header in '" + exchange.getRequestURI().getPath() + "' is missing");
+            exchange.sendResponseHeaders(400, -1); // Bad Request
+            exchange.close();
+            return null;
+        }
+
+        try {
+            int length = Integer.parseInt(content_length);
+            byte[] data = exchange.getRequestBody().readNBytes(length);
+            if (data.length != length) {
+                Logger.logError("Premature end of stream in '" + exchange.getRequestURI().getPath() + "'");
+                exchange.sendResponseHeaders(400, -1); // Bad Request
+                exchange.close();
+                return null;
+            }
+            return new String(data, StandardCharsets.UTF_8);
+        } catch (NumberFormatException e) {
+            Logger.logError("illegal content-length header in '" + exchange.getRequestURI().getPath() + "'");
+            exchange.sendResponseHeaders(400, -1); // Bad Request
+        } catch (IOException e) {
+            Logger.logError("Error reading request body in '" + exchange.getRequestURI().getPath() + "'", e);
+            exchange.sendResponseHeaders(400, -1); // Bad Request
+        }
+        exchange.close();
+        return null;
     }
 
+    // ---- Connection Management ----
     private void closeConnections(List<HttpExchange> connections) {
         for (HttpExchange connection : connections) {
             connection.close();
         }
     }
 
-    //TODO: Sauberes schließen im Fall von Fehlern
-    private String readRequestBody(HttpExchange exchange) throws IOException {
-        if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
-            Logger.logError("Method not allowed in '" + exchange.getRequestURI().getPath() + "'");
-            exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-            return null;
-        }
-
-        String content_length = exchange.getRequestHeaders().getFirst("Content-length");
-        if (content_length == null) {
-            exchange.sendResponseHeaders(400, -1); // Bad Request
-            Logger.logError("content-length header in '" + exchange.getRequestURI().getPath() + "' is missing");
-            return null;
-        }
-
-        try {
-            int length = Integer.parseInt(content_length);
-            byte[] data = new byte[length];
-            exchange.getRequestBody().read(data);   // Reads the request body into the byte array 'data'
-            return new String(data);
-        } catch (NumberFormatException e) {
-            Logger.logError("illegal content-length header in '" + exchange.getRequestURI().getPath() + "'");
-            exchange.sendResponseHeaders(400, -1); // Bad Request
-        }
-        return null;
+    // ---- Utilities ----
+    private String encodeData(String data) {
+        byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
+        return Base64.getEncoder().encodeToString(binaryData);
     }
 
-    private void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Shutting down...");
-            closeConnections(webClients);
-            if (javaClient != null) javaClient.close();
-            stop();
-            if (watcher != null) try { watcher.close(); } catch (IOException e) { e.printStackTrace(); }
-            if (debounceExecutor != null) debounceExecutor.shutdownNow();
-        }));
+    // ---- Lifecycle Management ----
+
+    public void stop() {
+        Logger.logInfo("Closing Server on port '" + port + "'");
+        closeConnections(webClients);
+        if (javaClient != null) javaClient.close();
+        httpServer.stop(0);
+        if (watcher != null) try { watcher.close(); } catch (IOException e) { e.printStackTrace(); }
+        if (debounceExecutor != null) debounceExecutor.shutdownNow();
+        if (watchThread != null) watchThread.interrupt();
+        System.out.println("Server stopped.");
     }
 }

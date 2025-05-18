@@ -13,12 +13,12 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 public class Client {
-    public static Client instance;
+    private static volatile Client instance;
     final int port;
     final String address;
     static int defaultPort = 50_001;
@@ -27,10 +27,19 @@ public class Client {
     private Thread worker;
     private final HttpClient client;
 
-    Map<String, Consumer<String>> callbacks = new HashMap<>();
+    Map<String, Consumer<String>> callbacks = new ConcurrentHashMap<>();
 
+    // https://www.baeldung.com/java-singleton-double-checked-locking
     public static Client of(int port) {
-        return instance == null ? (instance = new Client(port)) : instance;
+        if (instance == null || instance.port != port) {
+            synchronized (Client.class) {
+                if (instance == null || instance.port != port) {
+                    instance.stop();
+                    instance = new Client(port);
+                }
+            }
+        }
+        return instance;
     }
 
     private Client(int port) {
@@ -49,7 +58,8 @@ public class Client {
     public void send(SSEType event, String data) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(address + "/receive"))
-            .POST(BodyPublishers.ofString(event.toString() + ":" + data))
+            .POST(BodyPublishers.ofString(event + ":" + data))
+            .timeout(Duration.ofSeconds(10))
             .build();
         sendRequest(request);            
     }
@@ -59,6 +69,7 @@ public class Client {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(address + "/new"))
             .POST(BodyPublishers.ofString(path + ":" + id))
+            .timeout(Duration.ofSeconds(10))
             .build();
         
         if (sendRequest(request)) callbacks.put(id, delegate);
@@ -101,6 +112,7 @@ public class Client {
             .uri(URI.create(address + "/events?type=java"))
             .header("Accept", "text/event-stream")
             .GET()
+            .timeout(Duration.ofSeconds(10))
             .build();
 
         HttpResponse<InputStream> response = client.send(request, BodyHandlers.ofInputStream());

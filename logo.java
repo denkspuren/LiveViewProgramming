@@ -151,7 +151,7 @@ void main() {
 
     drawing(interactiveTurtle, (200.0 + 10.0) / 2.0);
 
-    Slider slider = new Slider(Clerk.client, 10, 200);
+    Slider slider = new Slider(Clerk.connect(), 10, 200);
     slider.attachTo(response -> {
         double size = Double.parseDouble(response);
         interactiveTurtle.reset();
