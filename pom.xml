@@ -58,7 +58,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>lvp.Server</mainClass>
+                <mainClass>lvp.Main</mainClass>
               </manifest>
             </archive>
           </configuration>
