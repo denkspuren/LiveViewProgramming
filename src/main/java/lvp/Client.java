@@ -29,17 +29,8 @@ public class Client {
 
     Map<String, Consumer<String>> callbacks = new ConcurrentHashMap<>();
 
-    // https://www.baeldung.com/java-singleton-double-checked-locking
     public static Client of(int port) {
-        if (instance == null || instance.port != port) {
-            synchronized (Client.class) {
-                if (instance == null || instance.port != port) {
-                    instance.stop();
-                    instance = new Client(port);
-                }
-            }
-        }
-        return instance;
+        return instance == null ? (instance = new Client(port)) : instance;
     }
 
     private Client(int port) {
@@ -51,7 +42,8 @@ public class Client {
             .build();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
-        worker = Thread.ofVirtual().name("SSE-Client").start(this::startSseWorker);
+        worker = new Thread(this::startSseWorker, "SSE-Worker");
+        worker.start();
     }
 
     // Trigger Server-Sent Events (SSE) by sending data to the server
