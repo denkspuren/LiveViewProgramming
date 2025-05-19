@@ -42,8 +42,6 @@ public class Client {
             .build();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
-        worker = new Thread(this::startSseWorker, "SSE-Worker");
-        worker.start();
     }
 
     // Trigger Server-Sent Events (SSE) by sending data to the server
@@ -86,17 +84,12 @@ public class Client {
         }
     }
 
-    private void startSseWorker() {
-        int attempts = 0;
-        while (attempts < 2) {
+    public void startSseWorker() {
             try {
                 connectToSse();
             } catch (Exception e) {
-                System.err.println("[SSE] (" + attempts +") Unexpected Exception: " + e.getMessage());
+            System.err.println("[SSE] Unexpected Exception: " + e.getMessage());
             }
-            attempts++;
-        }
-        stop();
     }
 
     private void connectToSse() throws InterruptedException, IOException {

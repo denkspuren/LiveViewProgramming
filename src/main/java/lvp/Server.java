@@ -1,31 +1,19 @@
 package lvp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.ClosedWatchServiceException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardWatchEventKinds;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,12 +26,8 @@ import lvp.logging.Logger;
 
 
 public class Server {
-    private record Config(Path path, String fileNamePattern, int port, LogLevel logLevel){}
 
     private final HttpServer httpServer;
-    private WatchService watcher;
-    private ScheduledExecutorService debounceExecutor;
-    private final AtomicReference<ScheduledFuture<?>> pendingTask = new AtomicReference<>();
 
     final int port;
     static int defaultPort = 50_001;
@@ -61,139 +45,9 @@ public class Server {
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
 
-    public static void main(String[] args) {
-        Config cfg = parseArgs(args);
-        Logger.setLogLevel(cfg.logLevel());
-        
-        try {
-            Server server = new Server(Math.abs(cfg.port()));
-            if(cfg.path() != null) {
-                server.initWatcher(cfg.path());
-                server.watchLoop(cfg);
-            }
-        } catch (IOException e) {
-            System.err.println("Fehler beim Starten des Servers: " + e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
-        }
-    }
 
-    private static Config parseArgs(String[] args) {
-        String fileNamePattern = null;
-        Path fileName = null;
-        Path path = null;
-        int port = defaultPort;
-        LogLevel logLevel = LogLevel.Error;
 
-        for (String arg : args) {
-            String[] parts = arg.split("=", 2);
-            String key = parts[0].trim();
-            String value = parts.length > 1 ? parts[1].trim() : "";
-
-            switch (key) {
-                case "-l":
-                case "--log":
-                    logLevel = value.isBlank() ? LogLevel.Info : LogLevel.fromString(value);
-                    break;
-                case "-p":
-                case "--pattern":
-                    fileNamePattern = value.isBlank() ? "*" : value;
-                    break;
-                case "--watch":
-                case "-w":
-                    path = value.isBlank() ? Paths.get(".") : Paths.get(value).normalize();
-                    break;
-                default:
-                    try { port = Integer.parseInt(arg.trim()); } catch(NumberFormatException _) {}
-                    break;
-            }
-        }
-
-        if (path == null) return new Config(null, null, port, logLevel);
-
-        if (!Files.exists(path)) {
-            System.err.println("Error: Path not found " + path);
-            System.exit(1);
-        }
-
-        if(!Files.isDirectory(path)) {
-            if (path.getFileName().toString().endsWith(".java")) fileName = path.getFileName();
-            path = path.getParent() != null ?  path.getParent() : Paths.get(".");
-        }
-
-        if (fileName == null && fileNamePattern == null) {
-            System.err.println("Error: No Java file or pattern specified.");
-            System.exit(1);
-        }
-
-        return new Config(path, fileNamePattern != null ? fileNamePattern : fileName.toString(), port, logLevel);
-    }
-
-    public void initWatcher(Path path) throws IOException{
-        watcher = FileSystems.getDefault().newWatchService();
-        path.register(watcher,
-            StandardWatchEventKinds.ENTRY_CREATE,
-            StandardWatchEventKinds.ENTRY_MODIFY);
-        Logger.logInfo("Watching in " + path.normalize().toAbsolutePath() + "");
-    }
-
-    private void watchLoop(Config cfg) {
-        debounceExecutor = Executors.newSingleThreadScheduledExecutor();
-        long debounceDelay = 200;            
-        while (true) {
-            WatchKey key;
-            try {
-                key = watcher.take();
-            } catch (InterruptedException | ClosedWatchServiceException e) {
-                break; // sauber beenden
-            }
-            for (WatchEvent<?> ev : key.pollEvents()) {
-                Path changed = (Path) ev.context();
-                if (FileSystems.getDefault().getPathMatcher("glob:" + cfg.fileNamePattern()).matches(changed)) {
-                    Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
-                    
-                    if (javaClient != null) javaClient.close();
-                    ScheduledFuture<?> prev = pendingTask.getAndSet(
-                        debounceExecutor.schedule(() -> runJava(cfg, changed), debounceDelay, TimeUnit.MILLISECONDS)
-                    );
-                    if (prev != null && !prev.isDone()) prev.cancel(false);
-                }
-            }
-            
-            if (!key.reset()) break;
-        }
-    }
-
-    private void runJava(Config cfg, Path path) {
-        try {
-            Path jarLocation = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
-            
-            Logger.logInfo("Executing java --enable-preview --class-path " + jarLocation + " " + path.toString() + " in " + cfg.path().normalize().toAbsolutePath());
-            ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", "--class-path", jarLocation.toString(), path.toString())
-                .directory(cfg.path().toFile())
-                .redirectErrorStream(true);
-            Process process = pb.start();
-
-            try(BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        Logger.logInfo("(JavaClient) " + line);
-                    }
-                }
-
-            boolean finished = process.waitFor(30, TimeUnit.SECONDS);
-            if (!finished) {
-                process.destroyForcibly();
-                Logger.logError("Timeout: process killed");
-            }
-
-        } catch (Exception e) {
-            Logger.logError("Error in Java Process", e);
-        }
-    }
-
-    private Server(int port) throws IOException {
+    public Server(int port) throws IOException {
         this.port = port;
         webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
@@ -315,7 +169,6 @@ public class Server {
         });
 
         httpServer.setExecutor(Executors.newFixedThreadPool(5));
-        addShutdownHook();
         httpServer.start();
     }
 
@@ -439,12 +292,6 @@ public class Server {
         });
     }
 
-    public void stop() {
-        Logger.logInfo("Closing Server on port '" + port + "'");
-        closeConnections(webClients);
-        httpServer.stop(0);
-    }
-
     private String encodeData(String data) {
         byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
         return Base64.getEncoder().encodeToString(binaryData);
@@ -453,6 +300,13 @@ public class Server {
     private void closeConnections(List<HttpExchange> connections) {
         for (HttpExchange connection : connections) {
             connection.close();
+        }
+    }
+
+    public void closeJavaClient() {
+        if (javaClient != null) {
+            javaClient.close();
+            javaClient = null;
         }
     }
 
@@ -483,14 +337,12 @@ public class Server {
         return null;
     }
 
-    private void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("Shutting down...");
-            closeConnections(webClients);
-            if (javaClient != null) javaClient.close();
-            stop();
-            if (watcher != null) try { watcher.close(); } catch (IOException e) { e.printStackTrace(); }
-            if (debounceExecutor != null) debounceExecutor.shutdownNow();
-        }));
+    
+
+    public void stop() {
+        Logger.logInfo("Closing Server on port '" + port + "'");
+        closeConnections(webClients);
+        if (javaClient != null) javaClient.close();
+        httpServer.stop(0);
     }
 }

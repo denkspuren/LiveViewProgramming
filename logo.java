@@ -2,10 +2,14 @@ import lvp.skills.Text;
 import lvp.views.MarkdownIt;
 import lvp.views.Slider;
 import lvp.views.Turtle;
+
+import java.time.Duration;
+
 import lvp.Clerk;
 
 void main() {
-    Clerk.connect();
+    Clerk.clear(
+        Clerk.connect());
     Clerk.markdown(
         Text.fillOut(
     """
@@ -163,6 +167,8 @@ void main() {
     Clerk.markdown("""
     Soviel möge als Demo vorerst genügen! _More features to come_ 😉
     """);
+
+    Clerk.connect().startSseWorker();
 }
 
 // triangles2
