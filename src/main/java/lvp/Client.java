@@ -31,8 +31,13 @@ public class Client {
 
     // https://www.baeldung.com/java-singleton-double-checked-locking
     public static Client of(int port) {
-        if (instance == null) {
-            instance = new Client(port);
+        if (instance == null || instance.port != port) {
+            synchronized (Client.class) {
+                if (instance == null || instance.port != port) {
+                    instance.stop();
+                    instance = new Client(port);
+                }
+            }
         }
         return instance;
     }
@@ -46,9 +51,7 @@ public class Client {
             .build();
 
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
-        
-        worker = new Thread(this::startSseWorker, "SSEWorker");
-        worker.start();
+        worker = Thread.ofVirtual().name("SSE-Client").start(this::startSseWorker);
     }
 
     // Trigger Server-Sent Events (SSE) by sending data to the server
