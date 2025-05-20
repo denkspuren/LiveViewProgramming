@@ -1,6 +1,5 @@
 import lvp.skills.Text;
 import lvp.views.MarkdownIt;
-import lvp.views.Slider;
 import lvp.views.Turtle;
 
 import java.time.Duration;
@@ -8,8 +7,7 @@ import java.time.Duration;
 import lvp.Clerk;
 
 void main() {
-    Clerk.clear(
-        Clerk.connect());
+    Clerk.clear();
     Clerk.markdown(
         Text.fillOut(
     """
@@ -41,7 +39,7 @@ void main() {
 
     > Wenn man die Befehle in der JShell zur Verfügung hat, benötigt man kein weiteres Wissen zu Logo. Man kann mit den Sprachkonstrukten von Java arbeiten.
 
-    ## Beispiel 1: Ein Quadrat aus Pfeilen
+    ## Beispiel 1: Ein Quadrat aus Pfeilennn
 
     Mit `new Turtle(300,300)` wird eine neue Schildkröte mittig auf eine Zeichenfläche der angegebenen Größe (Breite, Höhe) gesetzt. In den Grundeinstellungen sind die Breite und die Höhe auf 500 gesetzt. 
 
@@ -155,20 +153,18 @@ void main() {
 
     drawing(interactiveTurtle, (200.0 + 10.0) / 2.0);
 
-    Slider slider = new Slider(Clerk.connect(), 10, 200);
-    slider.attachTo(response -> {
-        double size = Double.parseDouble(response);
-        interactiveTurtle.reset();
-        drawing(interactiveTurtle, size);
-    });
+    // Slider slider = new Slider(Clerk.connect(), 10, 200);
+    // slider.attachTo(response -> {
+    //     double size = Double.parseDouble(response);
+    //     interactiveTurtle.reset();
+    //     drawing(interactiveTurtle, size);
+    // });
     // interactivity
 
 
     Clerk.markdown("""
     Soviel möge als Demo vorerst genügen! _More features to come_ 😉
     """);
-
-    Clerk.connect().startSseWorker();
 }
 
 // triangles2

@@ -1,5 +1,7 @@
 package lvp;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -14,17 +16,20 @@ public interface Clerk {
 
     public static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
 
-    public static Client connect(int port) { return Client.of(port); }
-    public static Client connect() { return connect(Client.defaultPort); }
 
-    public static void write(Client client, String html)        { client.send(SSEType.WRITE, html); }
-    public static void call(Client client, String javascript)   { client.send(SSEType.CALL, javascript); }
-    public static void script(Client client, String javascript) { client.send(SSEType.SCRIPT, javascript); }
-    public static void load(Client client, String path) { client.send(SSEType.LOAD, path); }
-    public static void load(Client client, String onlinePath, String offlinePath) {
-        load(client, onlinePath + ", " + offlinePath);
+    public static void write(String html)        { out(SSEType.WRITE, html); }
+    public static void call(String javascript)   { out(SSEType.CALL, javascript); }
+    public static void script(String javascript) { out(SSEType.SCRIPT, javascript); }
+    public static void load(String path) { out(SSEType.LOAD, path); }
+    public static void load(String onlinePath, String offlinePath) { load(onlinePath + ", " + offlinePath); }
+    public static void clear() { out(SSEType.CLEAR, ""); }
+
+    public static void markdown(String text) { new MarkdownIt().write(text); }
+
+    public static void out(SSEType event, String data) { System.out.println(event + ":" + encodeData(data)); }
+
+    private static String encodeData(String data) {
+        byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
+        return Base64.getEncoder().encodeToString(binaryData);
     }
-    public static void clear(Client client) { client.send(SSEType.CLEAR, ""); }
-
-    public static void markdown(String text) { new MarkdownIt(connect()).write(text); }
 }

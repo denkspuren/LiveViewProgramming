@@ -3,21 +3,18 @@ package lvp.views;
 import java.util.Map;
 import java.util.function.Consumer;
 import lvp.Clerk;
-import lvp.Client;
 import lvp.skills.Text;
 
 public class Slider implements Clerk {
     public final String ID;
-    Client client;
-    public Slider(Client client, double min, double max) {
-        this.client = client;
+    public Slider(double min, double max) {
         ID = Clerk.getHashID(this);
-        Clerk.write(client, "<div><input type='range' id='slider" + ID + "' min='" + min + "' max='" + max + "' step='any'/> </div>");
-        Clerk.script(client, "const slider" + ID + " = document.getElementById('slider" + ID + "');");
+        Clerk.write("<div><input type='range' id='slider" + ID + "' min='" + min + "' max='" + max + "' step='any'/> </div>");
+        Clerk.script("const slider" + ID + " = document.getElementById('slider" + ID + "');");
     }
     public Slider attachTo(Consumer<String> delegate) {
         this.client.createCallback("/slider" + ID, ID, delegate);
-        Clerk.script(client, Text.fillOut(
+        Clerk.script(Text.fillOut(
             """
             slider${0}.addEventListener('input', (event) => {
                 if (!lockAndCheck('${0}')) return;  // Prevents callback execution until client response unlocks it

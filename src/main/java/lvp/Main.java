@@ -20,7 +20,7 @@ public class Main {
             if(cfg.path() != null) {
                 FileWatcher watcher = new FileWatcher(cfg.path(), cfg.fileNamePattern());
                 Runtime.getRuntime().addShutdownHook(new Thread(watcher::stop));
-                watcher.watchLoop(server::closeJavaClient);
+                watcher.watchLoop(server);
             }
         } catch (IOException e) {
             System.err.println("Fehler beim Starten des Servers: " + e.getMessage());

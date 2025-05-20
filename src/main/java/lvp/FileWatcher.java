@@ -24,7 +24,8 @@ public class FileWatcher {
     private WatchService watcher;
     private ScheduledExecutorService debounceExecutor;
     private final AtomicReference<ScheduledFuture<?>> pendingTask = new AtomicReference<>();
-
+    
+    private boolean isRunning = true;
     Path dir;
     String fileNamePattern;
 
@@ -39,10 +40,10 @@ public class FileWatcher {
         Logger.logInfo("Watching in " + dir.normalize().toAbsolutePath() + "");
     }
 
-    public void watchLoop(Runnable closeClient) {
+    public void watchLoop(Server server) {
         debounceExecutor = Executors.newSingleThreadScheduledExecutor();
         long debounceDelay = 200;            
-        while (true) {
+        while (isRunning) {
             WatchKey key;
             try {
                 key = watcher.take();
@@ -55,9 +56,8 @@ public class FileWatcher {
                 if (FileSystems.getDefault().getPathMatcher("glob:" + fileNamePattern).matches(changed)) {
                     Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
                     
-                    closeClient.run();
                     ScheduledFuture<?> prev = pendingTask.getAndSet(
-                        debounceExecutor.schedule(() -> runJava(changed), debounceDelay, TimeUnit.MILLISECONDS)
+                        debounceExecutor.schedule(() -> runJava(changed, server), debounceDelay, TimeUnit.MILLISECONDS)
                     );
                     if (prev != null && !prev.isDone()) prev.cancel(false);
                 }
@@ -68,11 +68,12 @@ public class FileWatcher {
     }
 
     public void stop() {
+        isRunning = false;
         if (watcher != null) try { watcher.close(); } catch (IOException e) { e.printStackTrace(); }
         if (debounceExecutor != null) debounceExecutor.shutdownNow();
     }
 
-    private void runJava(Path path) {
+    private void runJava(Path path, Server server) {
         try {
             Path jarLocation = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
             
@@ -86,7 +87,8 @@ public class FileWatcher {
                 new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        Logger.logInfo("(JavaClient) " + line);
+                        Logger.logDebug("(JavaClient) " + line);
+                        server.read(line);
                     }
                 }
 
