@@ -2,6 +2,7 @@ const loadedDiv = document.getElementById('loadMessage');
 
 let debug = false;
 let locks = [];
+let scrollPosition = 0;
 
 const clerk = {}; // Scope for declarations
 
@@ -100,6 +101,7 @@ function setUp() {
           break;
         }
         case "CLEAR": {
+          scrollPosition = window.scrollY;
           const element = document.getElementById("events");
           while (element.firstChild) {
             element.removeChild(element.firstChild);
@@ -128,6 +130,10 @@ function setUp() {
         default:
           errorLog("Unknown Action");
           break;
+      }
+
+      if (scrollPosition > 0) {
+        window.scrollTo(0, scrollPosition);
       }
     };
 
