@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.IntStream;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
@@ -82,6 +83,26 @@ public class Server {
             if(parts.length != 2) return;
 
             Logger.log(LogLevel.fromString(parts[0]), parts[1]);
+        });
+
+        httpServer.createContext("/interact", exchange -> {
+            String message = readRequestBody(exchange);
+            if(message == null) return;
+            String[] parts = message.split(":", 3);
+            if(parts.length != 3) {
+                exchange.sendResponseHeaders(400, -1); // Bad Request
+                exchange.close();
+                Logger.logError("Illegal interaction message: " + message);
+                return;
+            }
+            
+            exchange.sendResponseHeaders(200, 0);
+            exchange.close();
+
+            String path = new String(Base64.getDecoder().decode(parts[0]), StandardCharsets.UTF_8);
+            String label = new String(Base64.getDecoder().decode(parts[1]), StandardCharsets.UTF_8);
+            String replacement = new String(Base64.getDecoder().decode(parts[2]), StandardCharsets.UTF_8);
+            updateFile(path, label, replacement);
         });
 
         // SSE context
@@ -244,6 +265,25 @@ public class Server {
             exchange.sendResponseHeaders(400, -1); // Bad Request
         }
         return null;
+    }
+
+    private void updateFile(String path, String label, String replacement) {
+        try {
+            Path filePath = Path.of(path);
+            List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+            for (int i = 0; i < lines.size(); i++) {
+                if (lines.get(i).trim().endsWith(label)) {
+                    String line = lines.get(i);
+                    int spaces = (int) IntStream.range(0, line.length())
+                        .takeWhile(pos -> line.charAt(pos) == ' ')
+                        .count();
+                    lines.set(i, " ".repeat(spaces) + replacement + " " + label);
+                }
+           }
+            Files.write(filePath, lines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            Logger.logError("Error updating file: " + path, e);
+        }
     }
 
     

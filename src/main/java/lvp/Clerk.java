@@ -26,10 +26,5 @@ public interface Clerk {
 
     public static void markdown(String text) { new MarkdownIt().write(text); }
 
-    public static void out(SSEType event, String data) { System.out.println(event + ":" + encodeData(data)); }
-
-    private static String encodeData(String data) {
-        byte[] binaryData = data.getBytes(StandardCharsets.UTF_8);
-        return Base64.getEncoder().encodeToString(binaryData);
-    }
+    public static void out(SSEType event, String data) { System.out.println(event + ":" + Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8))); }
 }

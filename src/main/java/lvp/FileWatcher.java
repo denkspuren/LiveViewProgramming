@@ -48,7 +48,8 @@ public class FileWatcher {
             try {
                 key = watcher.take();
             } catch (InterruptedException | ClosedWatchServiceException e) {
-                Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
+                if (isRunning)
+                    Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
                 break;
             }
             for (WatchEvent<?> ev : key.pollEvents()) {
