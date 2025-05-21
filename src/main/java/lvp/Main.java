@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import lvp.logging.LogLevel;
 import lvp.logging.Logger;
 
@@ -14,7 +15,7 @@ public class Main {
         Logger.setLogLevel(cfg.logLevel());
         
         try {
-            Server server = new Server(Math.abs(cfg.port()));
+            Server server = new Server(Math.abs(cfg.port()), cfg.logLevel().equals(LogLevel.Debug));
             Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
 
             if(cfg.path() != null) {

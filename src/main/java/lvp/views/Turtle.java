@@ -9,6 +9,10 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
+import lvp.Clerk;
+import lvp.skills.Interaction;
+import lvp.skills.Text;
+
 /**
  * Turtle ermöglicht das Erstellen einfacher Turtle-Grafiken als SVG-Datei.
  * Das Koordinatensystem ist kartesisch (0°=rechts, Winkel gegen den Uhrzeigersinn,
@@ -16,7 +20,8 @@ import java.util.Locale;
  * Daher werden die Y-Koordinaten beim Export invertiert.
  * Die einzelnen graphischen Elemente werden durchnummeriert in der Reihenfolge ihrer Erzeugung.
  */
-public class Turtle {
+public class Turtle implements Clerk{
+    public final String ID = Clerk.getHashID(this);
     private final double xFrom, yFrom, viewWidth, viewHeight;
     private final List<Line> lines = new ArrayList<>();
     private int elementCounter = 0;
@@ -119,6 +124,36 @@ public class Turtle {
         return this;
     }
 
+    public Turtle write() {
+        Clerk.write(Text.fillOut("<div id='turtle${0}'>${1}</div>", ID, toString()));
+        return this;
+    }
+
+    public Turtle timelineSlider() {
+        Clerk.write(Text.fillOut("""
+                <div>
+                    Linien sichtbar: <span id="currentLine${0}">${1}</span> / <span>${1}</span>
+                </div>
+                """, ID, lines.size()));
+        Clerk.write(
+            Interaction.slider(ID, 0, lines.size(), lines.size(), Text.fillOut("""
+                ((e) => {
+                    const n = e.target.value;
+                    const statusCurrent = document.getElementById("currentLine${0}");
+                    statusCurrent.textContent = n;
+                    const svgElement = document.getElementById("turtle${0}");
+                    const lineIds = Array.from(svgElement.querySelectorAll("[id]")).map(el => el.id);
+                    lineIds.forEach((id,i) => {
+                        const el = document.getElementById(id);
+                        if (el) el.style.display = i < n ? "" : "none";
+                    });
+                })(event)
+                """, ID))
+        );
+
+        return this;
+    }
+
     public void save(String filename) throws IOException {
         Path path = Path.of(filename);
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
@@ -127,8 +162,7 @@ public class Turtle {
                     """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="%.2f %.2f %.2f %.2f">
-                    """,
-                    xFrom, yFrom, viewWidth, viewHeight)
+                    """, xFrom, yFrom, viewWidth, viewHeight)
             );
             for (Line e : lines) {
                 // Adapt coordinates for SVG
@@ -164,10 +198,10 @@ public class Turtle {
             double y2Svg = (viewHeight - (e.y2() - yFrom)) + yFrom;
             out += String.format(Locale.US,
                     """
-                      <line id="%d" x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"
+                      <line id="%s%d" x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"
                             stroke="rgba(%d,%d,%d,%.2f)" stroke-width="%.2f" />
                     """,
-                    e.id(), e.x1(), y1Svg, e.x2(), y2Svg,
+                    ID, e.id(), e.x1(), y1Svg, e.x2(), y2Svg,
                     e.color().r(), e.color().g(), e.color().b(), e.color().a(),
                     e.width());
         }

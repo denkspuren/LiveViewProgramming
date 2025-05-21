@@ -45,8 +45,11 @@ public class Server {
     Condition loadEventOccurredCondition = lock.newCondition();
     boolean loadEventOccured = false;
 
-    public Server(int port) throws IOException {
+    boolean isVerbose = false;
+
+    public Server(int port, boolean isVerbose) throws IOException {
         this.port = port;
+        this.isVerbose = isVerbose;
         webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
         httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
@@ -129,6 +132,9 @@ public class Server {
         exchange.getResponseHeaders().add("Cache-Control", "no-cache");
         exchange.getResponseHeaders().add("Connection", "keep-alive");
         exchange.sendResponseHeaders(200, 0);
+
+        if (isVerbose) sendMessageToClient(exchange, SSEType.DEBUG, "");
+
         webClients.add(exchange);
         sendLoads(exchange);
     }
