@@ -8,6 +8,7 @@ public record MarkdownIt() implements Clerk {
         Clerk.load(mardownItUrl, "views/markdown/markdown-it.min.js");
         Clerk.load("views/markdown/highlight.min.js");
         Clerk.load("views/markdown/mathjax3.js");
+        Clerk.load("views/markdown/interactiveCodeblocks.js");
 
         Clerk.script("""
             var md = markdownit({
@@ -24,6 +25,10 @@ public record MarkdownIt() implements Clerk {
                 typographer: true
             });
             md.use(window.mathjax3);
+
+            md.renderer.rules.code_block = convertCodeBlock(md.renderer.rules.code_block);
+            md.renderer.rules.code_inline = convertCodeBlock(md.renderer.rules.code_inline);
+            md.renderer.rules.fence = convertCodeBlock(md.renderer.rules.fence);            
             """);
     }
     public String write(String markdownText) {

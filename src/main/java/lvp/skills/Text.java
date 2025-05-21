@@ -1,10 +1,12 @@
 package lvp.skills;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -71,6 +73,13 @@ public class Text { // Class with static methods for file operations
         return text.replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&gt;");
+    }
+
+    public static String codeBlock(String fileName, String label) {
+        return fillOut("""
+                src-info: ${0}:${1} |||
+                ${2}
+                """, Base64.getEncoder().encodeToString(fileName.getBytes(StandardCharsets.UTF_8)), Base64.getEncoder().encodeToString(label.getBytes(StandardCharsets.UTF_8)), cutOut(fileName, label));
     }
 
     // Method `fillOut` emulates String interpolation, since String Templates
