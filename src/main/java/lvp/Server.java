@@ -7,8 +7,10 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -156,11 +158,19 @@ public class Server {
         String[] parts = message.split(":", 2);
         if (parts.length != 2) return;
 
-        SSEType event = SSEType.valueOf(parts[0]);
-        if (event.equals(SSEType.LOAD)) {
+        Optional<SSEType> event = Arrays.stream(SSEType.values())
+            .filter(sseType -> sseType.name().equals(parts[0]))
+            .findFirst();
+
+        if (event.isEmpty()) {
+            Logger.logError(message);
+            return;
+        }
+
+        if (event.get().equals(SSEType.LOAD)) {
             if (!paths.contains(parts[1])) load(parts[1]);
         } else {
-            sendServerEvent(event, parts[1]);
+            sendServerEvent(event.get(), parts[1]);
         }
     }
 
