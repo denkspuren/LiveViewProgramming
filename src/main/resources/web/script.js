@@ -3,6 +3,8 @@ const loadedDiv = document.getElementById('loadMessage');
 let debug = false;
 let locks = [];
 
+const clerk = {}; // Scope for declarations
+
 
 function loadScript(src, onError = () => {
   errorLog(`script loading failed: ${src}`);
@@ -110,6 +112,10 @@ function setUp() {
             }
           }
           toRemove.forEach(x => document.body.removeChild(x));
+          
+          for (const prop of Object.getOwnPropertyNames(clerk)) {
+            delete clerk[prop];
+          }
           
           break;
         }

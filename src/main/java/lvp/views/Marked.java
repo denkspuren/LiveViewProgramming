@@ -1,13 +1,12 @@
 package lvp.views;
 import lvp.Clerk;
-import lvp.Server;
 
-public record Marked(Server server) implements Clerk {
+public record Marked() implements Clerk {
     static final String markedUrl = "https://cdn.jsdelivr.net/npm/marked/marked.min.js";
     
     public Marked {
-        Clerk.load(server, markedUrl, "views/markdown/marked.min.js");
-        Clerk.script(server, """
+        Clerk.load(markedUrl, "views/markdown/marked.min.js");
+        Clerk.script("""
             var md = marked.use({
                 gfm: true
             });
@@ -16,8 +15,8 @@ public record Marked(Server server) implements Clerk {
     public String write(String markdownText) {
         String ID = Clerk.generateID(10);
         // Using `preformatted` is a hack to get a Java String into the Browser without interpretation
-        Clerk.write(server, "<script id='" + ID + "' type='preformatted'>" + markdownText + "</script>");
-        Clerk.call(server, "var scriptElement = document.getElementById('" + ID + "');"
+        Clerk.write("<script id='" + ID + "' type='preformatted'>" + markdownText + "</script>");
+        Clerk.call("var scriptElement = document.getElementById('" + ID + "');"
         +
         """
         var divElement = document.createElement('div');
