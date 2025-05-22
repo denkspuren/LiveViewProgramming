@@ -78,9 +78,8 @@ public class FileWatcher {
         try {
             Path jarLocation = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
             
-            Logger.logInfo("Executing java --enable-preview --class-path " + jarLocation + " " + path.toString() + " in " + dir.normalize().toAbsolutePath());
-            ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", "--class-path", jarLocation.toString(), path.toString())
-                .directory(dir.toFile())
+            Logger.logInfo("Executing java --enable-preview --class-path " + jarLocation + " " + dir.resolve(path).toString());
+            ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", "--class-path", jarLocation.toString(), dir.resolve(path).toString())
                 .redirectErrorStream(true);
             Process process = pb.start();
 

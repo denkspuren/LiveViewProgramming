@@ -39,7 +39,7 @@ public void main() {
             ```java
             ${0}
             ```
-            """, Text.codeBlock("./Interactions.java", "// drawing")
+            """, Text.codeBlock("./examples/Interactions.java", "// drawing")
     ));
 }
 
