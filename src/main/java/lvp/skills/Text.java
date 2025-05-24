@@ -77,7 +77,7 @@ public class Text { // Class with static methods for file operations
 
     public static String codeBlock(String fileName, String label) {
         return fillOut("""
-                src-info: ${0}:${1} |||
+                src-info: ${0}:${1}:multi |||
                 ${2}
                 """, Base64.getEncoder().encodeToString(fileName.getBytes(StandardCharsets.UTF_8)), Base64.getEncoder().encodeToString(label.getBytes(StandardCharsets.UTF_8)), cutOut(fileName, label));
     }

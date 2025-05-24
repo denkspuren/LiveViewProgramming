@@ -5,16 +5,11 @@ import java.nio.file.Path;
 import java.util.Base64;
 
 public class Interaction {
-    public static String eventFunction(String label, String replacement) {
-        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-        String file = stackTrace[2].getFileName();
-        return eventFunction(file, label, replacement);
-    }
     public static String eventFunction(String path, String label, String replacement) {
         return eventFunction(Path.of(path), label, replacement);
     }
     public static String eventFunction(Path path, String label, String replacement) {
-        return Text.fillOut("fetch(\"interact\", { method: \"post\", body: \"${0}:${1}:${2}\" }).catch(console.error);", 
+        return Text.fillOut("fetch(\"interact\", { method: \"post\", body: \"${0}:${1}:single:${2}\" }).catch(console.error);", 
                 Base64.getEncoder().encodeToString(path.normalize().toAbsolutePath().toString().getBytes(StandardCharsets.UTF_8)),
                 Base64.getEncoder().encodeToString(label.getBytes(StandardCharsets.UTF_8)),
                 Base64.getEncoder().encodeToString(replacement.getBytes(StandardCharsets.UTF_8)));

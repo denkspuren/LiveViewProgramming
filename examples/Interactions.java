@@ -15,7 +15,7 @@ public class TestClass {
 public void main() {
     Clerk.clear();
     Clerk.markdown("# Hello World"); // hello
-    Clerk.write(Interaction.button("Click me", 200, 50, Interaction.eventFunction("// hello", "Clerk.markdown(\"# Goodbye World\");")));
+    Clerk.write(Interaction.button("Click me", 200, 50, Interaction.eventFunction("./examples/Interactions.java", "// hello", "Clerk.markdown(\"# Goodbye World\");")));
 
     Clerk.markdown("## Dot Example with Object Inspector");
     TestClass t1 = new TestClass(null, 1);
@@ -29,9 +29,9 @@ public void main() {
     drawing(turtle, 100);
     turtle.write().timelineSlider();
     Clerk.markdown("### Choose a Color");
-    Clerk.write(Interaction.button("Red", Interaction.eventFunction("// turtle color", "turtle.color(255, i * 256 / 37, i * 256 / 37, 1);")));
-    Clerk.write(Interaction.button("Green", Interaction.eventFunction("// turtle color", "turtle.color(i * 256 / 37, 255, i * 256 / 37, 1);")));
-    Clerk.write(Interaction.button("Blue", Interaction.eventFunction("// turtle color", "turtle.color(i * 256 / 37, i * 256 / 37, 255, 1);")));
+    Clerk.write(Interaction.button("Red", Interaction.eventFunction("./examples/Interactions.java", "// turtle color", "turtle.color(255, i * 256 / 37, i * 256 / 37, 1);")));
+    Clerk.write(Interaction.button("Green", Interaction.eventFunction("./examples/Interactions.java", "// turtle color", "turtle.color(i * 256 / 37, 255, i * 256 / 37, 1);")));
+    Clerk.write(Interaction.button("Blue", Interaction.eventFunction("./examples/Interactions.java", "// turtle color", "turtle.color(i * 256 / 37, i * 256 / 37, 255, 1);")));
     
     Clerk.markdown(Text.fillOut(
         """

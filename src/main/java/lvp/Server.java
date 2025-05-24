@@ -27,6 +27,9 @@ import lvp.logging.Logger;
 
 
 public class Server {
+    private enum ReplacementType {
+        Single, Multi, Block
+    }
 
     private final HttpServer httpServer;
 
@@ -103,8 +106,8 @@ public class Server {
     private void handleInteract(HttpExchange exchange) throws IOException {
         String message = readRequestBody(exchange);
         if (message == null) return;
-        String[] parts = message.split(":", 3);
-        if (parts.length != 3) {
+        String[] parts = message.split(":", 4);
+        if (parts.length != 4) {
             exchange.sendResponseHeaders(400, -1); // Bad Request
             exchange.close();
             Logger.logError("Illegal interaction message: " + message);
@@ -116,8 +119,18 @@ public class Server {
 
         String path = new String(Base64.getDecoder().decode(parts[0]), StandardCharsets.UTF_8);
         String label = new String(Base64.getDecoder().decode(parts[1]), StandardCharsets.UTF_8);
-        String replacement = new String(Base64.getDecoder().decode(parts[2]), StandardCharsets.UTF_8);
-        updateFile(path, label, replacement);
+
+        Optional<ReplacementType> rType = Arrays.stream(ReplacementType.values())
+            .filter(r -> r.name().toLowerCase().equals(parts[2]))
+            .findFirst();
+
+        if (rType.isEmpty()) {
+            Logger.logError("ReplacementType not found: + " + message);
+            return;
+        }
+        
+        String replacement = new String(Base64.getDecoder().decode(parts[3]), StandardCharsets.UTF_8);
+        updateFile(path, label, rType.get(), replacement);
     }
 
     private void handleEvents(HttpExchange exchange) throws IOException {
@@ -169,7 +182,7 @@ public class Server {
             .findFirst();
 
         if (event.isEmpty()) {
-            Logger.logError(message);
+            Logger.logError("SSEType not found: + " + message);
             return;
         }
 
@@ -278,23 +291,64 @@ public class Server {
         return null;
     }
 
-    private void updateFile(String path, String label, String replacement) {
+    private void updateFile(String path, String label, ReplacementType rType, String replacement) {
         try {
             Path filePath = Path.of(path);
             List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-            for (int i = 0; i < lines.size(); i++) {
-                if (lines.get(i).trim().endsWith(label)) {
-                    String line = lines.get(i);
-                    int spaces = (int) IntStream.range(0, line.length())
-                        .takeWhile(pos -> line.charAt(pos) == ' ')
-                        .count();
-                    lines.set(i, " ".repeat(spaces) + replacement + " " + label);
-                }
-           }
+            switch (rType) {
+                case Single:
+                    updateSingleLine(lines, label, replacement);
+                    break;
+                case Multi:
+                    updateMultiLine(lines, label, replacement);
+                    break;
+                default:
+                    break;
+            }
             Files.write(filePath, lines, StandardCharsets.UTF_8);
         } catch (IOException e) {
             Logger.logError("Error updating file: " + path, e);
         }
+    }
+
+    private void updateSingleLine(List<String> lines, String label, String replacement) {
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).trim().endsWith(label)) {
+                String line = lines.get(i);
+                int spaces = (int) IntStream.range(0, line.length())
+                    .takeWhile(pos -> line.charAt(pos) == ' ')
+                    .count();
+                lines.set(i, " ".repeat(spaces) + replacement + " " + label);
+            }
+        }
+    }
+
+    private void updateMultiLine(List<String> lines, String label, String replacement) {
+        int openingLabel = -1;
+        int closingLabel = -1;
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).trim().equals(label)) {
+                if (openingLabel == -1) {
+                    openingLabel = i;
+                } else {
+                    closingLabel = i;
+                    break;
+                }
+            }
+        }
+        if (openingLabel == -1 || closingLabel == -1) {
+            Logger.logError("Labels not found for multi-line replacement: " + label);
+            return;
+        }
+        if (closingLabel <= openingLabel) {
+            Logger.logError("Closing label is before opening label for multi-line replacement: " + label);
+            return;
+        }
+
+        for (int i = openingLabel + 1; i < closingLabel; i++) {
+            lines.remove(openingLabel + 1);
+        }
+        lines.add(openingLabel + 1, replacement);
     }
 
     public void stop() {

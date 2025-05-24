@@ -1,8 +1,6 @@
 function convertCodeBlock (renderer) {
     return function wrapRenderer(tokens, idx, options, env, slf) {
         const original = renderer(tokens, idx, options, env, slf)
-            .replace(/<pre class="/g, '<pre class="custom ')
-            .replace(/<pre>/g, '<pre class="custom">')
             .replace(/src-info:(.*?)\|\|\|/g, '');
         const match = tokens[idx].content.match(/src-info:(.*?)(\|\|\|)/s);
         const content = tokens[idx].content.replace(/src-info:(.*?)\|\|\|/g, ' ');    
@@ -25,10 +23,7 @@ function editCodeBlock(element) {
         codeEditor.style.display = 'block';
         element.textContent = 'Save Code';
     } else {
-        console.log(element.id);
-        console.log(codeEditor.value);
-        
-        // fetch 
+        fetch("interact", { method: "post", body: `${element.id}:${btoa(String.fromCharCode(...new TextEncoder().encode(codeEditor.value.trim())))}` }).catch(console.error);
     }
 }
 
