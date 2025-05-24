@@ -7,9 +7,9 @@ function convertCodeBlock (renderer) {
         const match = tokens[idx].content.match(/src-info:(.*?)(\|\|\|)/s);
         const content = tokens[idx].content.replace(/src-info:(.*?)\|\|\|/g, ' ');    
         
-        return `<div>` + original +
+        return match != null ? `<div>` + original +
             `<textarea style="display: none; width: 700px; height: 150px">${content}</textarea>` +
-            `<button id=${match[1]} onclick="editCodeBlock(this)">Edit Code</button>` + `</div>`;
+            `<button id=${match[1]} onclick="editCodeBlock(this)">Edit Code</button>` + `</div>` : original;
     }
     
 }
