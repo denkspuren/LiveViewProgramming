@@ -156,9 +156,9 @@ public class Turtle implements Clerk{
                     const statusCurrent = document.getElementById("currentLine${0}");
                     statusCurrent.textContent = n;
                     const svgElement = document.getElementById("turtle${0}");
-                    const lineIds = Array.from(svgElement.querySelectorAll("[id]")).map(el => el.id);
+                    const lineIds = Array.from(svgElement.querySelectorAll("[svg-id]")).map(el => el.getAttribute("svg-id"));
                     lineIds.forEach((id,i) => {
-                        const el = document.getElementById(id);
+                        const el = svgElement.querySelector(`[svg-id="` + id + `"]`);
                         if (el) el.style.display = i < n ? "" : "none";
                     });
                 })(event)
@@ -213,7 +213,7 @@ public class Turtle implements Clerk{
                 
                 yield String.format(Locale.US,
                     """
-                        <line id="%d" x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"
+                        <line svg-id="%d" x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"
                             stroke="rgba(%d,%d,%d,%.2f)" stroke-width="%.2f" />
                     """,
                     line.id(), line.x1(), y1Svg, line.x2(), y2Svg,
@@ -224,7 +224,7 @@ public class Turtle implements Clerk{
                 double ySvg = (viewHeight - (text.y() - yFrom)) + yFrom;
                 yield String.format(Locale.US,
                     """
-                        <text id="%d" x="%.2f" y="%.2f" dx="%.2f" dy="%.2f"
+                        <text svg-id="%d" x="%.2f" y="%.2f" dx="%.2f" dy="%.2f"
                             style="color: rgba(%d,%d,%d,%.2f); font:%s;">%s</text>
                     """,
                     text.id(), text.x(), ySvg, text.dx(), text.dy(),
