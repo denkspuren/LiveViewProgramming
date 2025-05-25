@@ -7,7 +7,7 @@ function convertCodeBlock (renderer) {
         
         return match != null ? `<div>` + original +
             `<textarea style="display: none; width: 700px; height: 150px">${content}</textarea>` +
-            `<button id=${match[1]} onclick="editCodeBlock(this)">Edit Code</button>` + `</div>` : original;
+            `<button id=${match[1]} onclick="editCodeBlock(this)" style="padding: 5px 10px">Edit Code</button>` + `</div>` : original;
     }
     
 }
