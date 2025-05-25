@@ -344,11 +344,15 @@ public class Server {
             Logger.logError("Closing label is before opening label for multi-line replacement: " + label);
             return;
         }
+        String startingLine = lines.get(openingLabel + 1);
+        int spaces = (int) IntStream.range(0, startingLine.length())
+                    .takeWhile(pos -> startingLine.charAt(pos) == ' ')
+                    .count();
 
         for (int i = openingLabel + 1; i < closingLabel; i++) {
             lines.remove(openingLabel + 1);
         }
-        lines.add(openingLabel + 1, replacement);
+        lines.add(openingLabel + 1, " ".repeat(spaces) + replacement);
     }
 
     public void stop() {
