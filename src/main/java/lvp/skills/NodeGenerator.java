@@ -200,7 +200,7 @@ public class NodeGenerator {
 
     @Override
     public String toString() {
-        return root.toString();
+        return  "digraph G {\n" + root.toString() + "}";
     }
 
     private Field[] combineFields(Class classToBeInspected, Field[] fields) {

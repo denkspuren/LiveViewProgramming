@@ -25,7 +25,7 @@ public class Dot implements Clerk {
 
     public Dot draw(String dotString) {
         String escaped = dotString.replaceAll("\\\"", "\\\\\"").replaceAll("\\n", "");
-        Clerk.script("clerk.dot" + ID + ".draw(\"dinetwork{" + escaped + "}\")");
+        Clerk.script("clerk.dot" + ID + ".draw(\"" + escaped + "\")");
         return this;
     }
 }
