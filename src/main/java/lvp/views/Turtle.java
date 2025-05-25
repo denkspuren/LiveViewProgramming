@@ -23,7 +23,7 @@ import lvp.skills.Text;
 public class Turtle implements Clerk{
     public final String ID = Clerk.getHashID(this);
     private final double xFrom, yFrom, viewWidth, viewHeight;
-    private final List<Line> lines = new ArrayList<>();
+    private final List<Element> elements = new ArrayList<>();
     private int elementCounter = 0;
     private State state;
     private final Deque<State> stack = new ArrayDeque<>();
@@ -65,7 +65,7 @@ public class Turtle implements Clerk{
         double newX = state.x() + dx;
         double newY = state.y() + dy;
         if (state.penDown()) {
-            lines.add(new Line(++elementCounter,
+            elements.add(new Line(++elementCounter,
                     state.x(), state.y(), newX, newY,
                     state.color(), state.width()));
         }
@@ -106,6 +106,20 @@ public class Turtle implements Clerk{
         return color(r, g, b, state.color().a());
     }
 
+    public Turtle text(String text) {
+        return text(text, "16px sans-serif");
+    }
+
+    public Turtle text(String text, String font) {
+        double rad = Math.toRadians(state.angle());
+        double dx = Math.cos(rad);
+        double dy = Math.sin(rad);
+
+        elements.add(new SvgText(++elementCounter, text,
+                state.x(), state.y(), dx, dy, state.color(), font));
+        return this;
+    }
+
     public Turtle width(double w) {
         state = state.withWidth(w);
         return this;
@@ -134,9 +148,9 @@ public class Turtle implements Clerk{
                 <div>
                     Linien sichtbar: <span id="currentLine${0}">${1}</span> / <span>${1}</span>
                 </div>
-                """, ID, lines.size()));
+                """, ID, elements.size()));
         Clerk.write(
-            Interaction.slider(ID, 0, lines.size(), lines.size(), Text.fillOut("""
+            Interaction.slider(ID, 0, elements.size(), elements.size(), Text.fillOut("""
                 ((e) => {
                     const n = e.target.value;
                     const statusCurrent = document.getElementById("currentLine${0}");
@@ -164,19 +178,8 @@ public class Turtle implements Clerk{
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="%.2f %.2f %.2f %.2f">
                     """, xFrom, yFrom, viewWidth, viewHeight)
             );
-            for (Line e : lines) {
-                // Adapt coordinates for SVG
-                double y1Svg = (viewHeight - (e.y1() - yFrom)) + yFrom;
-                double y2Svg = (viewHeight - (e.y2() - yFrom)) + yFrom;
-                writer.write(
-                    String.format(Locale.US,
-                        """
-                          <line id="%d" x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"
-                                stroke="rgba(%d,%d,%d,%.2f)" stroke-width="%.2f" />
-                        """,
-                        e.id(), e.x1(), y1Svg, e.x2(), y2Svg,
-                        e.color().r(), e.color().g(), e.color().b(), e.color().a(),
-                        e.width()));
+            for (Element e : elements) {
+                writer.write(elementString(e));
             }
             writer.write("</svg>\n");
         }
@@ -192,22 +195,43 @@ public class Turtle implements Clerk{
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="%.2f %.2f %.2f %.2f">
         """, xFrom, yFrom, viewWidth, viewHeight);
 
-        for (Line e : lines) {
-            // Adapt coordinates for SVG
-            double y1Svg = (viewHeight - (e.y1() - yFrom)) + yFrom;
-            double y2Svg = (viewHeight - (e.y2() - yFrom)) + yFrom;
-            out += String.format(Locale.US,
-                    """
-                      <line id="%s%d" x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"
-                            stroke="rgba(%d,%d,%d,%.2f)" stroke-width="%.2f" />
-                    """,
-                    ID, e.id(), e.x1(), y1Svg, e.x2(), y2Svg,
-                    e.color().r(), e.color().g(), e.color().b(), e.color().a(),
-                    e.width());
+        
+        for (Element e : elements) {
+            out += elementString(e);
         }
+        
 
         out += "</svg>\n";
         return out;
+    }
+
+    private String elementString(Element e) {
+        return switch (e) {
+            case Line line -> {
+                double y1Svg = (viewHeight - (line.y1() - yFrom)) + yFrom;
+                double y2Svg = (viewHeight - (line.y2() - yFrom)) + yFrom;
+                
+                yield String.format(Locale.US,
+                    """
+                        <line id="%d" x1="%.2f" y1="%.2f" x2="%.2f" y2="%.2f"
+                            stroke="rgba(%d,%d,%d,%.2f)" stroke-width="%.2f" />
+                    """,
+                    line.id(), line.x1(), y1Svg, line.x2(), y2Svg,
+                    line.color().r(), line.color().g(), line.color().b(), line.color().a(),
+                    line.width());
+            }
+            case SvgText text -> {
+                double ySvg = (viewHeight - (text.y() - yFrom)) + yFrom;
+                yield String.format(Locale.US,
+                    """
+                        <text id="%d" x="%.2f" y="%.2f" dx="%.2f" dy="%.2f"
+                            style="color: rgba(%d,%d,%d,%.2f); font:%s;">%s</text>
+                    """,
+                    text.id(), text.x(), ySvg, text.dx(), text.dy(),
+                    text.color().r(), text.color().g(), text.color().b(), text.color().a(),
+                    text.font(), text.text());
+            }
+        };
     }
 
     private static record State(double x, double y, double angle, Color color, double width, boolean penDown) {
@@ -228,7 +252,11 @@ public class Turtle implements Clerk{
         }
     }
 
-    private static record Line(int id, double x1, double y1, double x2, double y2, Color color, double width) {}
+    private static record Line(int id, double x1, double y1, double x2, double y2, Color color, double width) implements Element {}
+
+    private static record SvgText(int id, String text, double x, double y, double dx, double dy, Color color, String font) implements Element {}
 
     private static record Color(int r, int g, int b, double a) {}
+
+    public sealed interface Element permits Line, SvgText {}
 }
