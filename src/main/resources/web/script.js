@@ -60,6 +60,12 @@ function setUp() {
             element.removeChild(element.firstChild);
           }
 
+          const errors = document.getElementById("errors");
+          errors.style.display = "none";
+          while (errors.firstChild) {
+            errors.removeChild(errors.firstChild);
+          }
+
           const toRemove = [];
           for (const node of document.body.children) {
             if (node.classList == null || !node.classList.contains("persistent")) {
@@ -76,6 +82,15 @@ function setUp() {
         }
         case "DEBUG":
           debug = true;
+          break;
+        case "LOG":
+          const newElement = document.createElement("div");
+          newElement.innerText = data;
+          const errors = document.getElementById("errors")
+          errors.appendChild(newElement);
+          errors.style.display = "block";
+          scrollPosition = 0;
+          window.scrollTo(0, 0);
           break;
         default:
           errorLog("Unknown Action");

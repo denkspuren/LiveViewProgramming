@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -151,20 +152,20 @@ public class Server {
 
     public void read(String message) {
         String[] parts = message.split(":", 2);
-        if (parts.length != 2) return;
-
-        Optional<SSEType> event = Arrays.stream(SSEType.values())
-            .filter(sseType -> sseType.name().equals(parts[0]))
-            .findFirst();
-
-        if (event.isEmpty()) {
-            Logger.logError("SSEType not found: + " + message);
-            return;
+        Optional<SSEType> event = Optional.empty();
+        if (parts.length == 2) {
+            event = Arrays.stream(SSEType.values())
+                .filter(sseType -> sseType.name().equals(parts[0]))
+                .findFirst();
         }
+        if (event.isEmpty()) Logger.logError("Error: + " + message);
 
-        events.add(new EventMessage(event.get(), parts[1]));
+        SSEType eventMessage = event.orElse(SSEType.LOG);
+        String data = event.isEmpty() ? Base64.getEncoder().encodeToString(message.getBytes(StandardCharsets.UTF_8)) : parts[1];
+
+        events.add(new EventMessage(eventMessage, data));
         if (webClients.size() == 0) return;        
-        sendServerEvent(event.get(), parts[1]);
+        sendServerEvent(eventMessage, data);
     }
 
     public void sendServerEvent(SSEType sseType, String data) {
