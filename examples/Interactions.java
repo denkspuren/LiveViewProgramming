@@ -1,7 +1,6 @@
 import lvp.Clerk;
 import lvp.views.*;
 import lvp.skills.*;
-import lvp.skills.NodeGenerator;
 
 public class TestClass {
     public TestClass child;
@@ -20,7 +19,7 @@ public void main() {
     Clerk.markdown("## Dot Example with Object Inspector");
     TestClass t1 = new TestClass(null, 1);
     TestClass t2 = new TestClass(t1, 2);
-    NodeGenerator ng = NodeGenerator.inspect(t2, "t2");
+    ObjectInspector ng = ObjectInspector.inspect(t2, "t2");
     Dot d = new Dot(1200, 500);
     d.draw(ng.toString());
 

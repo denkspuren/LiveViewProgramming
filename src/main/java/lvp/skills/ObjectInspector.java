@@ -117,7 +117,7 @@ class ArrayNode extends ObjectNode_425 {
     }
 }
 
-public class NodeGenerator {
+public class ObjectInspector {
     private int nodeCounter = 0; //used to generate an unique node name
         
     // save inspected objects to prevent infinite loops in case of recursion and identify already used objects 
@@ -127,7 +127,7 @@ public class NodeGenerator {
 
     private boolean hideGeneratedVars, inspectSuperClasses;
 
-    private NodeGenerator(){}
+    private ObjectInspector(){}
 
     /**
      * Inspect the object using reflections and store it in a tree structure of Nodes
@@ -136,7 +136,7 @@ public class NodeGenerator {
      * @param identifier - variable name referencing the object 
      * @return instance of NodeGenerator
      */
-    public static NodeGenerator inspect(Object objectToBeInspected, String identifier) {
+    public static ObjectInspector inspect(Object objectToBeInspected, String identifier) {
         return inspect(objectToBeInspected, identifier, true, true);
     }
 
@@ -148,7 +148,7 @@ public class NodeGenerator {
      * @param inspectSuperClasses - true -> super class fields are inspected too
      * @return instance of NodeGenerator
      */
-    public static NodeGenerator inspect(Object objectToBeInspected, String identifier, boolean inspectSuperClasses) {
+    public static ObjectInspector inspect(Object objectToBeInspected, String identifier, boolean inspectSuperClasses) {
         return inspect(objectToBeInspected, identifier, inspectSuperClasses, true);
     }
 
@@ -161,9 +161,9 @@ public class NodeGenerator {
      * @param hideGeneratedVars - true -> compiler generated vars are hidden
      * @return instance of NodeGenerator
      */
-    public static NodeGenerator inspect(Object objectToBeInspected, String identifier, boolean inspectSuperClasses, boolean hideGeneratedVars) {
+    public static ObjectInspector inspect(Object objectToBeInspected, String identifier, boolean inspectSuperClasses, boolean hideGeneratedVars) {
         assert !objectToBeInspected.getClass().getPackageName().startsWith("java") : "Can't inspect Java owned objects!";
-        NodeGenerator g = new NodeGenerator();
+        ObjectInspector g = new ObjectInspector();
         g.hideGeneratedVars = hideGeneratedVars;
         g.inspectSuperClasses = inspectSuperClasses;
         g.root = g.objectReferenceToNodeTree(objectToBeInspected, identifier, true, false);
