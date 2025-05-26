@@ -59,6 +59,7 @@
             <archive>
               <manifest>
                 <mainClass>lvp.Main</mainClass>
+                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               </manifest>
             </archive>
           </configuration>

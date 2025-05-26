@@ -4,6 +4,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import lvp.logging.LogLevel;
 import lvp.logging.Logger;
@@ -13,6 +18,10 @@ public class Main {
     public static void main(String[] args) {
         Config cfg = parseArgs(args);
         Logger.setLogLevel(cfg.logLevel());
+
+        if (!isLatestRelease()) {
+            System.out.println("Warning: You are not using the latest release of Live View Programming. Please visit https://github.com/denkspuren/LiveViewProgramming/releases");
+        }
         
         try {
             Server server = new Server(Math.abs(cfg.port()), cfg.logLevel().equals(LogLevel.Debug));
@@ -81,5 +90,37 @@ public class Main {
         return new Config(path, fileNamePattern != null ? fileNamePattern : fileName.toString(), port, logLevel);
     }
 
+    public static boolean isLatestRelease() {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://api.github.com/repos/denkspuren/LiveViewProgramming/releases/latest"))
+                .header("Accept", "application/vnd.github+json")
+                .header("X-GitHub-Api-Version", "2022-11-28")
+                .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                Logger.logDebug("Failed to fetch latest release: " + response.statusCode());
+                return true;
+            }
+            String latestTag = extractJsonField(response.body(), "tag_name");
+            String currentVersion = Main.class.getPackage().getImplementationVersion();
+            Logger.logDebug("Latest release tag: " + latestTag);
+            Logger.logDebug("Current Version: " + currentVersion);
+            return latestTag == null || latestTag.equals(currentVersion);
+        } catch (Exception e) {
+            Logger.logDebug("Error checking latest release: " + e.getMessage());
+            return true;
+        }
+    }
 
+    public static String extractJsonField(String json, String field) {
+        Matcher matcher = java.util.regex.Pattern
+            .compile("\"" + field + "\"\\s*:\\s*\"([^\"]+)\"")
+            .matcher(json);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
 }
