@@ -28,6 +28,13 @@ public class Turtle implements Clerk{
     private State state;
     private final Deque<State> stack = new ArrayDeque<>();
 
+    public Turtle() {
+        this(500, 500);
+    }
+    public Turtle(int width, int height) {
+        this(0, width, 0, height, width / 2.0, height / 2.0, 0);        
+    }
+
     /**
      * @param xFrom      linke Begrenzung des Sichtbereichs
      * @param xTo        rechte Begrenzung des Sichtbereichs
@@ -118,6 +125,10 @@ public class Turtle implements Clerk{
         elements.add(new SvgText(++elementCounter, text,
                 state.x(), state.y(), dx, dy, state.color(), font));
         return this;
+    }
+
+    public Turtle lineWidth(double w) {
+        return width(w);
     }
 
     public Turtle width(double w) {
