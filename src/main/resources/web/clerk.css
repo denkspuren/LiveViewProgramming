@@ -52,6 +52,8 @@ pre {
     background-color: #eee;
     padding: 10px;
     overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 
 table {
