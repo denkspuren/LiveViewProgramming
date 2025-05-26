@@ -13,10 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.IntStream;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -30,7 +26,6 @@ public class Server {
     private enum ReplacementType {
         Single, Multi, Block
     }
-
     private record EventMessage(SSEType event, String data) {}
 
     private final HttpServer httpServer;
@@ -43,13 +38,7 @@ public class Server {
     static int getDefaultPort() { return defaultPort; }
 
     public List<HttpExchange> webClients;
-    List<String> paths = new CopyOnWriteArrayList<>();
     List<EventMessage> events = new CopyOnWriteArrayList<>();
-
-    // lock required to temporarily block processing of `SSEType.LOAD`
-    Lock lock = new ReentrantLock();
-    Condition loadEventOccurredCondition = lock.newCondition();
-    boolean loadEventOccured = false;
 
     boolean isVerbose = false;
 
@@ -61,7 +50,6 @@ public class Server {
         httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
 
-        httpServer.createContext("/loaded", this::handleLoaded);
         httpServer.createContext("/log", this::handleLog);
         httpServer.createContext("/interact", this::handleInteract);
         httpServer.createContext("/events", this::handleEvents);
@@ -69,23 +57,6 @@ public class Server {
 
         httpServer.setExecutor(Executors.newFixedThreadPool(5));
         httpServer.start();
-    }
-
-    private void handleLoaded(HttpExchange exchange) throws IOException {
-        if (!exchange.getRequestMethod().equalsIgnoreCase("post")) {
-            Logger.logError("Method not allowed in '/loaded'");
-            exchange.sendResponseHeaders(405, -1); // Method Not Allowed
-            return;
-        }
-        exchange.sendResponseHeaders(200, 0);
-        exchange.close();
-        lock.lock();
-        try {
-            loadEventOccured = true;
-            loadEventOccurredCondition.signalAll();
-        } finally {
-            lock.unlock();
-        }
     }
 
     private void handleLog(HttpExchange exchange) throws IOException {
@@ -152,7 +123,6 @@ public class Server {
         if (isVerbose) sendMessageToClient(exchange, SSEType.DEBUG, "");
 
         webClients.add(exchange);
-        sendLoads(exchange);
         if (events.size() > 0) {
             events.forEach(event -> sendMessageToClient(exchange, event.event, event.data));
         }
@@ -192,60 +162,13 @@ public class Server {
             return;
         }
 
-        
-        if (webClients.size() == 0) {
-            events.add(new EventMessage(event.get(), parts[1]));
-            return;
-        }
-        
-        if (event.get().equals(SSEType.LOAD)) {
-            if (!paths.contains(parts[1])) load(parts[1]);
-        } else {
-            events.add(new EventMessage(event.get(), parts[1]));
-            sendServerEvent(event.get(), parts[1]);
-        }
-    }
-
-    public void load(String data) {
-        if (paths.contains(data)) return;
-        lock.lock();
-        loadEventOccured = false;
-
-        try {
-            sendServerEvent(SSEType.LOAD, data);
-
-            loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
-            if (loadEventOccured) paths.add(data);
-            else Logger.logError("LOAD-Timeout: " + data);
-        } catch (InterruptedException e) {
-            Logger.logError("LOAD-Interruption: " + data, e);
-        } finally {
-            lock.unlock();
-        }
+        events.add(new EventMessage(event.get(), parts[1]));
+        if (webClients.size() == 0) return;        
+        sendServerEvent(event.get(), parts[1]);
     }
 
     public void sendServerEvent(SSEType sseType, String data) {
         webClients.removeIf(connection -> !sendMessageToClient(connection, sseType, data));
-    }
-
-    public void sendLoads(HttpExchange connection) {
-        if(paths.size() == 0) return;
-
-        Logger.logInfo("Sending " + paths.size() + " paths to '" + connection.getRemoteAddress() + "'...");
-        lock.lock();
-        for (String path : paths) {
-            loadEventOccured = false;
-            
-            try {
-                sendMessageToClient(connection, SSEType.LOAD, path);
-                loadEventOccurredCondition.await(1_000, TimeUnit.MILLISECONDS);
-                if (!loadEventOccured) System.err.println("LOAD-Timeout: " + path);
-            } catch (InterruptedException e) {
-                Logger.logError("LOAD-Interruption: " + path, e);
-            }
-        }
-        lock.unlock();
-        Logger.logInfo("Successfully sent " + paths.size() + " paths to '" + connection.getRemoteAddress() + "'");
     }
 
     private boolean sendMessageToClient(HttpExchange connection, SSEType event, String data) {
