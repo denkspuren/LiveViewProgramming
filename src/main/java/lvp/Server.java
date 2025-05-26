@@ -100,7 +100,7 @@ public class Server {
             .findFirst();
 
         if (rType.isEmpty()) {
-            Logger.logError("ReplacementType not found: + " + message);
+            Logger.logError("ReplacementType not found: " + message);
             return;
         }
         

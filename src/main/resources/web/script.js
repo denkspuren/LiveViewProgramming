@@ -86,7 +86,7 @@ function setUp() {
         case "LOG":
           const newElement = document.createElement("div");
           newElement.innerText = data;
-          const errors = document.getElementById("errors")
+          const errors = document.getElementById("errors");
           errors.appendChild(newElement);
           errors.style.display = "block";
           scrollPosition = 0;

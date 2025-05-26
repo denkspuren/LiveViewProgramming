@@ -33,7 +33,7 @@ public class Main {
                 watcher.watchLoop(server);
             }
         } catch (IOException e) {
-            System.err.println("Fehler beim Starten des Servers: " + e.getMessage());
+            System.err.println("Error starting server: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }
@@ -68,6 +68,11 @@ public class Main {
                     try { port = Integer.parseInt(arg.trim()); } catch(NumberFormatException _) {}
                     break;
             }
+        }
+
+        if (port < 1 || port > 65535) {
+            System.err.println("Error: Invalid port number. Must be between 1 and 65535.");
+            System.exit(1);
         }
 
         if (path == null) return new Config(null, null, port, logLevel);
