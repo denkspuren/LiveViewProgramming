@@ -1,48 +1,11 @@
 const loadedDiv = document.getElementById('loadMessage');
 
 let debug = false;
-let locks = [];
+let scrollPosition = 0;
+
+const clerk = {}; // Scope for declarations
 
 
-function loadScript(src, onError = () => {
-  errorLog(`script loading failed: ${src}`);
-  loadedDiv.style.display = 'none';
-}) {
-  loadedDiv.style.display = 'block';
-  
-  var script = document.createElement('script');
-  script.src = src;
-  script.onload = function() {
-    script.classList.add("persistent");
-    fetch("/loaded", {method: "post"}).catch(console.error);
-    debugLog(`script loaded: ${src}`);
-    loadedDiv.style.display = 'none';
-  };
-  script.onerror = onError;
-  document.body.appendChild(script);
-}
-
-function loadScriptWithFallback(mainSrc, alternativeSrc) {
-  loadScript(mainSrc, function() {
-    debugLog('loading', mainSrc, 'failed, trying', alternativeSrc);
-    loadScript(alternativeSrc);
-  });
-}
-
-/**
- * Attempts to lock an event listener for the given ID until the associated callback 
- * is executed on the server. Prevents duplicate event handling.
- * 
- * @param {string} id - Unique identifier for the event listener.
- * @returns {boolean} - false if the listener is already locked;
- *                      true if the lock was successfully acquired.
- */
-
-function lockAndCheck(id) {
-  if (locks.includes(id)) return false;
-  locks.push(id);
-  return true;
-}
 
 // Logs debug messages to both server and browser console when debug mode is active
 function debugLog(message) {
@@ -90,17 +53,17 @@ function setUp() {
           document.getElementById("events").appendChild(newElement);
           break;
         }
-        case "LOAD": {
-          var srcs = data.split(',');
-          srcs = srcs.map(src => src.trim());
-          if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
-          else loadScript(data);
-          break;
-        }
         case "CLEAR": {
+          scrollPosition = window.scrollY;
           const element = document.getElementById("events");
           while (element.firstChild) {
             element.removeChild(element.firstChild);
+          }
+
+          const errors = document.getElementById("errors");
+          errors.style.display = "none";
+          while (errors.firstChild) {
+            errors.removeChild(errors.firstChild);
           }
 
           const toRemove = [];
@@ -111,17 +74,31 @@ function setUp() {
           }
           toRemove.forEach(x => document.body.removeChild(x));
           
+          for (const prop of Object.getOwnPropertyNames(clerk)) {
+            delete clerk[prop];
+          }
+          
           break;
         }
-        case "RELEASE":
-          locks = locks.filter(lock => lock !== data);
-          break;
         case "DEBUG":
           debug = true;
+          break;
+        case "LOG":
+          const newElement = document.createElement("div");
+          newElement.innerText = data;
+          const errors = document.getElementById("errors");
+          errors.appendChild(newElement);
+          errors.style.display = "block";
+          scrollPosition = 0;
+          window.scrollTo(0, 0);
           break;
         default:
           errorLog("Unknown Action");
           break;
+      }
+
+      if (scrollPosition > 0) {
+        window.scrollTo(0, scrollPosition);
       }
     };
 
@@ -136,6 +113,27 @@ function setUp() {
   }
 }
 
-setUp();
+document.addEventListener("DOMContentLoaded", () => {
+  window.md = markdownit({
+      highlight: function (str, lang) {
+          if (lang && hljs.getLanguage(lang)) {
+              try {
+                  return hljs.highlight(str, { language: lang }).value;
+              } catch (__) {}
+          }
+          return ''; // use external default escaping
+      },
+      html: true,
+      linkify: true,
+      typographer: true
+  });
+  window.md.use(window.mathjax3);
+
+  window.md.renderer.rules.code_block = convertCodeBlock(window.md.renderer.rules.code_block);
+  window.md.renderer.rules.code_inline = convertCodeBlock(window.md.renderer.rules.code_inline);
+  window.md.renderer.rules.fence = convertCodeBlock(window.md.renderer.rules.fence);  
+
+  setUp();
+});
 
 // https://samthor.au/2020/understanding-load/

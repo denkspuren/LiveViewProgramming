@@ -1,42 +1,28 @@
 package lvp;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Random;
-
-import lvp.logging.LogLevel;
-import lvp.logging.Logger;
 import java.util.stream.Collectors;
 
 import lvp.views.MarkdownIt;
 
 public interface Clerk {
-    static String generateID(int n) { // random alphanumeric string of size n
+    public static String generateID(int n) { // random alphanumeric string of size n
         return new Random().ints(n, 0, 36).
                             mapToObj(i -> Integer.toString(i, 36)).
                             collect(Collectors.joining());
     }
 
-    static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
+    public static String getHashID(Object o) { return Integer.toHexString(o.hashCode()); }
 
-    static Server serve(int port) { return Server.onPort(port); }
-    static Server serve() { return serve(Server.getDefaultPort()); }
 
-    static void write(Server server, String html)        { server.sendServerEvent(SSEType.WRITE, html); }
-    static void call(Server server, String javascript)   { server.sendServerEvent(SSEType.CALL, javascript); }
-    static void script(Server server, String javascript) { server.sendServerEvent(SSEType.SCRIPT, javascript); }
-    static void load(Server server, String path) {
-        if (!server.paths.contains(path.trim())) server.load(path);
-    }
-    static void load(Server server, String onlinePath, String offlinePath) {
-        load(server, onlinePath + ", " + offlinePath);
-    }
-    static void clear(Server server) { server.sendServerEvent(SSEType.CLEAR, ""); }
-    static void clear() { clear(serve()); };
+    public static void write(String html)        { out(SSEType.WRITE, html); }
+    public static void call(String javascript)   { out(SSEType.CALL, javascript); }
+    public static void script(String javascript) { out(SSEType.SCRIPT, javascript); }
+    public static void clear() { out(SSEType.CLEAR, ""); }
 
-    static void markdown(String text) { new MarkdownIt(serve()).write(text); }
+    public static void markdown(String text) { new MarkdownIt().write(text); }
 
-    static void debugMode(Server server) { debugMode(server, false); }
-    static void debugMode(Server server, boolean isVerbose) {
-        Logger.setLogLevel(isVerbose ? LogLevel.Debug : LogLevel.Info);
-        if(isVerbose) server.sendServerEvent(SSEType.DEBUG, "");
-    }
+    public static void out(SSEType event, String data) { System.out.println(event + ":" + Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8))); }
 }

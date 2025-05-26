@@ -1,6 +1,73 @@
-# _Live View Programming_ mit Java und der JShell
+# _Live View Programming_ mit Java
 
 Das _Live View Programming_ (LVP) bietet Ihnen für die Java- bzw. JShell-Programmierung _Views_ und _Skills_ an. Views sind dazu da, um mediale Inhalte im Web-Browser darzustellen, also Texte, Bilder, Grafiken, Videos, inteaktive Animationen etc. Skills stellen nützliche Fähigkeiten bereit, die man in Kombination mit Views (z.B. zur Dokumentation von Code) gebrauchen kann.
+
+## 🚀 Nutze das _Live View Programming_
+
+Wenn Sie das _Live View Programming_ ausprobieren möchten, ist Folgendes zu tun:
+
+### 1. Lade die `.jar`-Datei herunter
+
+* Stellen Sie sicher, dasss Sie mit einem aktuellen JDK (Java Development Kit) arbeiten; es empfiehlt sich das [TemurinJDK](https://adoptium.net/temurin/releases/)
+* Laden Sie die aktuelle `.jar`-Datei herunter, die Ihnen als Asset zum [aktuellen Release](https://github.com/denkspuren/LiveViewProgramming/releases) als Download angeboten wird; die Datei hat den Namen `lvp-<Version>.jar`
+* Laden Sie `demo.java`-Datei herunter, die Ihnen ebenfalls als Asset zum [aktuellen Release](https://github.com/denkspuren/LiveViewProgramming/releases) als Download angeboten wird.
+
+### Die Alternative: `jar`-Datei selber erstellen
+
+Sie können die `.jar`-Datei auch selber generieren, wenn Sie zudem die Versionsverwaltungssoftware [Git](https://git-scm.com/) und das Build-Werkzeug [Maven](https://maven.apache.org/) installiert haben:
+
+* Laden Sie das Git-Repository herunter mit
+  ```
+  git clone https://github.com/denkspuren/LiveViewProgramming.git
+  ```
+* Nach dem Maven-Durchlauf finden Sie die `.jar`-Datei im `target`-Verzeichnis
+  ```
+  mvn clean package
+  ```  
+### 2. Starte den LVP-Server
+
+Passen Sie den Beispielaufruf an die aktuelle Version an:
+
+```
+java -jar lvp-<Version>.jar --log --watch=demo.java
+```
+
+Wenn Sie die Version `lvp-0.4.0.jar` heruntergeladen haben, lautet der Aufruf:
+
+```
+java -jar lvp-0.4.0.jar --log --watch=demo.java
+```
+
+#### Übersicht der möglichen Kommandozeilenargumente
+
+| Argument         | Alias   | Bedeutung                                 | Beispiel                                      |
+|------------------|---------|-------------------------------------------|-----------------------------------------------|
+| --watch=DATEI    | -w      | Zu überwachende Datei oder Verzeichnis     | --watch=path/to/<br>--watch=demo.java                  |
+| --pattern=PATTERN| -p      | Dateinamensmuster (z.B. *.java)           | --pattern=*.java                              |
+| --log[=LEVEL]    | -l      | Log-Level (Error, Info, Debug)            | --log=Debug                                   |
+| PORT             |         | Portnummer für den Server                 | 50001                                         |
+
+> Mehrere Argumente können kombiniert werden, z.B.:  
+> `java -jar lvp-<Version>.jar --watch=src --pattern=*.java --log=Debug 50001`
+
+### 3. So nutzt man das _Live View Programming_
+
+Die Datei `demo.java` dient als einfaches Beispiel für den Einstieg in das Live View Programming (LVP).  
+
+Damit LVP funktioniert, **muss der Server die Datei beobachten (watchen)** – sobald Änderungen erkannt werden, wird der Code automatisch neu ausgeführt und die Ausgabe aktualisiert.
+
+Innerhalb einer [`void main()`-Methode](https://openjdk.org/jeps/495) lassen sich interaktive Inhalte erzeugen, indem man Methoden des `Clerk`-Interfaces verwendet. Diese Inhalte werden anschließend im Browser angezeigt.
+
+**Beispiel:**
+
+```java
+import lvp.Clerk;
+
+void main() {
+    Clerk.markdown("# Hello World");
+}
+```
+Dieser einfache Aufruf rendert eine Markdown-Überschrift direkt im Browser. Weitere Ausgaben, Grafiken oder Interaktionen können durch zusätzliche Clerk-Methoden, Views oder Skills ergänzt werden.
 
 ## 💟 Motivation: Views bereichern das Programmieren
 
