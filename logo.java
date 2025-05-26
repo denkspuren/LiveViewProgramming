@@ -47,6 +47,7 @@ void main() {
 
     ```java
     ${0}
+    ...
     ${1}
     ```
 
@@ -63,6 +64,7 @@ void main() {
     myFirstTurtle = write(myFirstTurtle, "West").right(90);
     myFirstTurtle = edge(myFirstTurtle, 100, 5);
     myFirstTurtle = write(myFirstTurtle, "North").right(90);
+    myFirstTurtle.write();
     // myFirstTurtle
 
     Clerk.markdown(
@@ -92,6 +94,7 @@ void main() {
 
     ```java
     ${turtle_tree}
+    ...
     ${turtle_tree2}
     ```
 
@@ -113,6 +116,7 @@ void main() {
 
     // tree
     tree(turtle, 150);
+    turtle.write();
     // tree
 
     Clerk.markdown(
@@ -124,6 +128,7 @@ void main() {
 
     ```java
     ${0}
+    ...
     ${1}
     ```
     """, Text.cutOut("./logo.java", "// triangles"), Text.cutOut("./logo.java", "// triangles2")));
@@ -132,34 +137,8 @@ void main() {
     turtle = new Turtle(300,350);
 
     drawing(turtle, 100);
+    turtle.write();
     // triangles
-
-    Clerk.markdown(Text.fillOut(
-    """
-    ## Beispiel 4: Interaktivität mit Slider (Preview-Feature, _unstable_)
-
-    Es ist auch möglich, eine Turtle-Grafik mit einer Slider-View zu koppeln – und es entsteht eine interaktive Anwendung.
-
-    ```java
-    ${0}
-    ```
-
-    Das macht noch mehr Spaß! Die Zeichnungen werden auf Seiten des Java-Programms mit jeder Änderung am Slider neu erzeugt.
-
-    """, Text.cutOut("./logo.java", "// interactivity")));
-
-    // interactivity
-   Turtle interactiveTurtle = new Turtle(300, 350);
-
-    drawing(interactiveTurtle, (200.0 + 10.0) / 2.0);
-
-    // Slider slider = new Slider(Clerk.connect(), 10, 200);
-    // slider.attachTo(response -> {
-    //     double size = Double.parseDouble(response);
-    //     interactiveTurtle.reset();
-    //     drawing(interactiveTurtle, size);
-    // });
-    // interactivity
 
 
     Clerk.markdown("""
