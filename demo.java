@@ -12,21 +12,22 @@ void main() {
     # Interaktive LVP Demo
 
     ## Markdown
-    Das folgende Beispiel zeigt, wie ganz einfach Markdown-Text an den Broswser geschickt werden kann und dort als HTML gerendert wird.
+    Die Markdown-View erlaubt es, Markdown-Text direkt im Browser darzustellen. Der folgende Code zeigt ein einfaches Beispiel, wie Text im Markdown-Format 
+    an den Browser gesendet und dort automatisch als HTML gerendert wird:
     ```java
     ${0}
     ```
-    `Clerk.markdown(text)` elaubt den einfachen Zugriff auf die Markdown-View, um Markdown-Text an den Browser zu senden und dort als HTML zu rendern.
-    Zusätzlich werden in diesem Beispiel zwei Skills verwendet:
-    - `Text.fillOut(...)` zum Definieren von String-Vorlagen, die mit Auswertungen von Ausdrücken gefüllt werden können.
-    - `Text.codeBlock(...)` zum ausschneiden von Textabschnitten, die als interaktive Code-Blöcke im Markdown-Text angezeigt werden sollen.
+    Der Aufruf `Clerk.markdown(text)` elaubt den einfachen Zugriff auf die Markdown-View.
+    In diesem Beispiel werden zusätzlich zwei unterstützende Skills verwendet:
+    - `Text.fillOut(...)`: Zum Befüllen von String-Vorlagen mit dynamischen Inhalten, indem Platzhalter (z.B. ${2}) durch die Auswertung von übergebenen Ausdrücken ersetzt werden.
+    - `Text.codeBlock(...)`: Zum Einbinden von Codeabschnitten als interaktive Blöcke im Markdown-Text.
 
     ## Turtle
-    Die Turtle-View ermöglicht das Erstellen von SVG-Grafiken, die im Browser angezeigt werden können.
+    Die Turtle-View ermöglicht das Zeichnen und Anzeigen von SVG-Grafiken im Browser. Diese können Schritt für Schritt aufgebaut werden:
     ```java
     ${1}
     ```
-    """, Text.codeBlock("./demo.java", "// Markdown 1"), Text.codeBlock("./demo.java", "// Turtle 1")));
+    """, Text.codeBlock("./demo.java", "// Markdown 1"), Text.codeBlock("./demo.java", "// Turtle 1"), "${0}"));
     // Markdown 1
 
     // Label Turtle 1
@@ -39,25 +40,25 @@ void main() {
     Clerk.markdown(Text.fillOut("""
         
     ## Interaktionen
-    Die Live-View dient nicht nur zur Betrachtung von Inhalten, sondern kann auch als interaktiver Editor die Code-Datei bearbeiten. So führt das Bearbeiten
-    der interaktiven Code-Blöcke zu einer Änderung im Source Code selbst, die dann in der Live-View angezeigt wird. Auf diese Weise können Änderungen am
-    dokumentierten Code direkt in der Live-View ausgetestet werden. Dazu ermöglicht dies eine interaktive Dokumentation zu erstellen. Ein interaktiver Code-Block 
-    kann durch den Skill `Text.codeBlock(...)` erstellt werden. Der auszuschneidende Code wird durch zwei gleichnamige Kommentar-Label makiert.
+    Die Live-View ist nicht nur ein Anzeigewerkzeug, sondern dient auch als interaktiver Editor. Änderungen an eingebetteten Code-Blöcken wirken sich direkt auf die zugrunde liegende 
+    Datei aus. Dadurch kann der dokumentierte Code live ausprobiert und bearbeitet werden.
+    Ein interaktiver Code-Block wird mithilfe von `Text.codeBlock(...)` definiert. Der entsprechende Code im Quelltext muss durch Kommentar-Labels (z.B. `// Turtle 1`) markiert werden:
     ```java
     ${0}
     ```
-    Der makierte Code kann dann durch `Text.codeBlock("./demo.java", "// Turtle 1")` ausgeschnitten werden. Dabei wird der Pfad zur Datei und das Label angegeben. Wenn dieser
-    Code-Block in einen Markdown-Code-Block eingebettet wird, dann wird er in der Live-View als interaktiver Code-Block angezeigt.
+    Dieser markierte Block kann anschließend über `Text.codeBlock("./demo.java", "// Turtle 1")` eingebunden werden. Wird dieser Block in einen Markdown-Abschnitt eingefügt, erscheint 
+    er in der Live-View als editierbarer Code-Bereich.
 
-    Neben der interaktiven Code-Blöcken, können auch JavaScript-Funktionen erstellt werden, die den Source Code bearbeiten können. Dazu dient der Skill `Interaction.eventFunction(...)`.
-    Dieser Skill liefert eine JavaScript-Funktion, die eine makierte Zeile im Source Code ersetzt. Der Skill wird mit dem Pfad zur Datei, dem Label und dem zu ersetzenden Code aufgerufen.
-    Diese Funktion kann dann zum Beispiel in einem Button verwendet werden, um den Source Code zu ändern. Um schnell einen Button zu erstellen, kann der Skill `Interaction.button(...)` verwendet werden.
+    Zusätzlich können JavaScript-Funktionen eingebunden werden, die gezielt Teile des Quelltexts verändern. Dafür wird `Interaction.eventFunction(...)` verwendet. Dieser Skill liefert 
+    eine Funktion, die anhand des Dateipfads, eines Labels und des neuen Codes eine markierte Zeile ersetzt.
+    
+    Um solche Funktionen interaktiv nutzbar zu machen, kann `Interaction.button(...)` verwendet werden. Damit lässt sich ein Button erstellen, der bei Klick eine bestimmte Stelle im Code anpasst:
     ```java 
     ${1}
     ```
 
     ### Color Change
-    Als Beispiel dient die folgende Turtle-Grafik:
+    Im folgenden Beispiel wird eine Turtle-Grafik dargestellt:
     ```java
     ${2}
     ```
@@ -71,8 +72,8 @@ void main() {
     // Turtle 2
     
     Clerk.markdown("""
-            Für diese Grafik werden nun drei Buttons definiert, die die Farbe der Turtle ändern. Die Buttons sind so konfiguriert, dass sie den Source Code der Turtle-Grafik ändern, wenn 
-            sie geklickt werden. Die Stelle, die geändert wird, ist durch das Label `// turtle color` im Source Code markiert.
+            Darunter befinden sich drei Buttons, die jeweils die Farbe der Turtle ändern. Die zu ersetzende Stelle im Quellcode ist durch das Label `// turtle color` markiert. Beim Klick auf einen Button wird
+            dieser Teil des Codes automatisch angepasst.
             """);
 
     // Buttons
@@ -83,7 +84,7 @@ void main() {
 
     Clerk.markdown(Text.fillOut("""
             ### Turtle mit Timeline
-            Die Turtle-View bietet zudem die Möglichkeit, durch einen Timeline-Slider die einzelnen Schritte der Grafik zu durchlaufen.
+            Die Turtle-View unterstützt außerdem eine Timeline, über die sich die Zeichenreihenfolge der Grafik Schritt für Schritt nachvollziehen lässt:
             ```java
             ${0}
             ```
@@ -97,7 +98,7 @@ void main() {
 
     Clerk.markdown(Text.fillOut("""
     ## Dot View
-    Die Dot-View ermöglicht das Anzeigen von [Dot Graphen](https://graphviz.org/doc/info/lang.html) im Browser. 
+    Die Dot-View erlaubt das Anzeigen von Graphen, die im [DOT-Format](https://graphviz.org/doc/info/lang.html) beschrieben sind.
     ```java
     ${0}
     ```
