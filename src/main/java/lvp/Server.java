@@ -31,6 +31,8 @@ public class Server {
         Single, Multi, Block
     }
 
+    private record EventMessage(SSEType event, String data) {}
+
     private final HttpServer httpServer;
 
     final int port;
@@ -42,6 +44,7 @@ public class Server {
 
     public List<HttpExchange> webClients;
     List<String> paths = new CopyOnWriteArrayList<>();
+    List<EventMessage> events = new CopyOnWriteArrayList<>();
 
     // lock required to temporarily block processing of `SSEType.LOAD`
     Lock lock = new ReentrantLock();
@@ -150,6 +153,9 @@ public class Server {
 
         webClients.add(exchange);
         sendLoads(exchange);
+        if (events.size() > 0) {
+            events.forEach(event -> sendMessageToClient(exchange, event.event, event.data));
+        }
     }
 
     private void handleRoot(HttpExchange exchange) throws IOException {
@@ -186,9 +192,16 @@ public class Server {
             return;
         }
 
+        
+        if (webClients.size() == 0) {
+            events.add(new EventMessage(event.get(), parts[1]));
+            return;
+        }
+        
         if (event.get().equals(SSEType.LOAD)) {
             if (!paths.contains(parts[1])) load(parts[1]);
         } else {
+            events.add(new EventMessage(event.get(), parts[1]));
             sendServerEvent(event.get(), parts[1]);
         }
     }
@@ -212,10 +225,6 @@ public class Server {
     }
 
     public void sendServerEvent(SSEType sseType, String data) {
-        if (webClients.size() == 0) {
-            System.out.println("Open http://localhost:" + port + " in your browser");
-            return;
-        }
         webClients.removeIf(connection -> !sendMessageToClient(connection, sseType, data));
     }
 

@@ -28,7 +28,7 @@ public class Main {
             Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
 
             if(cfg.path() != null) {
-                FileWatcher watcher = new FileWatcher(cfg.path(), cfg.fileNamePattern());
+                FileWatcher watcher = new FileWatcher(cfg.path(), cfg.fileNamePattern(), server);
                 Runtime.getRuntime().addShutdownHook(new Thread(watcher::stop));
                 watcher.watchLoop(server);
             }

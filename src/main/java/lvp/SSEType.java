@@ -1,3 +1,3 @@
 package lvp;
 
-public enum SSEType { WRITE, CALL, SCRIPT, LOAD, CLEAR, RELEASE, DEBUG; }
+public enum SSEType { WRITE, CALL, SCRIPT, LOAD, CLEAR, DEBUG; }

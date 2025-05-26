@@ -2,19 +2,13 @@ package lvp.views;
 
 import lvp.Clerk;
 
-public class Dot implements Clerk {
-    static final String visLibUrl = "https://unpkg.com/vis-network/standalone/umd/vis-network.min.js";
-    
+public class Dot implements Clerk {    
     final String ID;
     int width, height;
 
     public Dot(int width, int height) {
         this.width = width;
         this.height = height;
-
-        Clerk.load(visLibUrl, "views/dot/vis-network.min.js");
-        Clerk.load( "views/dot/dot.js");
-
         ID = Clerk.getHashID(this);
 
         Clerk.write("<div id='dotContainer" + ID + "'></div>");

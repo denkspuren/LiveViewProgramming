@@ -5,13 +5,18 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -29,7 +34,7 @@ public class FileWatcher {
     Path dir;
     String fileNamePattern;
 
-    public FileWatcher(Path dir, String fileNamePattern) throws IOException{
+    public FileWatcher(Path dir, String fileNamePattern, Server server) throws IOException{
         this.dir = dir;
         this.fileNamePattern = fileNamePattern;
 
@@ -38,9 +43,15 @@ public class FileWatcher {
             StandardWatchEventKinds.ENTRY_CREATE,
             StandardWatchEventKinds.ENTRY_MODIFY);
         Logger.logInfo("Watching in " + dir.normalize().toAbsolutePath() + "");
+        
+        for (Path path : getMatchingFiles()) {
+            Logger.logInfo("Running initial file: " + path.toAbsolutePath().normalize());
+            runJava(path, server);
+        }
     }
 
     public void watchLoop(Server server) {
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + fileNamePattern);
         debounceExecutor = Executors.newSingleThreadScheduledExecutor();
         long debounceDelay = 200;            
         while (isRunning) {
@@ -54,7 +65,7 @@ public class FileWatcher {
             }
             for (WatchEvent<?> ev : key.pollEvents()) {
                 Path changed = (Path) ev.context();
-                if (FileSystems.getDefault().getPathMatcher("glob:" + fileNamePattern).matches(changed)) {
+                if (matcher.matches(changed)) {
                     Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
                     
                     ScheduledFuture<?> prev = pendingTask.getAndSet(
@@ -77,8 +88,8 @@ public class FileWatcher {
     private void runJava(Path path, Server server) {
         try {
             Path jarLocation = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
-            
-            Logger.logInfo("Executing java --enable-preview --class-path " + jarLocation + " " + dir.resolve(path).toString());
+            server.events.clear();
+            Logger.logInfo("Executing java --enable-preview --class-path " + jarLocation + " " + dir.resolve(path).normalize().toString());
             ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", "--class-path", jarLocation.toString(), dir.resolve(path).toString())
                 .redirectErrorStream(true);
             Process process = pb.start();
@@ -90,6 +101,7 @@ public class FileWatcher {
                         Logger.logDebug("(JavaClient) " + line);
                         server.read(line);
                     }
+                    Logger.logInfo("Execution finished");
                 }
 
             boolean finished = process.waitFor(30, TimeUnit.SECONDS);
@@ -101,5 +113,18 @@ public class FileWatcher {
         } catch (Exception e) {
             Logger.logError("Error in Java Process", e);
         }
+    }
+
+    public List<Path> getMatchingFiles() throws IOException {
+        List<Path> matchingFiles = new ArrayList<>();
+        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + fileNamePattern);
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
+            for (Path entry : stream) {
+                if (matcher.matches(entry.getFileName())) {
+                    matchingFiles.add(entry);
+                }
+            }
+        }
+        return matchingFiles;
     }
 }

@@ -20,8 +20,6 @@ public interface Clerk {
     public static void write(String html)        { out(SSEType.WRITE, html); }
     public static void call(String javascript)   { out(SSEType.CALL, javascript); }
     public static void script(String javascript) { out(SSEType.SCRIPT, javascript); }
-    public static void load(String path) { out(SSEType.LOAD, path); }
-    public static void load(String onlinePath, String offlinePath) { load(onlinePath + ", " + offlinePath); }
     public static void clear() { out(SSEType.CLEAR, ""); }
 
     public static void markdown(String text) { new MarkdownIt().write(text); }
