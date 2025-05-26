@@ -6,9 +6,9 @@ function convertCodeBlock (renderer) {
         const content = tokens[idx].content.replace(/src-info:(.*?)\|\|\|/g, ' ');    
         
         return match != null ? `<div>` + original +
-            `<textarea style="display: none; width: 100%; min-height: 30px; resize: none; max-height: 50vh" oninput="autoResize(this)">${content}</textarea>` +
-            `<button id=${match[1]} onclick="editCodeBlock(this)" style="padding: 5px 10px; margin: 5px 10px 0px 0px">Edit Code</button>` +
-            `<button onclick="cancelEdit(this)" style="padding: 5px 10px; display: none; margin: 5px 10px 0px 0px">Cancel</button>` +
+            `<textarea style="display: none; width: 100%; min-height: 30px; resize: none; max-height: 50vh; margin: 0 0 5px 0" oninput="autoResize(this)">${content}</textarea>` +
+            `<button id=${match[1]} onclick="editCodeBlock(this)" style="padding: 5px 10px; margin: 0 10px 0 0">Edit Code</button>` +
+            `<button onclick="cancelEdit(this)" style="padding: 5px 10px; display: none;">Cancel</button>` +
             `</div>` : original;
     }
     
