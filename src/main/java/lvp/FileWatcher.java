@@ -65,7 +65,7 @@ public class FileWatcher {
             }
             for (WatchEvent<?> ev : key.pollEvents()) {
                 Path changed = (Path) ev.context();
-                if (matcher.matches(changed)) {
+                if (matcher.matches(changed) && !Files.isDirectory(changed)) {
                     Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
                     
                     ScheduledFuture<?> prev = pendingTask.getAndSet(
@@ -120,7 +120,7 @@ public class FileWatcher {
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + fileNamePattern);
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
             for (Path entry : stream) {
-                if (matcher.matches(entry.getFileName())) {
+                if (!Files.isDirectory(entry) && matcher.matches(entry.getFileName())) {
                     matchingFiles.add(entry);
                 }
             }
