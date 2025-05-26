@@ -177,7 +177,6 @@ public class NodeGenerator {
     public void toGraph() {
         String dotSource = "digraph G {\n" + root.toString() + "}";
         File dot;
-        byte[] img_stream = null;
         File img;
         try {
             dot = writeDotSourceToFile(dotSource);
@@ -203,20 +202,20 @@ public class NodeGenerator {
         return  "digraph G {\n" + root.toString() + "}";
     }
 
-    private Field[] combineFields(Class classToBeInspected, Field[] fields) {
+    private Field[] combineFields(Class<?> classToBeInspected, Field[] fields) {
         Field[] classFields = classToBeInspected.getDeclaredFields();
         Field[] combinedFields = new Field[fields.length + classFields.length];
         for (int i = 0; i < combinedFields.length; i++) {
             combinedFields[i] = i < fields.length ? fields[i] : classFields[i - fields.length];
         }
 
-        Class superclass = classToBeInspected.getSuperclass();
+        Class<?> superclass = classToBeInspected.getSuperclass();
         if (superclass != null && inspectSuperClasses) return combineFields(superclass, combinedFields);
         return combinedFields;
     }
 
     private ObjectNode_425 objectReferenceToNodeTree(Object objectToBeInspected, String identifier, boolean isRoot, boolean isDotted) {
-        Class classToBeInspected = objectToBeInspected.getClass();
+        Class<?> classToBeInspected = objectToBeInspected.getClass();
 
         // reuse same node for identical objects
         if (inspectedObject.keySet().stream().anyMatch(key -> key == objectToBeInspected)) {
@@ -254,13 +253,13 @@ public class NodeGenerator {
                         continue;
                     }
                     if (Collection.class.isAssignableFrom(fieldObj.getClass())) {
-                        childs[i] = processArray(((Collection)fieldObj).toArray(), fields[i].getName(), Optional.empty(), !Arrays.asList(classToBeInspected.getDeclaredFields()).contains(fields[i]));
+                        childs[i] = processArray(((Collection<?>)fieldObj).toArray(), fields[i].getName(), Optional.empty(), !Arrays.asList(classToBeInspected.getDeclaredFields()).contains(fields[i]));
                         childs[i].value = Optional.of(fieldObj.getClass().getSimpleName());
                         continue;
                     }
                     if (Map.class.isAssignableFrom(fieldObj.getClass())) {
-                        childs[i] = processArray(((Map)fieldObj).values().toArray(), fields[i].getName(), 
-                            Optional.of(((Map)fieldObj).keySet().toArray()), !Arrays.asList(classToBeInspected.getDeclaredFields()).contains(fields[i]));
+                        childs[i] = processArray(((Map<?,?>)fieldObj).values().toArray(), fields[i].getName(), 
+                            Optional.of(((Map<?,?>)fieldObj).keySet().toArray()), !Arrays.asList(classToBeInspected.getDeclaredFields()).contains(fields[i]));
                         childs[i].value = Optional.of(fieldObj.getClass().getSimpleName());
                         continue;
                     }
