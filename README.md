@@ -129,7 +129,7 @@ Das _Live View Programming_ kommt seit dem Sommersemester 2024 in der Programmie
 
 Einige haben schon Beiträge zum LVP geliefert, meist sind es Studierende von mir. Die Contributors sind in dem GitHub-Repo ausgewiesen. Vielen Dank dafür!
 
-> Derzeit arbeiten Ramon und ich an einer neuen Architektur für das Live View Programming . Der Umbau soll im Spätsommer 2025 abgeschlossen sein. Dann ist die Möglichkeit zum Mitmachen wieder eröffnet. In der Zwischenzeit müssen wir Sie vertrösten.
+> Derzeit arbeiten Ramon und ich an einer neuen Architektur für das Live View Programming. Der Umbau soll im Spätsommer 2025 abgeschlossen sein. Dann ist die Möglichkeit zum Mitmachen wieder eröffnet. In der Zwischenzeit müssen wir Sie vertrösten.
 
 ### Historie
 
@@ -137,7 +137,7 @@ Einige haben schon Beiträge zum LVP geliefert, meist sind es Studierende von mi
 * Nach einem [_Proof of Concept_](https://github.com/denkspuren/LiveViewProgramming/releases/tag/0.1.0) von mir hat Ramon den _Live View Webserver_ mit Server Sent Events (SSE) gebaut und viele wichtige Beiträge geliefert! Server Sent Events machen die Architektur des Servers sehr einfach und kommen der Idee entgegen, primär _Views_ anzubieten.
 * [@BjoernLoetters](https://github.com/BjoernLoetters) hatte eine alternative Lösung mit [Websockets](https://github.com/denkspuren/LiveViewProgramming/tree/websockets) eingebracht, die jedoch deutlich komplizierter ausfällt. Auch wenn der SSE-Webserver "gewonnen" hat, empfehle ich das Studium des Codes von Björn sehr, man kann viel daran über Websockets lernen!
 * Mein Prototyp zum [Java Live Reloading](https://github.com/denkspuren/JavaLiveReloading) gab den Anstoss, eine neue Architektur umzusetzen und sich von der JShell als interaktives Medium zu verabschieden.
-* Die angestrebte und [hier](https://github.com/denkspuren/LiveViewProgramming/issues/77) skizzierte neue Architekturbasis aus dem Dialog zwischen Ramon und mir hervorgegangen. Sie wird das LVP mit ganz neuen Fähigkeiten ausstatten.
+* Die angestrebte und [hier](https://github.com/denkspuren/LiveViewProgramming/issues/77) skizzierte neue Architekturbasis ist aus dem Dialog zwischen Ramon und mir hervorgegangen. Sie wird das LVP mit ganz neuen Fähigkeiten ausstatten.
 
 Herzlichst,<br>
 Dominikus Herzberg
