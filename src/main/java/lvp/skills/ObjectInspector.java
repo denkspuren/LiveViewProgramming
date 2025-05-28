@@ -117,7 +117,7 @@ class ArrayNode extends ObjectNode_425 {
     }
 }
 
-public class NodeGenerator {
+public class ObjectInspector {
     private int nodeCounter = 0; //used to generate an unique node name
         
     // save inspected objects to prevent infinite loops in case of recursion and identify already used objects 
@@ -127,7 +127,7 @@ public class NodeGenerator {
 
     private boolean hideGeneratedVars, inspectSuperClasses;
 
-    private NodeGenerator(){}
+    private ObjectInspector(){}
 
     /**
      * Inspect the object using reflections and store it in a tree structure of Nodes
@@ -136,7 +136,7 @@ public class NodeGenerator {
      * @param identifier - variable name referencing the object 
      * @return instance of NodeGenerator
      */
-    public static NodeGenerator inspect(Object objectToBeInspected, String identifier) {
+    public static ObjectInspector inspect(Object objectToBeInspected, String identifier) {
         return inspect(objectToBeInspected, identifier, true, true);
     }
 
@@ -148,7 +148,7 @@ public class NodeGenerator {
      * @param inspectSuperClasses - true -> super class fields are inspected too
      * @return instance of NodeGenerator
      */
-    public static NodeGenerator inspect(Object objectToBeInspected, String identifier, boolean inspectSuperClasses) {
+    public static ObjectInspector inspect(Object objectToBeInspected, String identifier, boolean inspectSuperClasses) {
         return inspect(objectToBeInspected, identifier, inspectSuperClasses, true);
     }
 
@@ -161,9 +161,9 @@ public class NodeGenerator {
      * @param hideGeneratedVars - true -> compiler generated vars are hidden
      * @return instance of NodeGenerator
      */
-    public static NodeGenerator inspect(Object objectToBeInspected, String identifier, boolean inspectSuperClasses, boolean hideGeneratedVars) {
+    public static ObjectInspector inspect(Object objectToBeInspected, String identifier, boolean inspectSuperClasses, boolean hideGeneratedVars) {
         assert !objectToBeInspected.getClass().getPackageName().startsWith("java") : "Can't inspect Java owned objects!";
-        NodeGenerator g = new NodeGenerator();
+        ObjectInspector g = new ObjectInspector();
         g.hideGeneratedVars = hideGeneratedVars;
         g.inspectSuperClasses = inspectSuperClasses;
         g.root = g.objectReferenceToNodeTree(objectToBeInspected, identifier, true, false);
@@ -177,7 +177,6 @@ public class NodeGenerator {
     public void toGraph() {
         String dotSource = "digraph G {\n" + root.toString() + "}";
         File dot;
-        byte[] img_stream = null;
         File img;
         try {
             dot = writeDotSourceToFile(dotSource);
@@ -200,23 +199,23 @@ public class NodeGenerator {
 
     @Override
     public String toString() {
-        return root.toString();
+        return  "digraph G {\n" + root.toString() + "}";
     }
 
-    private Field[] combineFields(Class classToBeInspected, Field[] fields) {
+    private Field[] combineFields(Class<?> classToBeInspected, Field[] fields) {
         Field[] classFields = classToBeInspected.getDeclaredFields();
         Field[] combinedFields = new Field[fields.length + classFields.length];
         for (int i = 0; i < combinedFields.length; i++) {
             combinedFields[i] = i < fields.length ? fields[i] : classFields[i - fields.length];
         }
 
-        Class superclass = classToBeInspected.getSuperclass();
+        Class<?> superclass = classToBeInspected.getSuperclass();
         if (superclass != null && inspectSuperClasses) return combineFields(superclass, combinedFields);
         return combinedFields;
     }
 
     private ObjectNode_425 objectReferenceToNodeTree(Object objectToBeInspected, String identifier, boolean isRoot, boolean isDotted) {
-        Class classToBeInspected = objectToBeInspected.getClass();
+        Class<?> classToBeInspected = objectToBeInspected.getClass();
 
         // reuse same node for identical objects
         if (inspectedObject.keySet().stream().anyMatch(key -> key == objectToBeInspected)) {
@@ -254,13 +253,13 @@ public class NodeGenerator {
                         continue;
                     }
                     if (Collection.class.isAssignableFrom(fieldObj.getClass())) {
-                        childs[i] = processArray(((Collection)fieldObj).toArray(), fields[i].getName(), Optional.empty(), !Arrays.asList(classToBeInspected.getDeclaredFields()).contains(fields[i]));
+                        childs[i] = processArray(((Collection<?>)fieldObj).toArray(), fields[i].getName(), Optional.empty(), !Arrays.asList(classToBeInspected.getDeclaredFields()).contains(fields[i]));
                         childs[i].value = Optional.of(fieldObj.getClass().getSimpleName());
                         continue;
                     }
                     if (Map.class.isAssignableFrom(fieldObj.getClass())) {
-                        childs[i] = processArray(((Map)fieldObj).values().toArray(), fields[i].getName(), 
-                            Optional.of(((Map)fieldObj).keySet().toArray()), !Arrays.asList(classToBeInspected.getDeclaredFields()).contains(fields[i]));
+                        childs[i] = processArray(((Map<?,?>)fieldObj).values().toArray(), fields[i].getName(), 
+                            Optional.of(((Map<?,?>)fieldObj).keySet().toArray()), !Arrays.asList(classToBeInspected.getDeclaredFields()).contains(fields[i]));
                         childs[i].value = Optional.of(fieldObj.getClass().getSimpleName());
                         continue;
                     }

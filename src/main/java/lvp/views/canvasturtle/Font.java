@@ -1,4 +1,4 @@
-package lvp.views.turtle;
+package lvp.views.canvasturtle;
 
 public enum Font { 
     ARIAL("Arial"),

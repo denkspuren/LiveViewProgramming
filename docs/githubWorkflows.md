@@ -61,8 +61,6 @@ Der Release-Job startet erst, nachdem der Bump-Job erfolgreich abgeschlossen ist
 
 - **Download built artifact**: Lädt das zuvor hochgeladene JAR-Artefakt herunter und speichert es unter `target/`.
 
-- **Generate changelog since last tag**: Erstellt einen Changelog aus allen Commits seit dem letzten Tag.
-
 - **Create GitHub Release**:
     - Erstellt einen neuen Release auf GitHub basierend auf dem neuen Tag.
     - Setzt den Release auf Draft, damit er manuell überprüft werden kann.
@@ -100,28 +98,3 @@ else
 fi
 ```
 Dieser Abschnitt prüft die Commit-Nachricht auf #major oder #minor. Wird #major gefunden, wird die Major-Version erhöht und Minor sowie Patch auf 0 gesetzt. Bei #minor wird nur die Minor-Version erhöht und die Patch-Version auf 0 gesetzt. Fehlen beide Tags, wird nur die Patch-Version um 1 erhöht.
-
-### Erklärung der Generierung des Changelogs
-#### 1. Ermitteln des letzten Tags:
-```bash
-last_version=$(git tag --sort=-committerdate | head -2 | awk '{split($0, tags, "\n")} END {print tags[1]}')
-```
-- `git tag --sort=-committerdate`: Listet alle Git-Tags in absteigender Reihenfolge des letzten Commit-Datums auf.
-- `head -2`: Zeigt die obersten beiden Einträge an.
-- `awk '{split($0, tags, "\n")} END {print tags[1]}'`: Dieser Befehl teilt die Tags in einzelne Zeilen auf und gibt das zweite Tag (das vorletzte) aus. Das erste Tag, also das neueste Tag, ist das gerade neu erstellte Tag. Dieses neueste Tag wird in der Variable `last_version` gespeichert, um das Changelog von diesem Tag bis zum aktuellen Commit zu generieren.
-
-#### 2. Erstellung des Changelogs:
-```bash
-changelog=$(git log --pretty="- %s" --no-merges $last_version..HEAD)
-```
-- `git log --pretty="- %s"`: Listet alle Commit-Nachrichten im angegebenen Bereich auf, wobei - als Aufzählungszeichen verwendet wird. Dabei wird nur der Subjektteil der Commit-Nachricht angezeigt.
-- `--no-merges`: Schließt Merge-Commits aus der Log-Ausgabe aus.
-- `$last_version..HEAD`: Gibt den Bereich der Commit-Nachrichten an.
-
-#### 3. Multiline Ausgabe in den Job-Output
-```bash
-echo "changelog<<EOF" >> $GITHUB_OUTPUT
-echo "$changelog" >> $GITHUB_OUTPUT
-echo EOF >> $GITHUB_OUTPUT
-```
-Diese drei Zeilen werden verwendet, um den Changelog als mehrzeiligen String in den Job-Output zu schreiben. Dabei wird die [spezielle Syntax von GitHub Actions](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#multiline-strings) verwendet, um mehrzeilige Strings korrekt zu formatieren.

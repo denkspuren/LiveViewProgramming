@@ -1,31 +1,36 @@
-Clerk.markdown("""
-# Mathe Beispiele
-## Simple Math
-Man kann Formeln wie $2x_1+5x_2 = 12$ direkt in der Textzeile unterbringen.
+import lvp.Clerk;
 
-## Brüche
-$\\frac{1}{2}$
+void main() {
+    Clerk.clear();
+    Clerk.markdown("""
+    # Mathe Beispiele
+    ## Simple Math
+    Man kann Formeln wie $2x_1+5x_2 = 12$ direkt in der Textzeile unterbringen.
 
-## Wurzel
-$\\sqrt{2*5^x}$
+    ## Brüche
+    $\\frac{1}{2}$
 
-## Summe
-$\\sum^5_{x=0}x^2$
+    ## Wurzel
+    $\\sqrt{2*5^x}$
 
-## Summe in Large
-$\\Large\\sum^5_{x=0}x^2$
+    ## Summe
+    $\\sum^5_{x=0}x^2$
 
-## Summe in Larger
-$\\LARGE\\sum^5_{x=0}x^2$
+    ## Summe in Large
+    $\\Large\\sum^5_{x=0}x^2$
 
-## Inline vs Block
-### Inline
-$1+1$
+    ## Summe in Larger
+    $\\LARGE\\sum^5_{x=0}x^2$
 
-## Block
-$$
-\\Large
-1x^2 + 2x = 5
-$$
+    ## Inline vs Block
+    ### Inline
+    $1+1$
 
-""");
+    ## Block
+    $$
+    \\Large
+    1x^2 + 2x = 5
+    $$
+
+    """);
+}

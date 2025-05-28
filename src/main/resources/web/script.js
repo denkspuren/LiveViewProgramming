@@ -1,24 +1,26 @@
 const loadedDiv = document.getElementById('loadMessage');
 
-function loadScript(src, onError = () => console.log('script loading failed: ', src)) {
-  //console.log('loadScript: ', new Date().toISOString(), ' src: ', src);
-  var script = document.createElement('script');
-  script.src = src;
-  script.onload = function() {
-    //console.log('loaded script: ', new Date().toISOString(), ' src: ', src);
-    script.classList.add("persistent");
-    //console.log('script loaded:', src);
-    fetch("/loaded", {method: "post"}).catch(console.log);
-  };
-  script.onerror = onError;
-  document.body.appendChild(script);
+let debug = false;
+let scrollPosition = 0;
+
+const clerk = {}; // Scope for declarations
+
+
+
+// Logs debug messages to both server and browser console when debug mode is active
+function debugLog(message) {
+  if(!debug) return;
+  
+  console.debug(message);
+  fetch('log', { method: 'post', body: `debug:${message}` })
+    .catch(console.error);
 }
 
-function loadScriptWithFallback(mainSrc, alternativeSrc) {
-  loadScript(mainSrc, function() {
-    console.log('loading', mainSrc, 'failed, trying', alternativeSrc);
-    loadScript(alternativeSrc);
-  });
+// Send error logs to the server and log to browser console
+function errorLog(message) {
+  console.error(message);
+  fetch('log', { method: 'post', body: `error:${message}` })
+    .catch(console.error);
 }
 
 function setUp() {
@@ -31,9 +33,8 @@ function setUp() {
       const action = event.data.slice(0, splitPos);
       const base64Data = event.data.slice(splitPos + 1);
       const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
-      // const data = atob(base64Data);
-      // console.log(`Action: ${action}\n`);
-      // console.log(`Data: ${data}\n`);
+      
+      debugLog(`Action: ${action}\nData: ${data}`);
 
       switch (action) {
         case "CALL": {
@@ -52,23 +53,17 @@ function setUp() {
           document.getElementById("events").appendChild(newElement);
           break;
         }
-        case "LOAD": {
-          loadedDiv.style.display = 'block';
-          //setTimeout(() => {
-          //  loadedDiv.style.display = 'none';
-          // }, 300);
-          var srcs = data.split(',');
-          srcs = srcs.map(src => src.trim());
-          //console.log('LOAD received: ', new Date().toISOString(), ' data: ', data);
-          // if (srcs.length >= 2) loadScriptWithFallback(srcs[0], srcs[1]);
-          if (srcs.length >= 2) loadScript(srcs[0]);
-          else loadScript(data);
-          break;
-        }
         case "CLEAR": {
+          scrollPosition = window.scrollY;
           const element = document.getElementById("events");
           while (element.firstChild) {
             element.removeChild(element.firstChild);
+          }
+
+          const errors = document.getElementById("errors");
+          errors.style.display = "none";
+          while (errors.firstChild) {
+            errors.removeChild(errors.firstChild);
           }
 
           const toRemove = [];
@@ -79,14 +74,31 @@ function setUp() {
           }
           toRemove.forEach(x => document.body.removeChild(x));
           
+          for (const prop of Object.getOwnPropertyNames(clerk)) {
+            delete clerk[prop];
+          }
+          
           break;
         }
-        case "RELEASE":
-          locks = locks.filter(lock => lock !== data);
+        case "DEBUG":
+          debug = true;
+          break;
+        case "LOG":
+          const newElement = document.createElement("div");
+          newElement.innerText = data;
+          const errors = document.getElementById("errors");
+          errors.appendChild(newElement);
+          errors.style.display = "block";
+          scrollPosition = 0;
+          window.scrollTo(0, 0);
           break;
         default:
-          console.log("Unknown Action");
+          errorLog("Unknown Action");
           break;
+      }
+
+      if (scrollPosition > 0) {
+        window.scrollTo(0, scrollPosition);
       }
     };
 
@@ -101,8 +113,27 @@ function setUp() {
   }
 }
 
-const Clerk = {}; // not used, yet
-let locks = [];
-setUp();
+document.addEventListener("DOMContentLoaded", () => {
+  window.md = markdownit({
+      highlight: function (str, lang) {
+          if (lang && hljs.getLanguage(lang)) {
+              try {
+                  return hljs.highlight(str, { language: lang }).value;
+              } catch (__) {}
+          }
+          return ''; // use external default escaping
+      },
+      html: true,
+      linkify: true,
+      typographer: true
+  });
+  window.md.use(window.mathjax3);
+
+  window.md.renderer.rules.code_block = convertCodeBlock(window.md.renderer.rules.code_block);
+  window.md.renderer.rules.code_inline = convertCodeBlock(window.md.renderer.rules.code_inline);
+  window.md.renderer.rules.fence = convertCodeBlock(window.md.renderer.rules.fence);  
+
+  setUp();
+});
 
 // https://samthor.au/2020/understanding-load/
