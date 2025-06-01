@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,7 +24,7 @@ import lvp.logging.Logger;
 
 public class Server {
     private enum ReplacementType {
-        Single, Multi, Block
+        SINGLE, MULTI, BLOCK
     }
     private record EventMessage(SSEType event, String data) {}
 
@@ -33,12 +32,12 @@ public class Server {
 
     final int port;
     static int defaultPort = 50_001;
-    static final String index = "/web/index.html";
+    static final String INDEX = "/web/index.html";
 
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
     static int getDefaultPort() { return defaultPort; }
 
-    public List<HttpExchange> webClients;
+    public final List<HttpExchange> webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList;
     List<EventMessage> events = new CopyOnWriteArrayList<>();
 
     boolean isVerbose = false;
@@ -46,7 +45,6 @@ public class Server {
     public Server(int port, boolean isVerbose) throws IOException {
         this.port = port;
         this.isVerbose = isVerbose;
-        webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList
 
         httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
@@ -124,7 +122,7 @@ public class Server {
         if (isVerbose) sendMessageToClient(exchange, SSEType.DEBUG, "");
 
         webClients.add(exchange);
-        if (events.size() > 0) {
+        if (!events.isEmpty()) {
             events.forEach(event -> sendMessageToClient(exchange, event.event, event.data));
         }
     }
@@ -136,7 +134,7 @@ public class Server {
             return;
         }
 
-        final String resourcePath = exchange.getRequestURI().getPath().equals("/") ? index : exchange.getRequestURI().getPath();
+        final String resourcePath = exchange.getRequestURI().getPath().equals("/") ? INDEX : exchange.getRequestURI().getPath();
         Logger.logDebug("Sending '" + resourcePath + "'");
 
         try (final InputStream stream = Server.class.getResourceAsStream(resourcePath)) {
@@ -164,7 +162,7 @@ public class Server {
         String data = event.isEmpty() ? Base64.getEncoder().encodeToString(message.getBytes(StandardCharsets.UTF_8)) : parts[1];
 
         events.add(new EventMessage(eventMessage, data));
-        if (webClients.size() == 0) return;        
+        if (webClients.isEmpty()) return;        
         sendServerEvent(eventMessage, data);
     }
 
@@ -180,7 +178,7 @@ public class Server {
             os.write(message.getBytes(StandardCharsets.UTF_8));
             os.flush();
             return true;
-        } catch (IOException e) {
+        } catch (IOException _) {
             Logger.logError("Web exchange '" + connection.getRemoteAddress() + "' did not respond. Closing...");
             connection.close();
             return false;
@@ -195,8 +193,8 @@ public class Server {
             return null;
         }
 
-        String content_length = exchange.getRequestHeaders().getFirst("Content-length");
-        if (content_length == null) {
+        String contentLength = exchange.getRequestHeaders().getFirst("Content-length");
+        if (contentLength == null) {
             Logger.logError("content-length header in '" + exchange.getRequestURI().getPath() + "' is missing");
             exchange.sendResponseHeaders(400, -1); // Bad Request
             exchange.close();
@@ -204,7 +202,7 @@ public class Server {
         }
 
         try {
-            int length = Integer.parseInt(content_length);
+            int length = Integer.parseInt(contentLength);
             byte[] data = exchange.getRequestBody().readNBytes(length);
             if (data.length != length) {
                 Logger.logError("Premature end of stream in '" + exchange.getRequestURI().getPath() + "'");
@@ -214,7 +212,7 @@ public class Server {
             }
             return new String(data, StandardCharsets.UTF_8);
         } catch (NumberFormatException e) {
-            Logger.logError("illegal content-length header in '" + exchange.getRequestURI().getPath() + "'");
+            Logger.logError("illegal content-length header in '" + exchange.getRequestURI().getPath() + "'", e);
             exchange.sendResponseHeaders(400, -1); // Bad Request
         } catch (IOException e) {
             Logger.logError("Error reading request body in '" + exchange.getRequestURI().getPath() + "'", e);
@@ -229,10 +227,10 @@ public class Server {
             Path filePath = Path.of(path);
             List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
             switch (rType) {
-                case Single:
+                case SINGLE:
                     updateSingleLine(lines, label, replacement);
                     break;
-                case Multi:
+                case MULTI:
                     updateMultiLine(lines, label, replacement);
                     break;
                 default:
