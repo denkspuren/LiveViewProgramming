@@ -69,7 +69,7 @@ public class FileWatcher {
                     Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
                     
                     ScheduledFuture<?> prev = pendingTask.getAndSet(
-                        debounceExecutor.schedule(() -> runJava(changed, server), debounceDelay, TimeUnit.MILLISECONDS)
+                        debounceExecutor.schedule(() -> runJava(dir.resolve(changed), server), debounceDelay, TimeUnit.MILLISECONDS)
                     );
                     if (prev != null && !prev.isDone()) prev.cancel(false);
                 }
