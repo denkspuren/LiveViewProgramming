@@ -77,9 +77,9 @@ void main() {
             """);
 
     // Buttons
-    Clerk.write(Interaction.button("Red", Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(255, i * 256 / 37, i * 256 / 37, 1);")));
-    Clerk.write(Interaction.button("Green", Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(i * 256 / 37, 255, i * 256 / 37, 1);")));
-    Clerk.write(Interaction.button("Blue", Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(i * 256 / 37, i * 256 / 37, 255, 1);")));
+    Clerk.write(Interaction.button("Red", 200, 50, Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(255, i * 256 / 37, i * 256 / 37, 1);")));
+    Clerk.write(Interaction.button("Green", 200, 50, Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(i * 256 / 37, 255, i * 256 / 37, 1);")));
+    Clerk.write(Interaction.button("Blue", 200, 50, Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(i * 256 / 37, i * 256 / 37, 255, 1);")));
     // Buttons
 
     Clerk.markdown(Text.fillOut("""
@@ -95,6 +95,19 @@ void main() {
     drawing(turtle3, 24);
     turtle3.write().timelineSlider();
     // Turtle 3
+
+    Clerk.markdown(Text.fillOut("""
+    ### Input
+    Initialisierung von Variablen über ein Eingabefeld:
+    ```java
+    ${0}
+    ```    
+    """, Text.codeBlock("./demo.java", "// Input")));
+    
+    // Input
+    int exampleValue = 55; // InputExample
+    Clerk.write(Interaction.input("./demo.java", "// InputExample", "int exampleValue = $;", "Geben Sie eine Zahl ein"));
+    // Input
 
     Clerk.markdown(Text.fillOut("""
     ## Dot View
