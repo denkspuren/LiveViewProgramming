@@ -71,6 +71,37 @@ void main() {
 ```
 Dieser einfache Aufruf rendert eine Markdown-Überschrift direkt im Browser. Weitere Ausgaben, Grafiken oder Interaktionen können durch zusätzliche Clerk-Methoden, Views oder Skills ergänzt werden.
 
+### Troubleshooting
+
+> Error starting server: Address already in use: bind
+
+Wenn der Port blockiert ist, kann unter Windows mit folgendem Befehl die PID des blockierenden Prozesses ermittelt werden:
+
+```
+netstat -a -n -o | findstr ":50001"
+```
+
+Beispielausgabe:
+```
+TCP    127.0.0.1:50001        0.0.0.0:0              LISTENING       11840
+```
+Die letzte Spalte der Ausgabe zeigt die PID (Prozess-ID) des Prozesses, der den Port verwendet.
+
+Für Linux oder Mac kann folgender [Befehl](https://man7.org/linux/man-pages/man8/lsof.8.html) verwendet werden, um den Prozess zu finden, der den Port blockiert:
+```
+lsof -ti:50001
+```
+
+Die PID kann genutzt werden, um den entsprechenden Prozess im Task-Manager zu finden oder ihn direkt zu beenden. In PowerShell kann der Prozess mit folgendem Befehl beendet werden:
+```
+Stop-Process 11840
+```
+Um den Prozess unter Linux oder Mac zu beenden, kann folgender Befehl verwendet werden:
+```
+kill 11840
+```
+Dabei ist 11840 durch die ermittelte PID zu ersetzen.
+
 ## 💟 Motivation: Views bereichern das Programmieren
 
 Das _Live View Programming_ versteht sich als ein Angebot, in ein bestehendes Programm _Views_ einzubauen und zu verwenden, die im Web-Browser angezeigt werden. Es macht nicht nur Spaß, wenn man zum Beispiel Grafiken im Browser erzeugen kann -- man sieht auch die Programmierfehler, die einem unterlaufen. Wenn man etwa in der Turtle-View eine Schildkröte mit einem Stift über die Zeichenfläche schickt, zeigt sich unmittelbar, ob man Wiederholungen über Schleifen richtig aufgesetzt oder die Rekursion korrekt umgesetzt hat. Die visuelle Repräsentation gibt über das Auge eine direkte Rückmeldung. Feedback motiviert und hilft beim Verständnis.
