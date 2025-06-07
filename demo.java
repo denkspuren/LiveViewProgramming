@@ -101,13 +101,20 @@ void main() {
     Initialisierung von Variablen über ein Eingabefeld:
     ```java
     ${0}
-    ```    
+    ```
+    Der Skill `Interaction.input(...)` ermöglicht es, Eingabefelder zu erstellen, die genutzt werden können, um Werte in den Quelltext einzufügen.
+    Dazu wird Pfad und Label angegeben, um die Zeile zu makieren, in der der Wert eingefügt werden soll. Anschließend wird ein Template angegeben,
+    das den Platzhalter `$` enthält, der durch den eingegebenen Wert ersetzt wird. Optional kann ein Platzhaltertext angegeben werden,
+    der im Eingabefeld angezeigt wird.
+
     """, Text.codeBlock("./demo.java", "// Input")));
     
     // Input
-    int exampleValue = 55; // InputExample
+    int exampleValue = 0; // InputExample
     Clerk.write(Interaction.input("./demo.java", "// InputExample", "int exampleValue = $;", "Geben Sie eine Zahl ein"));
     // Input
+
+    Clerk.markdown(Text.fillOut("The value is **${0}**!", exampleValue));
 
     Clerk.markdown(Text.fillOut("""
     ## Dot View
