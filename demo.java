@@ -103,18 +103,29 @@ void main() {
     ${0}
     ```
     Der Skill `Interaction.input(...)` ermöglicht es, Eingabefelder zu erstellen, die genutzt werden können, um Werte in den Quelltext einzufügen.
-    Dazu wird Pfad und Label angegeben, um die Zeile zu makieren, in der der Wert eingefügt werden soll. Anschließend wird ein Template angegeben,
-    das den Platzhalter `$` enthält, der durch den eingegebenen Wert ersetzt wird. Optional kann ein Platzhaltertext angegeben werden,
-    der im Eingabefeld angezeigt wird.
-
+    Dazu wird Pfad und Label angegeben, um die Zeile zu makieren, in der der Wert eingefügt werden soll. Gleichzeitig wird das Label als Beschriftung des Eingabefelds verwendet.
+    Ein Template wird angegeben, das den Platzhalter `$` enthält, der durch den eingegebenen Wert ersetzt wird. Optional kann ein Platzhaltertext angegeben werden,
+    der im Eingabefeld angezeigt wird. Zusätzlich kann der Type des Eingabefelds angegeben werden (z.B. `text`, `number`, `email`).
+    
     """, Text.codeBlock("./demo.java", "// Input")));
     
     // Input
-    int exampleValue = 0; // InputExample
-    Clerk.write(Interaction.input("./demo.java", "// InputExample", "int exampleValue = $;", "Geben Sie eine Zahl ein"));
+    int exampleValue = 0; // Input Example
+    Clerk.write(Interaction.input("./demo.java", "// Input Example", "int exampleValue = $;", "Geben Sie eine Zahl ein"));
     // Input
 
-    Clerk.markdown(Text.fillOut("The value is **${0}**!", exampleValue));
+    Clerk.markdown(Text.fillOut("""
+    #### Checkbox
+    Für Checkboxen kann `Interaction.checkbox(...)` verwendet werden. Diese triggern die Änderung des Quelltextes, wenn sie angeklickt werden.
+    ```java
+    ${0}
+    ```
+    """, Text.codeBlock("./demo.java", "// Checkbox")));
+
+    // Checkbox
+    boolean booleanValue = false; // Boolean Example
+    Clerk.write(Interaction.checkbox("./demo.java", "// Boolean Example", "boolean booleanValue = $;", booleanValue));
+    // Checkbox
 
     Clerk.markdown(Text.fillOut("""
     ## Dot View
