@@ -61,7 +61,7 @@ function setUp() {
           }
 
           const errors = document.getElementById("errors");
-          errors.style.display = "none";
+          errors.parentNode.style.display = "none";
           while (errors.firstChild) {
             errors.removeChild(errors.firstChild);
           }
@@ -88,7 +88,7 @@ function setUp() {
           newElement.innerText = data;
           const errors = document.getElementById("errors");
           errors.appendChild(newElement);
-          errors.style.display = "block";
+          errors.parentNode.style.display = "";
           scrollPosition = 0;
           window.scrollTo(0, 0);
           break;
