@@ -112,6 +112,9 @@ void main() {
     // Input
     int exampleValue = 0; // Input Example
     Clerk.write(Interaction.input("./demo.java", "// Input Example", "int exampleValue = $;", "Geben Sie eine Zahl ein"));
+
+    String exampleString; // Input String Example
+    Clerk.write(Interaction.input("./demo.java", "// Input String Example", "String exampleString = \"$\";", "Geben Sie einen String ein"));
     // Input
 
     Clerk.markdown(Text.fillOut("""

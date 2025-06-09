@@ -45,7 +45,7 @@ public class Interaction {
         String button = button("Send", Text.fillOut("""
             (() => {
                 const input = document.getElementById("input${0}");
-                const result = "${3}".replace("$", input.value);
+                const result = `${3}`.replace("$", input.value);
                 fetch("interact", { method: "post", body: "${1}:${2}:single:" + btoa(String.fromCharCode(...new TextEncoder().encode(result))) }).catch(console.error);
             })()
             """, id, 
@@ -63,7 +63,7 @@ public class Interaction {
         return Text.fillOut("""
                 <label for='input${0}' style='margin-right: 5px;'>${5}</label>
                 <input type='checkbox' id='input${0}' style='margin: 0 5px 0 0;' ${4} onclick='(() => {
-                    const result = "${3}".replace("$", this.checked);
+                    const result = `${3}`.replace("$", this.checked);
                     fetch("interact", { method: "post", body: "${1}:${2}:single:" + btoa(String.fromCharCode(...new TextEncoder().encode(result))) }).catch(console.error);
                 })()' />
                 """, id,
