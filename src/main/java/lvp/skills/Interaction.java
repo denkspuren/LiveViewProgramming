@@ -40,7 +40,7 @@ public class Interaction {
         String id = Clerk.generateID(10);
         String inputField = Text.fillOut("""
                 <label for='input${0}' style='margin-right: 5px;'>${3}</label>
-                <input type='${2}' style='padding: 5px; margin: 0 5px 0 0;' id='input${0}' placeholder='${1}' />
+                <input type='${2}' style='padding: 5px; margin: 5px 5px 0 0;' id='input${0}' placeholder='${1}' />
                 """, id, placeholder, type, label.replaceFirst("//", "").trim());
         String button = button("Send", Text.fillOut("""
             (() => {
@@ -62,7 +62,7 @@ public class Interaction {
         String id = Clerk.generateID(10);
         return Text.fillOut("""
                 <label for='input${0}' style='margin-right: 5px;'>${5}</label>
-                <input type='checkbox' id='input${0}' style='margin: 0 5px 0 0;' ${4} onclick='(() => {
+                <input type='checkbox' id='input${0}' style='margin: 5px 5px 0 0;' ${4} onclick='(() => {
                     const result = `${3}`.replace("$", this.checked);
                     fetch("interact", { method: "post", body: "${1}:${2}:single:" + btoa(String.fromCharCode(...new TextEncoder().encode(result))) }).catch(console.error);
                 })()' />
