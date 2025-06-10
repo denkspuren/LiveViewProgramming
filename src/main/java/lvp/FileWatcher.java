@@ -10,7 +10,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
@@ -33,10 +32,12 @@ public class FileWatcher {
     private boolean isRunning = true;
     Path dir;
     String fileNamePattern;
+    Processor processor;
 
-    public FileWatcher(Path dir, String fileNamePattern, Server server) throws IOException{
+    public FileWatcher(Path dir, String fileNamePattern, Processor processor) throws IOException{
         this.dir = dir;
         this.fileNamePattern = fileNamePattern;
+        this.processor = processor;
 
         watcher = FileSystems.getDefault().newWatchService();
         dir.register(watcher,
@@ -46,11 +47,11 @@ public class FileWatcher {
         
         for (Path path : getMatchingFiles()) {
             Logger.logInfo("Running initial file: " + path.toAbsolutePath().normalize());
-            runJava(path, server);
+            run(path);
         }
     }
 
-    public void watchLoop(Server server) {
+    public void watchLoop() {
         PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + fileNamePattern);
         debounceExecutor = Executors.newSingleThreadScheduledExecutor();
         long debounceDelay = 200;            
@@ -59,8 +60,7 @@ public class FileWatcher {
             try {
                 key = watcher.take();
             } catch (InterruptedException | ClosedWatchServiceException e) {
-                if (isRunning)
-                    Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
+                Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
                 break;
             }
             for (WatchEvent<?> ev : key.pollEvents()) {
@@ -69,7 +69,7 @@ public class FileWatcher {
                     Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
                     
                     ScheduledFuture<?> prev = pendingTask.getAndSet(
-                        debounceExecutor.schedule(() -> runJava(dir.resolve(changed), server), debounceDelay, TimeUnit.MILLISECONDS)
+                        debounceExecutor.schedule(() -> run(dir.resolve(changed)), debounceDelay, TimeUnit.MILLISECONDS)
                     );
                     if (prev != null && !prev.isDone()) prev.cancel(false);
                 }
@@ -85,29 +85,20 @@ public class FileWatcher {
         if (debounceExecutor != null) debounceExecutor.shutdownNow();
     }
 
-    private void runJava(Path path, Server server) {
+    private void run(Path path) {
         try {
-            Path jarLocation = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
-            server.events.clear();
-            Logger.logInfo("Executing java --enable-preview --class-path " + jarLocation + " " + path.normalize().toString());
-            ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", "--class-path", jarLocation.toString(), path.normalize().toString())
+            processor.init();
+            Logger.logInfo("Executing java --enable-preview " + path.normalize().toString());
+            ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", path.normalize().toString())
                 .redirectErrorStream(true);
             Process process = pb.start();
-
-            try(BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        Logger.logDebug("(JavaClient) " + line);
-                        server.read(line);
-                    }
-                    Logger.logInfo("Execution finished");
-                }
-
+            processor.process(process);
             boolean finished = process.waitFor(30, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
                 Logger.logError("Timeout: process killed");
+            } else {
+                Logger.logInfo("Process finished successfully");
             }
 
         } catch (Exception e) {

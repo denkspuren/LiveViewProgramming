@@ -26,11 +26,11 @@ public class Main {
         try {
             Server server = new Server(Math.abs(cfg.port()), cfg.logLevel().equals(LogLevel.Debug));
             Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
-
+            Processor processor = new Processor(server);
             if(cfg.path() != null) {
-                FileWatcher watcher = new FileWatcher(cfg.path(), cfg.fileNamePattern(), server);
+                FileWatcher watcher = new FileWatcher(cfg.path(), cfg.fileNamePattern(), processor);
                 Runtime.getRuntime().addShutdownHook(new Thread(watcher::stop));
-                watcher.watchLoop(server);
+                watcher.watchLoop();
             }
         } catch (IOException e) {
             System.err.println("Error starting server: " + e.getMessage());
@@ -52,16 +52,13 @@ public class Main {
             String value = parts.length > 1 ? parts[1].trim() : "";
 
             switch (key) {
-                case "-l":
-                case "--log":
+                case "-l", "--log":
                     logLevel = value.isBlank() ? LogLevel.Info : LogLevel.fromString(value);
                     break;
-                case "-p":
-                case "--pattern":
+                case "-p", "--pattern":
                     fileNamePattern = value.isBlank() ? "*" : value;
                     break;
-                case "--watch":
-                case "-w":
+                case "--watch", "-w":
                     path = value.isBlank() ? Paths.get(".") : Paths.get(value).normalize();
                     break;
                 default:
@@ -96,8 +93,7 @@ public class Main {
     }
 
     public static boolean isLatestRelease() {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
+        try (HttpClient client = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.github.com/repos/denkspuren/LiveViewProgramming/releases/latest"))
                 .header("Accept", "application/vnd.github+json")

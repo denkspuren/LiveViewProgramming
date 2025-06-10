@@ -148,32 +148,16 @@ public class Server {
         }
     }
 
-    public void read(String message) {
-        String[] parts = message.split(":", 2);
-        Optional<SSEType> event = Optional.empty();
-        if (parts.length == 2) {
-            event = Arrays.stream(SSEType.values())
-                .filter(sseType -> sseType.name().equals(parts[0]))
-                .findFirst();
-        }
-        if (event.isEmpty()) Logger.logError("Error: + " + message);
-
-        SSEType eventMessage = event.orElse(SSEType.LOG);
-        String data = event.isEmpty() ? Base64.getEncoder().encodeToString(message.getBytes(StandardCharsets.UTF_8)) : parts[1];
-
-        events.add(new EventMessage(eventMessage, data));
-        if (webClients.isEmpty()) return;        
-        sendServerEvent(eventMessage, data);
-    }
-
     public void sendServerEvent(SSEType sseType, String data) {
+        events.add(new EventMessage(sseType, data));
+        if (webClients.isEmpty()) return;        
         webClients.removeIf(connection -> !sendMessageToClient(connection, sseType, data));
     }
 
     private boolean sendMessageToClient(HttpExchange connection, SSEType event, String data) {
         Logger.logDebug("Event: " + event + " with data: " + data);
         try {
-            String message = "data: " + event + ":" + data + "\n\n";
+            String message = "data: " + event + ":" +  Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8)) + "\n\n";
             OutputStream os = connection.getResponseBody();
             os.write(message.getBytes(StandardCharsets.UTF_8));
             os.flush();
