@@ -89,7 +89,7 @@ public class FileWatcher {
         try {
             processor.init();
             Logger.logInfo("Executing java --enable-preview " + path.normalize().toString());
-            ProcessBuilder pb = new ProcessBuilder("java", "-Dfile.encoding=UTF-8", "--enable-preview", path.normalize().toString())
+            ProcessBuilder pb = new ProcessBuilder("java", "-Dsun.stdout.encoding=UTF-8", "--enable-preview", path.normalize().toString())
                 .redirectErrorStream(true);
             Process process = pb.start();
             processor.process(process);

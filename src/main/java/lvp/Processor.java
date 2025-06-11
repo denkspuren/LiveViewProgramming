@@ -32,18 +32,15 @@ public class Processor {
     }
 
     void process(Process process) {
+        templates.clear();
         try(BufferedReader reader = new BufferedReader(
             new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-            // InstructionParser.parse(reader.lines()).gather(Gatherers.fold(() -> "", (prev, curr) ->
-            //     switch (curr) {
-            //         case Command cmd -> processCommands(cmd);
-            //         case Pipe pipe -> processPipe(pipe, prev);
-            //         default -> null;
-            //     })).findFirst();
+            InstructionParser.parse(reader.lines()).gather(Gatherers.fold(() -> "", (prev, curr) ->
+                switch (curr) {
+                    case Command cmd -> processCommands(cmd);
+                    case Pipe pipe -> processPipe(pipe, prev);
+                    default -> null;
+                })).findFirst();
         }
         catch (Exception e) {
             Logger.logError("Error reading process output: " + e.getMessage());
