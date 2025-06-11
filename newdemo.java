@@ -1,0 +1,32 @@
+void main() {
+    println("Clear:~");
+    println("Markdown: # Hello World!");
+    println("""
+            Markdown:
+            ## Hello World!
+            This is a simple example of a markdown block.
+
+            ~~~
+            """);
+    println("""
+            Text{0}:
+            # Text und Pipes
+            Der ${0} Command ${1} es ${0} Templates zu definieren.
+            In diesen Templates können Platzhalter genutzt werden, die
+            später durch Pipes mit Content befüllt werden.
+            Dieser ${0} kann zum Beispiel in die Markdown View "gepiped" werden.
+            ~~~
+            | Markdown
+            """);
+
+
+    println("""
+            Text: Text
+            | Text{0} | Markdown
+            """);
+
+    println("""
+            Text: erlaubt
+            | Text{0} | Markdown
+            """);
+}
