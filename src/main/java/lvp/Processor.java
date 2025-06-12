@@ -16,9 +16,10 @@ import lvp.InstructionParser.CommandRef;
 import lvp.InstructionParser.Pipe;
 import lvp.logging.Logger;
 import lvp.skills.IdGen;
+import lvp.skills.Text;
 public class Processor {
     Server server;
-    Map<String, BiFunction<String, String, String>> services = new HashMap<>(Map.of("Text", this::text));
+    Map<String, BiFunction<String, String, String>> services = new HashMap<>(Map.of("Text", this::text, "Codeblock", this::codeblock));
     Map<String, BiConsumer<String, String>> targets = Map.of(
             "Markdown", this::consumeMarkdown, 
             "Html", this::consumeHTML, 
@@ -40,10 +41,10 @@ public class Processor {
                     case Command cmd -> processCommands(cmd);
                     case Pipe pipe -> processPipe(pipe, prev);
                     default -> null;
-                })).findFirst();
+                })).forEachOrdered(_->{});
         }
         catch (Exception e) {
-            Logger.logError("Error reading process output: " + e.getMessage());
+            Logger.logError("Error reading process output: " + e.getMessage(), e);
         }
     }
 
@@ -82,6 +83,15 @@ public class Processor {
 
     void init() {
         server.events.clear();
+    }
+
+    String codeblock(String id, String content) {
+        String[] parts = content.split(":");
+        if (parts.length != 2) {
+            Logger.logError("Invalid Codeblock Format.");
+            return null;
+        }
+        return Text.codeBlock(parts[0].trim(), parts[1].trim());
     }
 
     String text(String id, String content) {

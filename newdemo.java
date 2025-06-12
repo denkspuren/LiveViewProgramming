@@ -29,4 +29,18 @@ void main() {
             Text: erlaubt
             | Text{0} | Markdown
             """);
+
+// ex1
+    println("""
+            Text{1}:
+            # Codeblocks
+            This is a codeblock example:
+            ```java
+            ${0}
+            ```
+            ~~~
+            Codeblock: newdemo.java:// ex1
+            | Text{1} | Markdown
+            """);
+// ex1
 }
