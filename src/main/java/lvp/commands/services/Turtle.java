@@ -9,7 +9,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
-import lvp.skills.IdGen;
 import lvp.skills.Interaction;
 import lvp.skills.TextUtils;
 import lvp.skills.TurtleParser;
