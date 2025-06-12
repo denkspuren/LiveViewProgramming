@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import lvp.commands.services.Turtle;
-import lvp.logging.Logger;
+import lvp.skills.logging.Logger;
 
 public class TurtleParser {
     private TurtleParser() {}

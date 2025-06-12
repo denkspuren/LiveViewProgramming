@@ -1,4 +1,4 @@
-package lvp.logging;
+package lvp.skills.logging;
 
 public enum LogLevel {
     Debug,

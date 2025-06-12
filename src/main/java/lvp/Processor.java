@@ -12,11 +12,11 @@ import java.util.stream.Gatherers;
 import lvp.commands.services.Text;
 import lvp.commands.services.Turtle;
 import lvp.commands.targets.Targets;
-import lvp.logging.Logger;
 import lvp.skills.InstructionParser;
 import lvp.skills.InstructionParser.Command;
 import lvp.skills.InstructionParser.CommandRef;
 import lvp.skills.InstructionParser.Pipe;
+import lvp.skills.logging.Logger;
 public class Processor {
     Server server;
     Targets targetProcessor;

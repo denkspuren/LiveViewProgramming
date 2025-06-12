@@ -5,12 +5,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.Gatherer.Downstream;
+
+import lvp.skills.logging.Logger;
+
 import java.util.stream.Gatherer;
 import java.util.List;
 import java.util.Objects;
 import java.util.Arrays;
-
-import lvp.logging.Logger;
 
 public class InstructionParser {
 

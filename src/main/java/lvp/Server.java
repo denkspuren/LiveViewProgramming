@@ -18,8 +18,8 @@ import java.util.stream.IntStream;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
-import lvp.logging.LogLevel;
-import lvp.logging.Logger;
+import lvp.skills.logging.LogLevel;
+import lvp.skills.logging.Logger;
 
 
 public class Server {

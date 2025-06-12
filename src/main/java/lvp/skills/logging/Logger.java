@@ -1,4 +1,4 @@
-package lvp.logging;
+package lvp.skills.logging;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

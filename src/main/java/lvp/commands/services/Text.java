@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import lvp.logging.Logger;
 import lvp.skills.TextUtils;
+import lvp.skills.logging.Logger;
 
 public class Text {
     private Text() {}

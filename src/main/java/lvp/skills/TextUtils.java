@@ -18,7 +18,6 @@ import java.util.stream.IntStream;
 public class TextUtils { // Class with static methods for file operations
     private TextUtils(){}
 
-    //TODO: Move to Text Service
     
     public static void write(String fileName, String text) {
         try {

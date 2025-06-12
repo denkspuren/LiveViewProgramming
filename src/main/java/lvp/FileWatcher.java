@@ -22,7 +22,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import lvp.logging.Logger;
+import lvp.skills.logging.Logger;
 
 public class FileWatcher {
     private WatchService watcher;

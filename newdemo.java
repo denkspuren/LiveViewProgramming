@@ -47,7 +47,7 @@ void main() {
 // ex1
 
     println("""
-            Text:
+            Text{2}:
             init 0 200 0 25 50 0 0
             forward 25
             right 60
@@ -57,6 +57,8 @@ void main() {
             timeline
             ~~~
             | Turtle | Html
+            Text{2}: ~
+            | Markdown
             """);
 
     
