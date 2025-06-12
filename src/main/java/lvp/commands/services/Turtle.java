@@ -167,7 +167,7 @@ public class Turtle {
             """, id, elements.size());
         String slider = Interaction.slider(id, 0, elements.size(), elements.size(), TextUtils.fillOut("""
                 ((e) => {
-                    const n = e.target.value;
+                    const n = Math.round(e.target.value);
                     const statusCurrent = document.getElementById("currentLine${0}");
                     statusCurrent.textContent = n;
                     const svgElement = document.getElementById("turtle${0}");
