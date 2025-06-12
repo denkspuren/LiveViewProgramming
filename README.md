@@ -89,7 +89,7 @@ Die letzte Spalte der Ausgabe zeigt die PID (Prozess-ID) des Prozesses, der den 
 
 Für Linux oder Mac kann folgender [Befehl](https://man7.org/linux/man-pages/man8/lsof.8.html) verwendet werden, um den Prozess zu finden, der den Port blockiert:
 ```
-lsof -ti:50001
+lsof -i:50001
 ```
 
 Die PID kann genutzt werden, um den entsprechenden Prozess im Task-Manager zu finden oder ihn direkt zu beenden. In PowerShell kann der Prozess mit folgendem Befehl beendet werden:
@@ -98,7 +98,7 @@ Stop-Process 11840
 ```
 Um den Prozess unter Linux oder Mac zu beenden, kann folgender Befehl verwendet werden:
 ```
-kill 11840
+kill -9 11840
 ```
 Dabei ist 11840 durch die ermittelte PID zu ersetzen.
 
