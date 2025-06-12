@@ -69,12 +69,6 @@ public class Text { // Class with static methods for file operations
         return cutOut(fileName, true, true, "");
     }
 
-    public static String escapeHtml(String text) {
-        return text.replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;");
-    }
-
     public static String codeBlock(String fileName, String label) {
         return fillOut("""
                 src-info: ${0}:${1}:multi |||
