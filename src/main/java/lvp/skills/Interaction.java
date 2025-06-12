@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Base64;
 
-import lvp.Clerk;
 
 public class Interaction {
     public static String eventFunction(String path, String label, String replacement) {
@@ -37,7 +36,7 @@ public class Interaction {
         return input(Path.of(path), label, template, placeholder, type);
     }
     public static String input(Path path, String label, String template, String placeholder, String type) {
-        String id = Clerk.generateID(10);
+        String id = IdGen.generateID(10);
         String inputField = Text.fillOut("""
                 <label for='input${0}' style='margin-right: 5px;'>${3}</label>
                 <input type='${2}' style='padding: 5px; margin: 5px 5px 0 0;' id='input${0}' placeholder='${1}' />
@@ -59,7 +58,7 @@ public class Interaction {
         return checkbox(Path.of(path), label, template, checked);
     }
     public static String checkbox(Path path, String label, String template, boolean checked) {
-        String id = Clerk.generateID(10);
+        String id = IdGen.generateID(10);
         return Text.fillOut("""
                 <label for='input${0}' style='margin-right: 5px;'>${5}</label>
                 <input type='checkbox' id='input${0}' style='margin: 5px 5px 0 0;' ${4} onclick='(() => {
