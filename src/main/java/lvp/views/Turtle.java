@@ -163,7 +163,7 @@ public class Turtle implements Clerk{
         Clerk.write(
             Interaction.slider(ID, 0, elements.size(), elements.size(), Text.fillOut("""
                 ((e) => {
-                    const n = e.target.value;
+                    const n = Math.round(e.target.value);
                     const statusCurrent = document.getElementById("currentLine${0}");
                     statusCurrent.textContent = n;
                     const svgElement = document.getElementById("turtle${0}");
