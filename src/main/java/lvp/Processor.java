@@ -7,33 +7,34 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Gatherers;
 
 import lvp.InstructionParser.Command;
 import lvp.InstructionParser.CommandRef;
 import lvp.InstructionParser.Pipe;
+import lvp.commands.services.Text;
+import lvp.commands.services.Turtle;
+import lvp.commands.targets.Targets;
 import lvp.logging.Logger;
-import lvp.skills.IdGen;
-import lvp.skills.Text;
 public class Processor {
     Server server;
-    Map<String, BiFunction<String, String, String>> services = new HashMap<>(Map.of("Text", this::text, "Codeblock", this::codeblock));
-    Map<String, BiConsumer<String, String>> targets = Map.of(
-            "Markdown", this::consumeMarkdown, 
-            "Html", this::consumeHTML, 
-            "JavaScript", this::consumeJS, 
-            "JavaScriptCall", this::consumeJSCall, 
-            "Clear", this::consumeClear);
-    Map<String, String> templates = new HashMap<>();
+    Targets targetProcessor;
+    Map<String, BiFunction<String, String, String>> services = new HashMap<>(Map.of("Text", Text::of, "Codeblock", Text::codeblock, "Turtle", Turtle::of));
+    Map<String, BiConsumer<String, String>> targets;
 
     public Processor(Server server) {
         this.server = server;
+        targetProcessor = Targets.of(server);
+        targets = Map.of(
+            "Markdown", targetProcessor::consumeMarkdown, 
+            "Dot", targetProcessor::consumeDot,
+            "Html", targetProcessor::consumeHTML, 
+            "JavaScript", targetProcessor::consumeJS, 
+            "JavaScriptCall", targetProcessor::consumeJSCall, 
+            "Clear", targetProcessor::consumeClear);
     }
 
     void process(Process process) {
-        templates.clear();
         try(BufferedReader reader = new BufferedReader(
             new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
             InstructionParser.parse(reader.lines()).gather(Gatherers.fold(() -> "", (prev, curr) ->
@@ -69,7 +70,7 @@ public class Processor {
         for (CommandRef ref : pipe.commands()) {
             Logger.logDebug("Command: " + ref.name() + "{" + ref.id() + "}, " + current);
             if (targets.containsKey(ref.name())) {
-                targets.get(ref.name()).accept(ref.id() == null ? IdGen.generateID(10) : ref.id(), current);
+                targets.get(ref.name()).accept(ref.id(), current);
                 return null;
             }
             else if (services.containsKey(ref.name())) {
@@ -83,69 +84,7 @@ public class Processor {
 
     void init() {
         server.events.clear();
-    }
-
-    String codeblock(String id, String content) {
-        String[] parts = content.split(":");
-        if (parts.length != 2) {
-            Logger.logError("Invalid Codeblock Format.");
-            return null;
-        }
-        return Text.codeBlock(parts[0].trim(), parts[1].trim());
-    }
-
-    String text(String id, String content) {
-        String newValue = templates.merge(id, content, this::fillOut);
-        return newValue == null ? content : newValue;
-    }
-
-    String fillOut(String template, String replacement) {
-        Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}"); // `${<key>}`
-        Matcher matcher = pattern.matcher(template);
-        StringBuffer result = new StringBuffer();
-        String key = "";
-
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            if (key.isBlank()) key = group;
-            if (!key.equals(group)) continue;
-            
-            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
-        }
-        matcher.appendTail(result);
-
-        return result.toString();
-    }
-
-    void consumeClear(String id, String content) {
-        server.sendServerEvent(SSEType.CLEAR, "");
-    }
-    
-    void consumeHTML(String id, String content) {
-        server.sendServerEvent(SSEType.WRITE, content);
-    }
-
-    void consumeJS(String id, String content) {
-        server.sendServerEvent(SSEType.SCRIPT, content);
-    }
-
-    void consumeJSCall(String id, String content) {
-        server.sendServerEvent(SSEType.CALL, content);
-    }
-
-    void consumeMarkdown(String id, String content) {
-        consumeHTML(id, "<script id='" + id + "' type='preformatted'>" + content + "</script>");
-        // Using `preformatted` is a hack to get a Java String into the Browser without interpretation
-        
-        consumeJSCall(id, "var scriptElement = document.getElementById('" + id  + "');"
-        +
-        """
-        var divElement = document.createElement('div');
-        divElement.id = scriptElement.id;
-        divElement.innerHTML = window.md.render(scriptElement.textContent);
-        scriptElement.parentNode.replaceChild(divElement, scriptElement);
-        """
-        );
+        Text.clear();
     }
     
 }

@@ -43,4 +43,15 @@ void main() {
             | Text{1} | Markdown
             """);
 // ex1
+
+    println("""
+            Dot:
+            width: 1000
+            height: 600
+            digraph G {
+                A -> B;
+                B -> C;
+            }
+            ~~~
+            """);
 }

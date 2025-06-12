@@ -1,4 +1,4 @@
-package lvp.views;
+package lvp.commands.services;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +11,7 @@ import java.util.Locale;
 
 import lvp.skills.IdGen;
 import lvp.skills.Interaction;
-import lvp.skills.Text;
+import lvp.skills.TextUtils;
 
 /**
  * Turtle ermöglicht das Erstellen einfacher Turtle-Grafiken als SVG-Datei.
@@ -21,18 +21,21 @@ import lvp.skills.Text;
  * Die einzelnen graphischen Elemente werden durchnummeriert in der Reihenfolge ihrer Erzeugung.
  */
 public class Turtle {
-    public final String ID = IdGen.getHashID(this);
+    public final String id;
     private final double xFrom, yFrom, viewWidth, viewHeight;
     private final List<Element> elements = new ArrayList<>();
     private int elementCounter = 0;
     private State state;
     private final Deque<State> stack = new ArrayDeque<>();
 
-    public Turtle() {
-        this(500, 500);
+    public static String of(String id, String content) {
+        
+        Turtle turtle = new Turtle(id, 0, 0);
+        return turtle.toString() + turtle.timelineSlider();
     }
-    public Turtle(int width, int height) {
-        this(0, width, 0, height, width / 2.0, height / 2.0, 0);        
+
+    public Turtle(String id, int width, int height) {
+        this(id, 0, width, 0, height, width / 2.0, height / 2.0, 0);        
     }
 
     /**
@@ -44,8 +47,9 @@ public class Turtle {
      * @param startY     Start-Y-Koordinate der Turtle
      * @param startAngle Blickrichtung in Grad (0°=rechts, 90°=oben, gegen den Uhrzeigersinn)
      */
-    public Turtle(double xFrom, double xTo, double yFrom, double yTo,
+    public Turtle(String id, double xFrom, double xTo, double yFrom, double yTo,
                      double startX, double startY, double startAngle) {
+        this.id = id;
         this.xFrom = xFrom;
         this.yFrom = yFrom;
         this.viewWidth = xTo - xFrom;
@@ -149,50 +153,33 @@ public class Turtle {
         return this;
     }
 
-    public Turtle write() {
-     //   Clerk.write(Text.fillOut("<div id='turtle${0}'>${1}</div>", ID, toString()));
-        return this;
-    }
+    public String timelineSlider() {
+        String status = TextUtils.fillOut("""
+            <div>
+                Linien sichtbar: <span id="currentLine${0}">${1}</span> / <span>${1}</span>
+            </div>
+            """, id, elements.size());
+        String slider = Interaction.slider(id, 0, elements.size(), elements.size(), TextUtils.fillOut("""
+                ((e) => {
+                    const n = e.target.value;
+                    const statusCurrent = document.getElementById("currentLine${0}");
+                    statusCurrent.textContent = n;
+                    const svgElement = document.getElementById("turtle${0}");
+                    const lineIds = Array.from(svgElement.querySelectorAll("[svg-id]")).map(el => el.getAttribute("svg-id"));
+                    lineIds.forEach((id,i) => {
+                        const el = svgElement.querySelector(`[svg-id="` + id + `"]`);
+                        if (el) el.style.display = i < n ? "" : "none";
+                    });
+                })(event)
+                """, id));
 
-    public Turtle timelineSlider() {
-        // Clerk.write(Text.fillOut("""
-        //         <div>
-        //             Linien sichtbar: <span id="currentLine${0}">${1}</span> / <span>${1}</span>
-        //         </div>
-        //         """, ID, elements.size()));
-        // Clerk.write(
-        //     Interaction.slider(ID, 0, elements.size(), elements.size(), Text.fillOut("""
-        //         ((e) => {
-        //             const n = e.target.value;
-        //             const statusCurrent = document.getElementById("currentLine${0}");
-        //             statusCurrent.textContent = n;
-        //             const svgElement = document.getElementById("turtle${0}");
-        //             const lineIds = Array.from(svgElement.querySelectorAll("[svg-id]")).map(el => el.getAttribute("svg-id"));
-        //             lineIds.forEach((id,i) => {
-        //                 const el = svgElement.querySelector(`[svg-id="` + id + `"]`);
-        //                 if (el) el.style.display = i < n ? "" : "none";
-        //             });
-        //         })(event)
-        //         """, ID))
-        // );
-
-        return this;
+        return status + slider;
     }
 
     public void save(String filename) throws IOException {
         Path path = Path.of(filename);
         try (BufferedWriter writer = Files.newBufferedWriter(path)) {
-            writer.write(
-                String.format(Locale.US,
-                    """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="%.2f %.2f %.2f %.2f">
-                    """, xFrom, yFrom, viewWidth, viewHeight)
-            );
-            for (Element e : elements) {
-                writer.write(elementString(e));
-            }
-            writer.write("</svg>\n");
+            writer.write(toString());
         }
     }
 
