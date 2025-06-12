@@ -59,6 +59,13 @@ void main() {
             | Turtle | Html
             Text{2}: ~
             | Markdown
+            Text{3}:
+            ```
+            ${0}
+            ```
+            ~~~
+            Text{2}: -
+            | Text{3} | Markdown
             """);
 
     
