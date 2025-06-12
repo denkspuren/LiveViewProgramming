@@ -12,6 +12,7 @@ import java.util.Locale;
 import lvp.skills.IdGen;
 import lvp.skills.Interaction;
 import lvp.skills.TextUtils;
+import lvp.skills.TurtleParser;
 
 /**
  * Turtle ermöglicht das Erstellen einfacher Turtle-Grafiken als SVG-Datei.
@@ -26,12 +27,12 @@ public class Turtle {
     private final List<Element> elements = new ArrayList<>();
     private int elementCounter = 0;
     private State state;
+    private boolean showTimeline = false;
     private final Deque<State> stack = new ArrayDeque<>();
 
     public static String of(String id, String content) {
-        
-        Turtle turtle = new Turtle(id, 0, 0);
-        return turtle.toString() + turtle.timelineSlider();
+        Turtle turtle = TurtleParser.parse(id, content);
+        return turtle.toString();
     }
 
     public Turtle(String id, int width, int height) {
@@ -153,6 +154,11 @@ public class Turtle {
         return this;
     }
 
+    public Turtle timeline() {
+        showTimeline = true;
+        return this;
+    }
+
     public String timelineSlider() {
         String status = TextUtils.fillOut("""
             <div>
@@ -173,7 +179,7 @@ public class Turtle {
                 })(event)
                 """, id));
 
-        return status + slider;
+        return String.join(System.lineSeparator(), status, slider);
     }
 
     public void save(String filename) throws IOException {
@@ -200,7 +206,12 @@ public class Turtle {
         
 
         out += "</svg>\n";
-        return out;
+        return TextUtils.fillOut("""
+        <div id=turtle${0}>
+            ${1} 
+        </div>
+        ${2}     
+        """, id, out, showTimeline ? timelineSlider() : "");
     }
 
     private String elementString(Element e) {

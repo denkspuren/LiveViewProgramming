@@ -1,4 +1,4 @@
-package lvp;
+package lvp.skills;
 
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
@@ -11,7 +11,6 @@ import java.util.Objects;
 import java.util.Arrays;
 
 import lvp.logging.Logger;
-import lvp.skills.IdGen;
 
 public class InstructionParser {
 

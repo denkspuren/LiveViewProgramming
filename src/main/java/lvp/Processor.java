@@ -9,18 +9,22 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Gatherers;
 
-import lvp.InstructionParser.Command;
-import lvp.InstructionParser.CommandRef;
-import lvp.InstructionParser.Pipe;
 import lvp.commands.services.Text;
 import lvp.commands.services.Turtle;
 import lvp.commands.targets.Targets;
 import lvp.logging.Logger;
+import lvp.skills.InstructionParser;
+import lvp.skills.InstructionParser.Command;
+import lvp.skills.InstructionParser.CommandRef;
+import lvp.skills.InstructionParser.Pipe;
 public class Processor {
     Server server;
     Targets targetProcessor;
-    Map<String, BiFunction<String, String, String>> services = new HashMap<>(Map.of("Text", Text::of, "Codeblock", Text::codeblock, "Turtle", Turtle::of));
     Map<String, BiConsumer<String, String>> targets;
+    Map<String, BiFunction<String, String, String>> services = new HashMap<>(Map.of(
+            "Text", Text::of, 
+            "Codeblock", Text::codeblock, 
+            "Turtle", Turtle::of));
 
     public Processor(Server server) {
         this.server = server;

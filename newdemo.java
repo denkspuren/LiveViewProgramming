@@ -1,3 +1,5 @@
+import static java.io.IO.println;
+
 void main() {
     println("Clear:~");
     println("Markdown: # Hello World!");
@@ -44,6 +46,20 @@ void main() {
             """);
 // ex1
 
+    println("""
+            Text:
+            init 0 200 0 25 50 0 0
+            forward 25
+            right 60
+            backward 25
+            right 60
+            forward 25
+            timeline
+            ~~~
+            | Turtle | Html
+            """);
+
+    
     println("""
             Dot:
             width: 1000
