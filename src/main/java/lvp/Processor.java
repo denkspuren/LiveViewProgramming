@@ -13,10 +13,13 @@ import lvp.commands.services.Text;
 import lvp.commands.services.Turtle;
 import lvp.commands.services.Interaction;
 import lvp.commands.targets.Targets;
+import lvp.skills.HTMLElements;
 import lvp.skills.InstructionParser;
+import lvp.skills.TextUtils;
 import lvp.skills.InstructionParser.Command;
 import lvp.skills.InstructionParser.CommandRef;
 import lvp.skills.InstructionParser.Pipe;
+import lvp.skills.InstructionParser.Read;
 import lvp.skills.logging.Logger;
 public class Processor {
     Server server;
@@ -49,6 +52,7 @@ public class Processor {
                 switch (curr) {
                     case Command cmd -> processCommands(cmd);
                     case Pipe pipe -> processPipe(pipe, prev);
+                    case Read read -> processRead(read, process);
                     default -> null;
                 })).forEachOrdered(_->{});
         }
@@ -88,6 +92,19 @@ public class Processor {
             }
         }
         return current;
+    }
+
+    String processRead(Read read, Process process) {
+        server.waitingStreams.put(read.id(), process.getOutputStream());
+        String inputField = HTMLElements.input("input" + read.id());
+        String button = HTMLElements.button("button" + read.id(), "Send", TextUtils.fillOut("""
+                (()=>{
+                    const input = document.getElementById("input${0}");
+                    fetch("read", { method: "post", body: "${0}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
+                })()
+                """,read.id()));
+        targetProcessor.consumeHTML(read.id(), inputField + button);
+        return null;
     }
 
     void init() {

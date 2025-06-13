@@ -164,7 +164,7 @@ public class Turtle {
                 Linien sichtbar: <span id="currentLine${0}">${1}</span> / <span>${1}</span>
             </div>
             """, id, elements.size());
-        String slider = HTMLElements.slider(id, 0, elements.size(), elements.size(), TextUtils.fillOut("""
+        String slider = HTMLElements.slider("slider" + id, 0, elements.size(), elements.size(), TextUtils.fillOut("""
                 ((e) => {
                     const n = Math.round(e.target.value);
                     const statusCurrent = document.getElementById("currentLine${0}");

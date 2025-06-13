@@ -15,6 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
+import lvp.skills.logging.Logger;
+
 public class TextUtils { // Class with static methods for file operations
     private TextUtils(){}
 
@@ -106,5 +108,75 @@ public class TextUtils { // Class with static methods for file operations
         IntStream.range(0, replacements.length)
             .forEach(i -> m.put(Integer.toString(i), replacements[i]));
         return fillOut(m, template);
+    }
+
+    
+
+    public enum ReplacementType {
+        SINGLE, MULTI, BLOCK
+    }
+
+    public static void updateFile(String path, String label, ReplacementType rType, String replacement) {
+        try {
+            Path filePath = Path.of(path);
+            List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+            switch (rType) {
+                case SINGLE:
+                    updateSingleLine(lines, label, replacement);
+                    break;
+                case MULTI:
+                    updateMultiLine(lines, label, replacement);
+                    break;
+                default:
+                    break;
+            }
+            Files.write(filePath, lines, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            Logger.logError("Error updating file: " + path, e);
+        }
+    }
+
+    private static void updateSingleLine(List<String> lines, String label, String replacement) {
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).trim().endsWith(label)) {
+                String line = lines.get(i);
+                int spaces = (int) IntStream.range(0, line.length())
+                    .takeWhile(pos -> line.charAt(pos) == ' ')
+                    .count();
+                lines.set(i, " ".repeat(spaces) + replacement + " " + label);
+            }
+        }
+    }
+
+    private static void updateMultiLine(List<String> lines, String label, String replacement) {
+        int openingLabel = -1;
+        int closingLabel = -1;
+        for (int i = 0; i < lines.size(); i++) {
+            if (lines.get(i).trim().equals(label)) {
+                if (openingLabel == -1) {
+                    openingLabel = i;
+                } else {
+                    closingLabel = i;
+                    break;
+                }
+            }
+        }
+        if (openingLabel == -1 || closingLabel == -1) {
+            Logger.logError("Labels not found for multi-line replacement: " + label);
+            return;
+        }
+        if (closingLabel <= openingLabel) {
+            Logger.logError("Closing label is before opening label for multi-line replacement: " + label);
+            return;
+        }
+        String startingLine = lines.get(openingLabel + 1);
+        int spaces = (int) IntStream.range(0, startingLine.length())
+                    .takeWhile(pos -> startingLine.charAt(pos) == ' ')
+                    .count();
+
+        for (int i = openingLabel + 1; i < closingLabel; i++) {
+            lines.remove(openingLabel + 1);
+        }
+        lines.add(openingLabel + 1, " ".repeat(spaces) + replacement);
     }
 }

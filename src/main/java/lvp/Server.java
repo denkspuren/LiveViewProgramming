@@ -10,7 +10,9 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
@@ -18,14 +20,13 @@ import java.util.stream.IntStream;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
+import lvp.skills.TextUtils;
+import lvp.skills.TextUtils.ReplacementType;
 import lvp.skills.logging.LogLevel;
 import lvp.skills.logging.Logger;
 
 
 public class Server {
-    private enum ReplacementType {
-        SINGLE, MULTI, BLOCK
-    }
     private record EventMessage(SSEType event, String data) {}
 
     private final HttpServer httpServer;
@@ -39,6 +40,7 @@ public class Server {
 
     public final List<HttpExchange> webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList;
     List<EventMessage> events = new CopyOnWriteArrayList<>();
+    Map<String, OutputStream> waitingStreams = new ConcurrentHashMap<>();
 
     boolean isVerbose = false;
 
@@ -51,6 +53,7 @@ public class Server {
 
         httpServer.createContext("/log", this::handleLog);
         httpServer.createContext("/interact", this::handleInteract);
+        httpServer.createContext("/read", this::handleRead);
         httpServer.createContext("/events", this::handleEvents);
         httpServer.createContext("/", this::handleRoot);
 
@@ -74,6 +77,38 @@ public class Server {
         exchange.close();
 
         Logger.log(LogLevel.fromString(parts[0]), parts[1]);
+    }
+
+    private void handleRead(HttpExchange exchange) throws IOException {
+        String message = readRequestBody(exchange);
+        if (message == null) return;
+        String[] parts = message.split(":", 2);
+        if (parts.length != 2) {
+            exchange.sendResponseHeaders(400, -1); // Bad Request
+            exchange.close();
+            Logger.logError("Illegal read message: " + message);
+            return;
+        }
+
+        Logger.logInfo(message);
+
+        exchange.sendResponseHeaders(200, 0);
+        exchange.close();
+
+        OutputStream stream = waitingStreams.get(parts[0]);
+        if (stream == null) {
+            Logger.logError("Stream not found: " + message);
+            return;
+        }
+        try {
+            stream.write(Base64.getDecoder().decode(parts[1]));
+        } catch (IOException e) {
+            Logger.logError("Error while writing stream for: " + parts[0], e);
+        } finally {
+            stream.close();
+            waitingStreams.remove(parts[0]);
+        }
+
     }
 
     private void handleInteract(HttpExchange exchange) throws IOException {
@@ -103,7 +138,7 @@ public class Server {
         }
         
         String replacement = new String(Base64.getDecoder().decode(parts[3]), StandardCharsets.UTF_8);
-        updateFile(path, label, rType.get(), replacement);
+        TextUtils.updateFile(path, label, rType.get(), replacement);
     }
 
     private void handleEvents(HttpExchange exchange) throws IOException {
@@ -204,70 +239,6 @@ public class Server {
         }
         exchange.close();
         return null;
-    }
-
-    private void updateFile(String path, String label, ReplacementType rType, String replacement) {
-        try {
-            Path filePath = Path.of(path);
-            List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-            switch (rType) {
-                case SINGLE:
-                    updateSingleLine(lines, label, replacement);
-                    break;
-                case MULTI:
-                    updateMultiLine(lines, label, replacement);
-                    break;
-                default:
-                    break;
-            }
-            Files.write(filePath, lines, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            Logger.logError("Error updating file: " + path, e);
-        }
-    }
-
-    private void updateSingleLine(List<String> lines, String label, String replacement) {
-        for (int i = 0; i < lines.size(); i++) {
-            if (lines.get(i).trim().endsWith(label)) {
-                String line = lines.get(i);
-                int spaces = (int) IntStream.range(0, line.length())
-                    .takeWhile(pos -> line.charAt(pos) == ' ')
-                    .count();
-                lines.set(i, " ".repeat(spaces) + replacement + " " + label);
-            }
-        }
-    }
-
-    private void updateMultiLine(List<String> lines, String label, String replacement) {
-        int openingLabel = -1;
-        int closingLabel = -1;
-        for (int i = 0; i < lines.size(); i++) {
-            if (lines.get(i).trim().equals(label)) {
-                if (openingLabel == -1) {
-                    openingLabel = i;
-                } else {
-                    closingLabel = i;
-                    break;
-                }
-            }
-        }
-        if (openingLabel == -1 || closingLabel == -1) {
-            Logger.logError("Labels not found for multi-line replacement: " + label);
-            return;
-        }
-        if (closingLabel <= openingLabel) {
-            Logger.logError("Closing label is before opening label for multi-line replacement: " + label);
-            return;
-        }
-        String startingLine = lines.get(openingLabel + 1);
-        int spaces = (int) IntStream.range(0, startingLine.length())
-                    .takeWhile(pos -> startingLine.charAt(pos) == ' ')
-                    .count();
-
-        for (int i = openingLabel + 1; i < closingLabel; i++) {
-            lines.remove(openingLabel + 1);
-        }
-        lines.add(openingLabel + 1, " ".repeat(spaces) + replacement);
     }
 
     public void stop() {

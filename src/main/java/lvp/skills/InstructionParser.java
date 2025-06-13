@@ -16,10 +16,11 @@ import java.util.Arrays;
 public class InstructionParser {
 
     // ---- Instruction Types ----
-    public sealed interface Instruction permits Command, Register, Pipe {}
+    public sealed interface Instruction permits Command, Register, Read, Pipe {}
 
     public record Command(String name, String id, String content) implements Instruction {}
     public record Register(String name, String call) implements Instruction {}
+    public record Read(String id) implements Instruction {}
     public record Pipe(List<CommandRef> commands) implements Instruction {}
 
     public record CommandRef(String name, String id) {}
@@ -27,6 +28,7 @@ public class InstructionParser {
     // ---- Patterns ----
     private static final Pattern SINGLE_LINE_COMMAND = Pattern.compile("^(\\w+)(?:\\{([^}]+)\\})?:\\s*(.+)$");
     private static final Pattern BLOCK_START = Pattern.compile("^(\\w+)(?:\\{([^}]+)\\})?:\\s*$");
+    private static final Pattern READ = Pattern.compile("^Read(?:\\{([^}]+)\\})?:\\s*$");
     private static final Pattern REGISTER = Pattern.compile("^Register:\\s+(\\w+)\\s+(.+)$");
     private static final Pattern PIPE_LINE = Pattern.compile("^\\s*\\|(.+)$");
     private static final Pattern PIPE_ENTRY = Pattern.compile("^(\\w+)(?:\\{([^}]+)\\})?$");
@@ -79,6 +81,7 @@ public class InstructionParser {
 
         if (tryPipe(line, out)) return;
         if (tryRegister(line, out)) return;
+        if (tryRead(line, out)) return;
         if (tryBlockStart(state, line)) return;
         if (trySingleCommand(line, out)) return;
 
@@ -121,6 +124,16 @@ public class InstructionParser {
 
         Logger.logDebug("Parsed register: " + matcher.group(1) + " -> " + matcher.group(2));
         out.push(new Register(matcher.group(1), matcher.group(2)));
+        return true;
+    }
+
+    private static boolean tryRead(String line, Downstream<? super Instruction>  out) {
+        Matcher matcher = READ.matcher(line);
+        if (!matcher.matches()) return false;
+
+        String id = matcher.group(1) == null ? IdGen.generateID(10) : matcher.group(1);
+        Logger.logDebug("Parsed Read" + formatId(id));
+        out.push(new Read(id));
         return true;
     }
 
