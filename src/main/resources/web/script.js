@@ -116,7 +116,11 @@ function setUp() {
 
 document.addEventListener("DOMContentLoaded", () => {
   const errorContainer = document.getElementsByClassName("error-container")[0];
-  errorContainer.addEventListener("click", () => { errorContainer.style.display = "none"; })
+    errorContainer.addEventListener("click", (event) => {
+    const errors = document.getElementById("errors");
+    if (!errors.contains(event.target))
+      errorContainer.style.display = "none";
+  });
   window.md = markdownit({
       highlight: function (str, lang) {
           if (lang && hljs.getLanguage(lang)) {
