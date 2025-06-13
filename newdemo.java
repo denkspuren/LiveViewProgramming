@@ -49,6 +49,12 @@ void main() {
     println("""
             Text{2}:
             init 0 200 0 25 50 0 0
+            """
+            +
+            "color 37 255 37 1" // turtle color
+            +
+            """
+            
             forward 25
             right 60
             backward 25
@@ -66,6 +72,52 @@ void main() {
             ~~~
             Text{2}: -
             | Text{3} | Markdown
+            """);
+
+    println("""
+            Button:
+            Text: Green
+            width: 200
+            height: 50
+            path: newdemo.java
+            label: "// turtle color"
+            replacement: "color 37 255 37 1"
+            ~~~
+            | Html
+            Button:
+            Text: Red
+            width: 200
+            height: 50
+            path: newdemo.java
+            label: "// turtle color"
+            replacement: "color 255 37 37 1"
+            ~~~
+            | Html
+            """);
+
+    int n = 55; // input
+    boolean b = true; // bool
+    println("""
+            Input:
+            path: newdemo.java
+            label: "// input"
+            placeholder: Enter a number
+            template: int n = $;
+            type: text
+            ~~~
+            | Html
+            Checkbox:
+            path: newdemo.java
+            label: "// bool"
+            template: boolean b = $;
+            """
+            +
+            "checked:" + b
+            +
+            """
+
+            ~~~
+            | Html
             """);
 
     

@@ -9,7 +9,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
-import lvp.skills.Interaction;
+import lvp.skills.HTMLElements;
 import lvp.skills.TextUtils;
 import lvp.skills.TurtleParser;
 
@@ -164,7 +164,7 @@ public class Turtle {
                 Linien sichtbar: <span id="currentLine${0}">${1}</span> / <span>${1}</span>
             </div>
             """, id, elements.size());
-        String slider = Interaction.slider(id, 0, elements.size(), elements.size(), TextUtils.fillOut("""
+        String slider = HTMLElements.slider(id, 0, elements.size(), elements.size(), TextUtils.fillOut("""
                 ((e) => {
                     const n = Math.round(e.target.value);
                     const statusCurrent = document.getElementById("currentLine${0}");

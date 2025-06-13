@@ -34,7 +34,7 @@ public class Main {
                 watcher.watchLoop();
             }
         } catch (IOException e) {
-            System.err.println("Error starting server: " + e.getMessage());
+            System.err.println("Error starting lvp: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }

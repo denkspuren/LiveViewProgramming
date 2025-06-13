@@ -11,6 +11,7 @@ import java.util.stream.Gatherers;
 
 import lvp.commands.services.Text;
 import lvp.commands.services.Turtle;
+import lvp.commands.services.Interaction;
 import lvp.commands.targets.Targets;
 import lvp.skills.InstructionParser;
 import lvp.skills.InstructionParser.Command;
@@ -24,7 +25,10 @@ public class Processor {
     Map<String, BiFunction<String, String, String>> services = new HashMap<>(Map.of(
             "Text", Text::of, 
             "Codeblock", Text::codeblock, 
-            "Turtle", Turtle::of));
+            "Turtle", Turtle::of,
+            "Button", Interaction::button,
+            "Input", Interaction::input,
+            "Checkbox", Interaction::checkbox));
 
     public Processor(Server server) {
         this.server = server;

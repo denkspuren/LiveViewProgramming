@@ -1,9 +1,6 @@
 package lvp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
@@ -63,19 +60,22 @@ public class FileWatcher {
                 Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
                 break;
             }
-            for (WatchEvent<?> ev : key.pollEvents()) {
-                Path changed = (Path) ev.context();
-                if (matcher.matches(changed) && !Files.isDirectory(changed)) {
-                    Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
-                    
-                    ScheduledFuture<?> prev = pendingTask.getAndSet(
-                        debounceExecutor.schedule(() -> run(dir.resolve(changed)), debounceDelay, TimeUnit.MILLISECONDS)
-                    );
-                    if (prev != null && !prev.isDone()) prev.cancel(false);
-                }
+            processWatchKeyEvents(key, matcher, debounceDelay);
+            if (!key.reset()) isRunning = false;
+        }
+    }
+
+    private void processWatchKeyEvents(WatchKey key, PathMatcher matcher, long debounceDelay) {
+        for (WatchEvent<?> ev : key.pollEvents()) {
+            Path changed = (Path) ev.context();
+            if (matcher.matches(changed) && !Files.isDirectory(changed)) {
+                Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
+                
+                ScheduledFuture<?> prev = pendingTask.getAndSet(
+                    debounceExecutor.schedule(() -> run(dir.resolve(changed)), debounceDelay, TimeUnit.MILLISECONDS)
+                );
+                if (prev != null && !prev.isDone()) prev.cancel(false);
             }
-            
-            if (!key.reset()) break;
         }
     }
 

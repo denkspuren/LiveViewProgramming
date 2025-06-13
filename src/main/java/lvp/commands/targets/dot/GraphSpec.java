@@ -2,13 +2,13 @@ package lvp.commands.targets.dot;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.OptionalInt;
 
-public record GraphSpec(Optional<Integer> width, Optional<Integer> height, String dot) {
+public record GraphSpec(OptionalInt width, OptionalInt height, String dot) {
 
     public static GraphSpec fromContent(String content) {
-        Optional<Integer> width = Optional.empty();
-        Optional<Integer> height = Optional.empty();
+        OptionalInt width = OptionalInt.empty();
+        OptionalInt height = OptionalInt.empty();
 
         List<String> dotLines = new ArrayList<>();
 
@@ -27,11 +27,11 @@ public record GraphSpec(Optional<Integer> width, Optional<Integer> height, Strin
         return new GraphSpec(width, height, dot);
     }
 
-    private static Optional<Integer> tryInt(String s) {
+    private static OptionalInt tryInt(String s) {
         try {
-            return Optional.of(Integer.parseInt(s.trim()));
+            return OptionalInt.of(Integer.parseInt(s.trim()));
         } catch (NumberFormatException _) {
-            return Optional.empty();
+            return OptionalInt.empty();
         }
     }
 }
