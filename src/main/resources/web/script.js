@@ -83,7 +83,7 @@ function setUp() {
         case "DEBUG":
           debug = true;
           break;
-        case "LOG":
+        case "LOG": {
           const newElement = document.createElement("div");
           newElement.innerText = data;
           const errors = document.getElementById("errors");
@@ -92,6 +92,7 @@ function setUp() {
           scrollPosition = 0;
           window.scrollTo(0, 0);
           break;
+        }
         default:
           errorLog("Unknown Action");
           break;
@@ -114,6 +115,8 @@ function setUp() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  const errorContainer = document.getElementsByClassName("error-container")[0];
+  errorContainer.addEventListener("click", () => { errorContainer.style.display = "none"; })
   window.md = markdownit({
       highlight: function (str, lang) {
           if (lang && hljs.getLanguage(lang)) {
