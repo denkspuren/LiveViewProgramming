@@ -85,4 +85,35 @@ th {
     z-index: 1000; /* Ensure it stays on top */
     border-radius: 5px; /* rounded corners */
 }
-  
+
+.error-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: all;
+    background: rgba(255,240,240,0.3);
+    backdrop-filter: blur(2px);
+}
+
+.error-container .error-content {
+    background: #fff0f0;
+    border: 2px solid #a00;
+    box-shadow: 0 4px 32px #a00a;
+    font-size: 1.2em;
+    border-radius: 8px;
+    margin: 0;
+    padding: 32px 48px;
+    min-width: 320px;
+    max-width: 90vw;
+    max-height: 60vh;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+}

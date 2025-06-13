@@ -77,9 +77,9 @@ void main() {
             """);
 
     // Buttons
-    Clerk.write(Interaction.button("Red", Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(255, i * 256 / 37, i * 256 / 37, 1);")));
-    Clerk.write(Interaction.button("Green", Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(i * 256 / 37, 255, i * 256 / 37, 1);")));
-    Clerk.write(Interaction.button("Blue", Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(i * 256 / 37, i * 256 / 37, 255, 1);")));
+    Clerk.write(Interaction.button("Red", 200, 50, Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(255, i * 256 / 37, i * 256 / 37, 1);")));
+    Clerk.write(Interaction.button("Green", 200, 50, Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(i * 256 / 37, 255, i * 256 / 37, 1);")));
+    Clerk.write(Interaction.button("Blue", 200, 50, Interaction.eventFunction("./demo.java", "// turtle color", "turtle.color(i * 256 / 37, i * 256 / 37, 255, 1);")));
     // Buttons
 
     Clerk.markdown(Text.fillOut("""
@@ -95,6 +95,40 @@ void main() {
     drawing(turtle3, 24);
     turtle3.write().timelineSlider();
     // Turtle 3
+
+    Clerk.markdown(Text.fillOut("""
+    ### Input
+    Initialisierung von Variablen über ein Eingabefeld:
+    ```java
+    ${0}
+    ```
+    Der Skill `Interaction.input(...)` ermöglicht es, Eingabefelder zu erstellen, die genutzt werden können, um Werte in den Quelltext einzufügen.
+    Dazu wird Pfad und Label angegeben, um die Zeile zu makieren, in der der Wert eingefügt werden soll. Gleichzeitig wird das Label als Beschriftung des Eingabefelds verwendet.
+    Ein Template wird angegeben, das den Platzhalter `$` enthält, der durch den eingegebenen Wert ersetzt wird. Optional kann ein Platzhaltertext angegeben werden,
+    der im Eingabefeld angezeigt wird. Zusätzlich kann der Type des Eingabefelds angegeben werden (z.B. `text`, `number`, `email`).
+    
+    """, Text.codeBlock("./demo.java", "// Input")));
+    
+    // Input
+    int exampleValue = 0; // Input Example
+    Clerk.write(Interaction.input("./demo.java", "// Input Example", "int exampleValue = $;", "Geben Sie eine Zahl ein"));
+
+    String exampleString; // Input String Example
+    Clerk.write(Interaction.input("./demo.java", "// Input String Example", "String exampleString = \"$\";", "Geben Sie einen String ein"));
+    // Input
+
+    Clerk.markdown(Text.fillOut("""
+    #### Checkbox
+    Für Checkboxen kann `Interaction.checkbox(...)` verwendet werden. Diese triggern die Änderung des Quelltextes, wenn sie angeklickt werden.
+    ```java
+    ${0}
+    ```
+    """, Text.codeBlock("./demo.java", "// Checkbox")));
+
+    // Checkbox
+    boolean booleanValue = false; // Boolean Example
+    Clerk.write(Interaction.checkbox("./demo.java", "// Boolean Example", "boolean booleanValue = $;", booleanValue));
+    // Checkbox
 
     Clerk.markdown(Text.fillOut("""
     ## Dot View
