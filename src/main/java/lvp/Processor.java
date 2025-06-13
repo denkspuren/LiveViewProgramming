@@ -1,15 +1,20 @@
 package lvp;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Gatherers;
 
 import lvp.commands.services.Text;
+import lvp.commands.services.Test;
 import lvp.commands.services.Turtle;
 import lvp.commands.services.Interaction;
 import lvp.commands.targets.Targets;
@@ -20,6 +25,7 @@ import lvp.skills.InstructionParser.Command;
 import lvp.skills.InstructionParser.CommandRef;
 import lvp.skills.InstructionParser.Pipe;
 import lvp.skills.InstructionParser.Read;
+import lvp.skills.InstructionParser.Register;
 import lvp.skills.logging.Logger;
 public class Processor {
     Server server;
@@ -31,7 +37,8 @@ public class Processor {
             "Turtle", Turtle::of,
             "Button", Interaction::button,
             "Input", Interaction::input,
-            "Checkbox", Interaction::checkbox));
+            "Checkbox", Interaction::checkbox,
+            "Test", Test::test));
 
     public Processor(Server server) {
         this.server = server;
@@ -53,6 +60,7 @@ public class Processor {
                     case Command cmd -> processCommands(cmd);
                     case Pipe pipe -> processPipe(pipe, prev);
                     case Read read -> processRead(read, process);
+                    case Register register -> processRegister(register);
                     default -> null;
                 })).forEachOrdered(_->{});
         }
@@ -104,6 +112,39 @@ public class Processor {
                 })()
                 """,read.id()));
         targetProcessor.consumeHTML(read.id(), inputField + button);
+        return null;
+    }
+
+    String processRegister(Register register) {
+        services.put(register.name(), (id, content) -> {
+            boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
+            String out = null;
+            try {
+                Logger.logInfo("Executing " + register.call());
+                ProcessBuilder pb = new ProcessBuilder(isWindows ? new String[]{"cmd.exe", "/c", register.call()} : new String[]{"sh", "-c", register.call()})
+                    .redirectErrorStream(true);
+                Process process = pb.start();
+
+                try (BufferedWriter writer = new BufferedWriter(
+                       new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8))) {
+                    writer.write(id + "\n");
+                    writer.write(content + "\n");
+                    writer.flush();
+                }
+                try (var reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                    out = reader.lines().collect(Collectors.joining("\n"));
+                }
+                boolean finished = process.waitFor(10, TimeUnit.SECONDS);
+                if (!finished) {
+                    process.destroyForcibly();
+                    Logger.logError("Timeout: process " + register.name() + " killed");
+                }
+            } catch (Exception e) {
+                Logger.logError("Error in " + register.name(), e);
+            }
+            return out;
+        });
         return null;
     }
 

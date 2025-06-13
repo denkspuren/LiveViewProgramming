@@ -10,6 +10,7 @@ import java.util.OptionalInt;
 import java.util.stream.Collectors;
 
 import lvp.skills.HTMLElements;
+import lvp.skills.ParsingTools;
 import lvp.skills.TextUtils;
 import lvp.skills.logging.Logger;
 
@@ -33,18 +34,18 @@ public class Interaction {
             return null;
         }
 
-        Optional<Path> path = tryPath(pathString);
+        Optional<Path> path = ParsingTools.tryPath(pathString);
         if (path.isEmpty()) {
             Logger.logError("Invalid path in button command");
             return null;
         }
-        OptionalInt width = tryInt(fields.get("width"));
-        OptionalInt height = tryInt(fields.get("height"));
+        OptionalInt width = ParsingTools.tryInt(fields.get("width"));
+        OptionalInt height = ParsingTools.tryInt(fields.get("height"));
 
         Logger.logDebug("Parsed button with text=" + text + ", path=" + path + ", label=" + label + ", size=" + 
             (width.isPresent() ? width.getAsInt() + "x" + height.getAsInt() : "default"));
 
-        String func = eventFunction(path.get(), stripQuotes(label), replacement);
+        String func = eventFunction(path.get(), ParsingTools.stripQuotes(label), replacement);
 
         return width.isPresent() || height.isPresent()
             ? HTMLElements.button(id, text, width.orElse(height.getAsInt()), height.orElse(width.getAsInt()), func)
@@ -70,14 +71,14 @@ public class Interaction {
             return null;
         }
 
-        Optional<Path> path = tryPath(pathString);
+        Optional<Path> path = ParsingTools.tryPath(pathString);
         if (path.isEmpty()) {
             Logger.logError("Invalid path in input command");
             return null;
         }
 
         Logger.logDebug("Parsed input with path=" + path + ", label=" + label + ", type=" + type);
-        String inputElement = HTMLElements.input(id, placeholder, type, stripQuotes(label).replaceFirst("//", "").strip());
+        String inputElement = HTMLElements.input(id, placeholder, type, ParsingTools.stripQuotes(label).replaceFirst("//", "").strip());
         String button = HTMLElements.button("button" + id, "Send", TextUtils.fillOut("""
             (() => {
                 const input = document.getElementById("input${0}");
@@ -86,7 +87,7 @@ public class Interaction {
             })()
             """, id, 
                 Base64.getEncoder().encodeToString(path.get().normalize().toAbsolutePath().toString().getBytes(StandardCharsets.UTF_8)),
-                Base64.getEncoder().encodeToString(stripQuotes(label).getBytes(StandardCharsets.UTF_8)),
+                Base64.getEncoder().encodeToString(ParsingTools.stripQuotes(label).getBytes(StandardCharsets.UTF_8)),
                 template));
         return inputElement + button;
     }
@@ -108,7 +109,7 @@ public class Interaction {
             return null;
         }
 
-        Optional<Path> path = tryPath(pathString);
+        Optional<Path> path = ParsingTools.tryPath(pathString);
         if (path.isEmpty()) {
             Logger.logError("Invalid path in checkbox command");
             return null;
@@ -117,13 +118,13 @@ public class Interaction {
         boolean checked = Boolean.parseBoolean(fields.getOrDefault("checked", "false"));
 
         Logger.logDebug("Parsed checkbox with path=" + path + ", label=" + label + ", checked=" + checked);
-        return HTMLElements.checkbox(id, stripQuotes(label).replaceFirst("//", "").strip(), checked, TextUtils.fillOut("""
+        return HTMLElements.checkbox(id, ParsingTools.stripQuotes(label).replaceFirst("//", "").strip(), checked, TextUtils.fillOut("""
                 (() => {
                     const result = `${2}`.replace("$", this.checked);
                     fetch("interact", { method: "post", body: "${0}:${1}:single:" + btoa(String.fromCharCode(...new TextEncoder().encode(result))) }).catch(console.error);
                 })()
                 """, Base64.getEncoder().encodeToString(path.get().normalize().toAbsolutePath().toString().getBytes(StandardCharsets.UTF_8)),
-                Base64.getEncoder().encodeToString(stripQuotes(label).getBytes(StandardCharsets.UTF_8)),
+                Base64.getEncoder().encodeToString(ParsingTools.stripQuotes(label).getBytes(StandardCharsets.UTF_8)),
                 template));
     }
 
@@ -132,28 +133,5 @@ public class Interaction {
                 Base64.getEncoder().encodeToString(path.normalize().toAbsolutePath().toString().getBytes(StandardCharsets.UTF_8)),
                 Base64.getEncoder().encodeToString(label.getBytes(StandardCharsets.UTF_8)),
                 Base64.getEncoder().encodeToString(replacement.getBytes(StandardCharsets.UTF_8)));
-    }
-
-    private static OptionalInt tryInt(String s) {
-        try {
-            return OptionalInt.of(Integer.parseInt(s.strip()));
-        } catch (NumberFormatException _) {
-            return OptionalInt.empty();
-        }
-    }
-
-    private static Optional<Path> tryPath(String s) {
-        try {
-           return Optional.of(Path.of(s));
-        } catch (InvalidPathException _) {
-            return Optional.empty();
-        }
-    }
-
-    private static String stripQuotes(String s) {
-        if ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'"))) {
-            return s.substring(1, s.length() - 1).strip();
-        }
-        return s;
     }
 }
