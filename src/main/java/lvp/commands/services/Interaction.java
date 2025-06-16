@@ -78,7 +78,7 @@ public class Interaction {
         }
 
         Logger.logDebug("Parsed input with path=" + path + ", label=" + label + ", type=" + type);
-        String inputElement = HTMLElements.input(id, placeholder, type, ParsingTools.stripQuotes(label).replaceFirst("//", "").strip());
+        String inputElement = HTMLElements.input("input" + id, placeholder, type, ParsingTools.stripQuotes(label).replaceFirst("//", "").strip());
         String button = HTMLElements.button("button" + id, "Send", TextUtils.fillOut("""
             (() => {
                 const input = document.getElementById("input${0}");

@@ -70,11 +70,11 @@ public class TurtleParser {
         if (parts.length == 0) return;
 
         try {
-            switch (parts[0]) {
-                case "penUp":
+            switch (parts[0].toLowerCase()) {
+                case "penup":
                     turtle.penUp();
                     break;
-                case "penDown":
+                case "pendown":
                     turtle.penDown();
                     break;
                 case "forward":

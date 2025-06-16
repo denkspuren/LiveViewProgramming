@@ -2,9 +2,6 @@ package lvp.commands.services;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import lvp.skills.TextUtils;
 import lvp.skills.logging.Logger;
 
@@ -17,7 +14,7 @@ public class Text {
     }
 
     public static String codeblock(String id, String content) {
-        String[] parts = content.split(":");
+        String[] parts = content.split(";");
         if (parts.length != 2) {
             Logger.logError("Invalid Codeblock Format.");
             return null;
@@ -26,25 +23,7 @@ public class Text {
     }
 
     public static String of(String id, String content) {
-        String newValue = templates.merge(id, content, Text::fillOut);
+        String newValue = templates.merge(id, content, TextUtils::linearFillOut);
         return newValue == null ? content : newValue;
-    }
-
-    static String fillOut(String template, String replacement) {
-        Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}"); // `${<key>}`
-        Matcher matcher = pattern.matcher(template);
-        StringBuffer result = new StringBuffer();
-        String key = "";
-
-        while (matcher.find()) {
-            String group = matcher.group(1);
-            if (key.isBlank()) key = group;
-            if (!key.equals(group)) continue;
-            
-            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
-        }
-        matcher.appendTail(result);
-
-        return result.toString();
     }
 }

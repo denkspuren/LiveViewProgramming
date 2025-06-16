@@ -78,7 +78,7 @@ public class Processor {
         else if (services.containsKey(command.name())) {
             return services.get(command.name()).apply(command.id(), command.content());
         } else {
-                Logger.logError("Command not found: " + command.name());
+            Logger.logError("Command not found: " + command.name());
         }
 
         return null;

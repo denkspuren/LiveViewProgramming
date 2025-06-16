@@ -110,6 +110,24 @@ public class TextUtils { // Class with static methods for file operations
         return fillOut(m, template);
     }
 
+    public static String linearFillOut(String template, String replacement) {
+        Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}"); // `${<key>}`
+        Matcher matcher = pattern.matcher(template);
+        StringBuffer result = new StringBuffer();
+        String key = "";
+
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            if (key.isBlank()) key = group;
+            if (!key.equals(group)) continue;
+            
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
     
 
     public enum ReplacementType {

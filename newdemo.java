@@ -43,17 +43,10 @@ void main() {
             ${0}
             ```
             ~~~
-            Codeblock: newdemo.java:// ex1
+            Codeblock: newdemo.java;// ex1
             | Text{1} | Markdown
             """);
 // ex1
-
-    println("Markdown: # Blocking Input");
-    println("Read:");
-    Scanner scanner = new Scanner(System.in);
-    String d = scanner.nextLine();
-
-    println("Markdown: Your input was: " + d);
 
     println("""
             Text{2}:
