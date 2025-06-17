@@ -8,7 +8,7 @@ void main() {
             ```
             ~~~
             Test{0}:
-            Send: int i = 2;
+            Send: 1 + 1
             Expect: 2
             ~~~
             | Text{0} | Markdown

@@ -95,7 +95,7 @@ public class InstructionParser {
         if (!matcher.matches()) return false;
 
         List<CommandRef> commands = Arrays.stream(matcher.group(1).split("\\|"))
-            .map(String::trim)
+            .map(String::strip)
             .map(cmd -> {
                 Matcher m = PIPE_ENTRY.matcher(cmd);
                 if (!m.matches()) {

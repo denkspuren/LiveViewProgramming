@@ -19,7 +19,7 @@ public class Text {
             Logger.logError("Invalid Codeblock Format.");
             return null;
         }
-        return TextUtils.codeBlock(parts[0].trim(), parts[1].trim());
+        return TextUtils.codeBlock(parts[0].strip(), parts[1].strip());
     }
 
     public static String of(String id, String content) {
