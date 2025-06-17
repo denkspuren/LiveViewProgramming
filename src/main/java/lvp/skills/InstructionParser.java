@@ -19,7 +19,7 @@ public class InstructionParser {
     public sealed interface Instruction permits Command, Register, Read, Pipe {}
 
     public record Command(String name, String id, String content) implements Instruction {}
-    public record Register(String name, String call) implements Instruction {}
+    public record Register(String name, String call, boolean skipId) implements Instruction {}
     public record Read(String id) implements Instruction {}
     public record Pipe(List<CommandRef> commands) implements Instruction {}
 
@@ -29,7 +29,7 @@ public class InstructionParser {
     private static final Pattern SINGLE_LINE_COMMAND = Pattern.compile("^(\\w+)(?:\\{([^}]+)\\})?:\\s*(.+)$");
     private static final Pattern BLOCK_START = Pattern.compile("^(\\w+)(?:\\{([^}]+)\\})?:\\s*$");
     private static final Pattern READ = Pattern.compile("^Read(?:\\{([^}]+)\\})?:\\s*$");
-    private static final Pattern REGISTER = Pattern.compile("^Register:\\s+(\\w+)\\s+(.+)$");
+    private static final Pattern REGISTER = Pattern.compile("^Register(?:\\{([^}]+)\\})?:\\s+(\\w+)\\s+(.+)$");
     private static final Pattern PIPE_LINE = Pattern.compile("^\\s*\\|(.+)$");
     private static final Pattern PIPE_ENTRY = Pattern.compile("^(\\w+)(?:\\{([^}]+)\\})?$");
 
@@ -122,8 +122,9 @@ public class InstructionParser {
         Matcher matcher = REGISTER.matcher(line);
         if (!matcher.matches()) return false;
 
+        String skipIdFlag = matcher.group(1);
         Logger.logDebug("Parsed register: " + matcher.group(1) + " -> " + matcher.group(2));
-        out.push(new Register(matcher.group(1), matcher.group(2)));
+        out.push(new Register(matcher.group(2), matcher.group(3), skipIdFlag != null && skipIdFlag.equals("skipId")));
         return true;
     }
 

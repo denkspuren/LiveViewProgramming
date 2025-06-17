@@ -127,7 +127,7 @@ public class Processor {
 
                 try (BufferedWriter writer = new BufferedWriter(
                        new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8))) {
-                    writer.write(id + "\n");
+                    if (!register.skipId()) writer.write(id + "\n");
                     writer.write(content + "\n");
                     writer.flush();
                 }
