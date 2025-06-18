@@ -1,4 +1,4 @@
-package lvp.skills;
+package lvp.skills.parser;
 
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.Gatherer.Downstream;
 
+import lvp.skills.IdGen;
 import lvp.skills.logging.Logger;
 
 import java.util.stream.Gatherer;
@@ -45,7 +46,7 @@ public class InstructionParser {
             this.id = id;
             this.content = new StringJoiner("\n");
             this.inBlock = true;
-            Logger.logDebug("Started block command: " + name + formatId(id));
+            Logger.logDebug("Started block command: " + name + formatFlag(id));
         }
 
         void append(String line) {
@@ -123,7 +124,7 @@ public class InstructionParser {
         if (!matcher.matches()) return false;
 
         String skipIdFlag = matcher.group(1);
-        Logger.logDebug("Parsed register: " + matcher.group(1) + " -> " + matcher.group(2));
+        Logger.logDebug("Parsed register" + formatFlag(skipIdFlag) + ": " + matcher.group(2) + " -> " + matcher.group(3));
         out.push(new Register(matcher.group(2), matcher.group(3), skipIdFlag != null && skipIdFlag.equals("skipId")));
         return true;
     }
@@ -133,7 +134,7 @@ public class InstructionParser {
         if (!matcher.matches()) return false;
 
         String id = matcher.group(1) == null ? IdGen.generateID(10) : matcher.group(1);
-        Logger.logDebug("Parsed Read" + formatId(id));
+        Logger.logDebug("Parsed Read" + formatFlag(id));
         out.push(new Read(id));
         return true;
     }
@@ -142,7 +143,7 @@ public class InstructionParser {
         Matcher matcher = SINGLE_LINE_COMMAND.matcher(line);
         if (!matcher.matches()) return false;
         String id = matcher.group(2) == null ? IdGen.generateID(10) : matcher.group(2);
-        Logger.logDebug("Parsed single-line command: " + matcher.group(1) + formatId(id));
+        Logger.logDebug("Parsed single-line command: " + matcher.group(1) + formatFlag(id));
         out.push(new Command(matcher.group(1), id, matcher.group(3)));
         return true;
     }
@@ -158,7 +159,7 @@ public class InstructionParser {
 
     private static void handleBlockContent(BlockState state, String line, Downstream<? super Instruction>  out) {
         if (line.equals("~~~")) {
-            Logger.logDebug("Parsed block command: " + state.name + formatId(state.id));
+            Logger.logDebug("Parsed block command: " + state.name + formatFlag(state.id));
             out.push(new Command(state.name, state.id, state.content.toString()));
             state.reset();
         } else {
@@ -166,7 +167,7 @@ public class InstructionParser {
         }
     }
 
-    private static String formatId(String id) {
+    private static String formatFlag(String id) {
         return id != null ? "{" + id + "}" : "";
     }
 }

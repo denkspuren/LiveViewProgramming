@@ -11,7 +11,7 @@ import java.util.Locale;
 
 import lvp.skills.HTMLElements;
 import lvp.skills.TextUtils;
-import lvp.skills.TurtleParser;
+import lvp.skills.parser.TurtleParser;
 
 /**
  * Turtle ermöglicht das Erstellen einfacher Turtle-Grafiken als SVG-Datei.

@@ -39,7 +39,7 @@ public class Server {
 
     public final List<HttpExchange> webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList;
     List<EventMessage> events = new CopyOnWriteArrayList<>();
-    Map<String, OutputStream> waitingStreams = new ConcurrentHashMap<>();
+    Map<Path, Process> waitingProcesses = new ConcurrentHashMap<>();
 
     boolean isVerbose = false;
 
@@ -94,7 +94,7 @@ public class Server {
         exchange.sendResponseHeaders(200, 0);
         exchange.close();
 
-        OutputStream stream = waitingStreams.get(parts[0]);
+        OutputStream stream = waitingProcesses.get(parts[0]).getOutputStream();
         if (stream == null) {
             Logger.logError("Stream not found: " + message);
             return;
@@ -105,7 +105,7 @@ public class Server {
             Logger.logError("Error while writing stream for: " + parts[0], e);
         } finally {
             stream.close();
-            waitingStreams.remove(parts[0]);
+            waitingProcesses.remove(parts[0]);
         }
 
     }

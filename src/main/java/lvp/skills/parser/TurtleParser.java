@@ -1,4 +1,4 @@
-package lvp.skills;
+package lvp.skills.parser;
 
 import java.util.Optional;
 import java.util.regex.Matcher;

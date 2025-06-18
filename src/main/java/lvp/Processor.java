@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -19,14 +20,14 @@ import lvp.commands.services.Turtle;
 import lvp.commands.services.Interaction;
 import lvp.commands.targets.Targets;
 import lvp.skills.HTMLElements;
-import lvp.skills.InstructionParser;
 import lvp.skills.TextUtils;
-import lvp.skills.InstructionParser.Command;
-import lvp.skills.InstructionParser.CommandRef;
-import lvp.skills.InstructionParser.Pipe;
-import lvp.skills.InstructionParser.Read;
-import lvp.skills.InstructionParser.Register;
 import lvp.skills.logging.Logger;
+import lvp.skills.parser.InstructionParser;
+import lvp.skills.parser.InstructionParser.Command;
+import lvp.skills.parser.InstructionParser.CommandRef;
+import lvp.skills.parser.InstructionParser.Pipe;
+import lvp.skills.parser.InstructionParser.Read;
+import lvp.skills.parser.InstructionParser.Register;
 public class Processor {
     Server server;
     Targets targetProcessor;
@@ -52,17 +53,18 @@ public class Processor {
             "Clear", targetProcessor::consumeClear);
     }
 
-    void process(Process process) {
+    void process(Process process, Path path) {
         try(BufferedReader reader = new BufferedReader(
             new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
             InstructionParser.parse(reader.lines()).gather(Gatherers.fold(() -> "", (prev, curr) ->
                 switch (curr) {
                     case Command cmd -> processCommands(cmd);
                     case Pipe pipe -> processPipe(pipe, prev);
-                    case Read read -> processRead(read, process);
+                    case Read read -> processRead(read, process, path);
                     case Register register -> processRegister(register);
                     default -> null;
                 })).forEachOrdered(_->{});
+                
         }
         catch (Exception e) {
             Logger.logError("Error reading process output: " + e.getMessage(), e);
@@ -102,15 +104,15 @@ public class Processor {
         return current;
     }
 
-    String processRead(Read read, Process process) {
-        server.waitingStreams.put(read.id(), process.getOutputStream());
+    String processRead(Read read, Process process, Path path) {
+        server.waitingProcesses.put(path, process);
         String inputField = HTMLElements.input("input" + read.id());
         String button = HTMLElements.button("button" + read.id(), "Send", TextUtils.fillOut("""
                 (()=>{
                     const input = document.getElementById("input${0}");
                     fetch("read", { method: "post", body: "${0}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
                 })()
-                """,read.id()));
+                """, path));
         targetProcessor.consumeHTML(read.id(), inputField + button);
         return null;
     }
