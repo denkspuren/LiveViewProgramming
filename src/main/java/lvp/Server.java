@@ -98,6 +98,7 @@ public class Server {
         }
         try {
             stream.write(Base64.getDecoder().decode(parts[1]));
+            stream.flush();
         } catch (IOException e) {
             Logger.logError("Error while writing stream for: " + parts[0], e);
         } finally {
@@ -245,6 +246,10 @@ public class Server {
 
     public void clearEvents(String sourceId) {
         events.removeIf(event -> event.sourceId().equals(sourceId));
+        if (waitingProcesses.containsKey(sourceId)) {
+            waitingProcesses.get(sourceId).destroyForcibly();
+            waitingProcesses.remove(sourceId);
+        }
     }
 
     public void stop() {

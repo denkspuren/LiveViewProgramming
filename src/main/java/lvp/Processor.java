@@ -112,9 +112,9 @@ public class Processor {
         String button = HTMLElements.button("button" + read.id(), "Send", TextUtils.fillOut("""
                 (()=>{
                     const input = document.getElementById("input${0}");
-                    fetch("read", { method: "post", body: "${0}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
+                    fetch("read", { method: "post", body: "${1}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
                 })()
-                """, sourceId));
+                """, read.id(), sourceId));
         targetProcessor.consumeHTML(new MetaInformation(sourceId, read.id()), inputField + button);
         return null;
     }
