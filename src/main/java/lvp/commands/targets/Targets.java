@@ -1,11 +1,11 @@
 package lvp.commands.targets;
 
+import lvp.Processor.MetaInformation;
 import lvp.SSEType;
 import lvp.Server;
 import lvp.commands.targets.dot.GraphSpec;
 
 public class Targets {
-    public record MetaInformation(String sourceId, String id) {}
     Server server;
 
     public static Targets of(Server server) { return new Targets(server); }
@@ -39,10 +39,10 @@ public class Targets {
     }
 
     public void consumeMarkdown(MetaInformation meta, String content) {
-        consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id()), "<script id='" + meta.id() + "' type='preformatted'>" + content + "</script>");
+        consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id(), meta.standalone()), "<script id='" + meta.id() + "' type='preformatted'>" + content + "</script>");
         // Using `preformatted` is a hack to get a Java String into the Browser without interpretation
         
-        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id()), "var scriptElement = document.getElementById('" + meta.id() + "');"
+        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id(), meta.standalone()), "var scriptElement = document.getElementById('" + meta.id() + "');"
         +
         """
         var divElement = document.createElement('div');
@@ -56,9 +56,9 @@ public class Targets {
     public void consumeDot(MetaInformation meta, String content) {
         GraphSpec specs = GraphSpec.fromContent(content);
 
-        consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id()), "<div id='dotContainer" + meta.id() + "'></div>");
-        consumeJS(new MetaInformation(meta.sourceId(), "script" + meta.id()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + " = new Dot(document.getElementById('dotContainer" + meta.id() + "'), " + specs.width().orElse(500) + ", " + specs.height().orElse(500) + ");");
-        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + ".draw(\"" + specs.dot() + "\")");
+        consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id(), meta.standalone()), "<div id='dotContainer" + meta.id() + "'></div>");
+        consumeJS(new MetaInformation(meta.sourceId(), "script" + meta.id(), meta.standalone()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + " = new Dot(document.getElementById('dotContainer" + meta.id() + "'), " + specs.width().orElse(500) + ", " + specs.height().orElse(500) + ");");
+        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id(), meta.standalone()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + ".draw(\"" + specs.dot() + "\")");
     }
     
 }

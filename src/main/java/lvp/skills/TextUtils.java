@@ -110,7 +110,7 @@ public class TextUtils { // Class with static methods for file operations
         return fillOut(m, template);
     }
 
-    public static String linearFillOut(String template, String replacement) {
+    public static String linearFillOut(String replacement, String template) {
         Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}"); // `${<key>}`
         Matcher matcher = pattern.matcher(template);
         StringBuffer result = new StringBuffer();

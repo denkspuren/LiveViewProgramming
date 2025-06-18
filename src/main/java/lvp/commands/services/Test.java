@@ -5,19 +5,18 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import lvp.Processor.MetaInformation;
 import lvp.skills.TextUtils;
 import lvp.skills.logging.Logger;
 
 //TODO: multiple actual and expect
 public class Test {
     private static final String JSHELL_PROMPT = "jshell>";
-    public static String test(String id, String content) {
+    public static String test(MetaInformation meta, String content) {
         Map<String, String> fields = content.lines()
             .filter(line -> !line.isBlank())
             .map(line -> line.split(":", 2))
@@ -45,7 +44,7 @@ public class Test {
             Actual: ${3}
             Expected: ${4}
             Status: ${5}
-            """, id, send, actual, actualParsed, expect, actualParsed.equals(expect) ? "Success" : "Failure");
+            """, meta.id(), send, actual, actualParsed, expect, actualParsed.equals(expect) ? "Success" : "Failure");
     }
 
     private static String executeJshell(String send) {

@@ -117,7 +117,7 @@ function setUp() {
         }
         case "CLEAR": {
           scrollPosition = window.scrollY;
-          clear(sourceId, id === "-1" || id === "all");
+          clear(sourceId, id === "-1" || id === "all" || id === "global");
           break;
         }
         case "LOG": {

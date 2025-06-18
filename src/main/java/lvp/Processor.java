@@ -18,7 +18,6 @@ import lvp.commands.services.Test;
 import lvp.commands.services.Turtle;
 import lvp.commands.services.Interaction;
 import lvp.commands.targets.Targets;
-import lvp.commands.targets.Targets.MetaInformation;
 import lvp.skills.HTMLElements;
 import lvp.skills.TextUtils;
 import lvp.skills.logging.Logger;
@@ -29,10 +28,12 @@ import lvp.skills.parser.InstructionParser.Pipe;
 import lvp.skills.parser.InstructionParser.Scan;
 import lvp.skills.parser.InstructionParser.Register;
 public class Processor {
+    public record MetaInformation(String sourceId, String id, boolean standalone) {}
+
     Server server;
     Targets targetProcessor;
     Map<String, BiConsumer<MetaInformation, String>> targets;
-    Map<String, BiFunction<String, String, String>> services = new HashMap<>(Map.of(
+    Map<String, BiFunction<MetaInformation, String, String>> services = new HashMap<>(Map.of(
             "Text", Text::of, 
             "Codeblock", Text::codeblock, 
             "Turtle", Turtle::of,
@@ -77,10 +78,10 @@ public class Processor {
         Logger.logDebug("Command: " + command.name() + "{" + command.id() + "}, " + command.content());
         
         if (targets.containsKey(command.name())) {
-            targets.get(command.name()).accept(new MetaInformation(sourceId, command.id()), command.content());
+            targets.get(command.name()).accept(new MetaInformation(sourceId, command.id(), true), command.content());
         }
         else if (services.containsKey(command.name())) {
-            return services.get(command.name()).apply(command.id(), command.content());
+            return services.get(command.name()).apply(new MetaInformation(sourceId, command.id(), true), command.content());
         } else {
             Logger.logError("Command not found: " + command.name());
         }
@@ -94,11 +95,11 @@ public class Processor {
         for (CommandRef ref : pipe.commands()) {
             Logger.logDebug("Command: " + ref.name() + "{" + ref.id() + "}, " + current);
             if (targets.containsKey(ref.name())) {
-                targets.get(ref.name()).accept(new MetaInformation(sourceId, ref.id()), current);
+                targets.get(ref.name()).accept(new MetaInformation(sourceId, ref.id(), false), current);
                 return null;
             }
             else if (services.containsKey(ref.name())) {
-                current = services.get(ref.name()).apply(ref.id(), current);
+                current = services.get(ref.name()).apply(new MetaInformation(sourceId, ref.id(), false), current);
             } else {
                 Logger.logError("Command not found: " + ref.name());
             }
@@ -115,12 +116,12 @@ public class Processor {
                     fetch("scan", { method: "post", body: "${1}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
                 })()
                 """, scan.id(), sourceId));
-        targetProcessor.consumeHTML(new MetaInformation(sourceId, scan.id()), inputField + button);
+        targetProcessor.consumeHTML(new MetaInformation(sourceId, scan.id(), true), inputField + button);
         return null;
     }
 
     String processRegister(Register register) {
-        services.put(register.name(), (id, content) -> {
+        services.put(register.name(), (meta, content) -> {
             boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
             String out = null;
             try {
@@ -131,7 +132,7 @@ public class Processor {
 
                 try (BufferedWriter writer = new BufferedWriter(
                        new OutputStreamWriter(process.getOutputStream(), StandardCharsets.UTF_8))) {
-                    if (!register.skipId()) writer.write(id + "\n");
+                    if (!register.skipId()) writer.write(meta.id() + "\n");
                     writer.write(content + "\n");
                     writer.flush();
                 }

@@ -9,6 +9,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 
+import lvp.Processor.MetaInformation;
 import lvp.skills.HTMLElements;
 import lvp.skills.TextUtils;
 import lvp.skills.parser.TurtleParser;
@@ -29,8 +30,8 @@ public class Turtle {
     private boolean showTimeline = false;
     private final Deque<State> stack = new ArrayDeque<>();
 
-    public static String of(String id, String content) {
-        Turtle turtle = TurtleParser.parse(id, content);
+    public static String of(MetaInformation meta, String content) {
+        Turtle turtle = TurtleParser.parse(meta.id(), content);
         return turtle.toString();
     }
 

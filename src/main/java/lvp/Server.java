@@ -152,6 +152,7 @@ public class Server {
         exchange.sendResponseHeaders(200, 0);
 
         webClients.add(exchange);
+        sendMessageToClient(exchange, new EventMessage(SSEType.CLEAR, "", "all", "server"));
         if (!events.isEmpty()) {
             events.forEach(event -> sendMessageToClient(exchange, event));
         }
