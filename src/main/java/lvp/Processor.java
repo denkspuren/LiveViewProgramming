@@ -49,7 +49,9 @@ public class Processor {
             "Dot", targetProcessor::consumeDot,
             "Html", targetProcessor::consumeHTML, 
             "JavaScript", targetProcessor::consumeJS, 
-            "JavaScriptCall", targetProcessor::consumeJSCall, 
+            "JavaScriptCall", targetProcessor::consumeJSCall,
+            "Css", targetProcessor::consumeCss,
+            "SubViewStyle", targetProcessor::consumeSubViewStyle,
             "Clear", targetProcessor::consumeClear);
     }
 
@@ -150,8 +152,9 @@ public class Processor {
         return null;
     }
 
-    void init() {
-        server.events.clear();
+    void init(String sourceId) {
+        server.clearEvents(sourceId);
+        server.sendServerEvent(SSEType.CLEAR, "", "", sourceId);
         Text.clear();
     }
     

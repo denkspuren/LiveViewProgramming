@@ -117,3 +117,21 @@ th {
     flex-direction: column;
     line-height: 1;
 }
+
+#events {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+}
+
+.section-marker {
+  font-size: 0.8rem;
+  margin-left: auto;
+  color: #333;
+  opacity: 0.6;
+}

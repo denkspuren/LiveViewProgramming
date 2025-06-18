@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 
-import com.sun.jdi.event.Event;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -38,15 +37,12 @@ public class Server {
     static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
     static int getDefaultPort() { return defaultPort; }
 
-    public final List<HttpExchange> webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList;
+    public final List<HttpExchange> webClients = new CopyOnWriteArrayList<>();
     List<EventMessage> events = new CopyOnWriteArrayList<>();
     Map<String, Process> waitingProcesses = new ConcurrentHashMap<>();
 
-    boolean isVerbose = false;
-
-    public Server(int port, boolean isVerbose) throws IOException {
+    public Server(int port) throws IOException {
         this.port = port;
-        this.isVerbose = isVerbose;
 
         httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         System.out.println("Open http://localhost:" + port + " in your browser");
@@ -245,6 +241,10 @@ public class Server {
         }
         exchange.close();
         return null;
+    }
+
+    public void clearEvents(String sourceId) {
+        events.removeIf(event -> event.sourceId().equals(sourceId));
     }
 
     public void stop() {

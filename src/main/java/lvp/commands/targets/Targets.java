@@ -30,6 +30,14 @@ public class Targets {
         server.sendServerEvent(SSEType.CALL, content, meta.id(), meta.sourceId());
     }
 
+    public void consumeCss(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.CSS, content, meta.id(), meta.sourceId());
+    }
+
+    public void consumeSubViewStyle(MetaInformation meta, String content) {
+        consumeCss(meta, "#subViewContainer-" + meta.sourceId() + " { " + content + " }");
+    }
+
     public void consumeMarkdown(MetaInformation meta, String content) {
         consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id()), "<script id='" + meta.id() + "' type='preformatted'>" + content + "</script>");
         // Using `preformatted` is a hack to get a Java String into the Browser without interpretation
@@ -49,8 +57,8 @@ public class Targets {
         GraphSpec specs = GraphSpec.fromContent(content);
 
         consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id()), "<div id='dotContainer" + meta.id() + "'></div>");
-        consumeJS(new MetaInformation(meta.sourceId(), "script" + meta.id()), "clerk.dot" + meta.id() + " = new Dot(document.getElementById('dotContainer" + meta.id() + "'), " + specs.width().orElse(500) + ", " + specs.height().orElse(500) + ");");
-        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id()), "clerk.dot" + meta.id() + ".draw(\"" + specs.dot() + "\")");
+        consumeJS(new MetaInformation(meta.sourceId(), "script" + meta.id()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + " = new Dot(document.getElementById('dotContainer" + meta.id() + "'), " + specs.width().orElse(500) + ", " + specs.height().orElse(500) + ");");
+        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + ".draw(\"" + specs.dot() + "\")");
     }
     
 }

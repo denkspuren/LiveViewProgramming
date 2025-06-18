@@ -31,7 +31,7 @@ public class Main {
         }
         
         try {
-            Server server = new Server(Math.abs(cfg.port()), cfg.logLevel().equals(LogLevel.Debug));
+            Server server = new Server(Math.abs(cfg.port()));
             Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
             Processor processor = new Processor(server);
             FileWatcher watcher = new FileWatcher(cfg.sources(), cfg.watchFilter(), cfg.sourceOnly(), processor);

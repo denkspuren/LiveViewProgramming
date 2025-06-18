@@ -16,7 +16,7 @@ import lvp.skills.logging.Logger;
 public class ConfigParser {
     public record Source(Path path, String cmd) {
         public String id() {
-            return Base64.getEncoder().encodeToString(path().toString().getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(path().toString().getBytes(StandardCharsets.UTF_8));
         }
     }
 

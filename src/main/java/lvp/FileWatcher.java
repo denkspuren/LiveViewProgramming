@@ -138,7 +138,7 @@ public class FileWatcher {
     }
 
     private void run(Source source) {
-        processor.init();
+        processor.init(source.id());
         try {
             boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
             Logger.logInfo("Running: " + source.cmd() + " " + source.path());

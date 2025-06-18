@@ -2,6 +2,7 @@ package lvp.skills;
 
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.util.Base64;
 import java.util.Optional;
 import java.util.OptionalInt;
 

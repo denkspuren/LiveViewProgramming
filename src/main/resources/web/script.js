@@ -23,18 +23,69 @@ function errorLog(message) {
     .catch(console.error);
 }
 
-function setUp() {
+function clearErrorLog() {
+  const errors = document.getElementById("errors");
+  errors.parentNode.style.display = "none";
+  while (errors.firstChild) {
+    errors.removeChild(errors.firstChild);
+  }
+}
 
+function clear(sourceId, global) {
+  const element = !global ? document.getElementById(sourceId) : document.getElementById("events");
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+
+  const styleElements = document.querySelectorAll(global ? 'style' : `style.${sourceId}`);
+  styleElements.forEach(el => el.parentNode.removeChild(el));
+  const scriptElements = document.body.querySelectorAll(global ? 'script' : `script.${sourceId}`);
+  scriptElements.forEach(el => el.parentNode.removeChild(el));
+  
+  
+  if (!global) {
+    for (const prop of Object.getOwnPropertyNames(clerk[sourceId])) {
+      delete clerk[sourceId][prop];
+    }
+  } else {
+    for (const prop of Object.getOwnPropertyNames(clerk)) {
+      delete clerk[prop];
+    }
+  }
+    
+}
+
+function splitEventMessage(message) {
+  const parts = message.split(':');
+  if (parts.length <= 4) return parts;
+
+  const firstThree = parts.slice(0, 3);
+  const rest = parts.slice(3).join(':');
+  return [...firstThree, rest];
+}
+
+function setUp() {
   if (window.EventSource) {
     const source = new EventSource(`/events`);
 
     source.onmessage = function (event) {
-      const splitPos = event.data.indexOf(":");
-      const action = event.data.slice(0, splitPos);
-      const base64Data = event.data.slice(splitPos + 1);
+      const [action, sourceId, id, base64Data] = splitEventMessage(event.data);
       const data = new TextDecoder("utf-8").decode(Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)));
       
-      debugLog(`Action: ${action}\nData: ${data}`);
+      debugLog(`Action: ${action}\nSourceId: ${sourceId}\nId: ${id}\nData: ${data}`);
+
+      let subView = document.getElementById(sourceId);
+      if (!subView) {
+        const subViewContainer = document.createElement("div");
+        subViewContainer.innerHTML = `<span class="section-marker">${new TextDecoder("utf-8").decode(Uint8Array.from(atob(sourceId), c => c.charCodeAt(0)))}</span>`;
+        subViewContainer.classList.add("section");
+        subViewContainer.id = `subViewContainer-${sourceId}`;
+        subView = document.createElement("div");
+        subView.id = sourceId;
+        subViewContainer.appendChild(subView);
+        clerk[sourceId] = {};
+        document.getElementById("events").appendChild(subViewContainer);
+      }
 
       switch (action) {
         case "CALL": {
@@ -44,45 +95,31 @@ function setUp() {
         case "SCRIPT": {
           const newElement = document.createElement("script");
           newElement.innerHTML = data;
+          newElement.id = id;
+          newElement.classList.add(sourceId);
           document.body.appendChild(newElement);
           break;
         }
         case "WRITE": {
           const newElement = document.createElement("div");
           newElement.innerHTML = data;
-          document.getElementById("events").appendChild(newElement);
+          newElement.id = id;
+          subView.appendChild(newElement);
+          break;
+        }
+        case "CSS": {
+          const newElement = document.createElement("style");
+          newElement.innerHTML = data;
+          newElement.id = id;
+          newElement.classList.add(sourceId);
+          document.head.appendChild(newElement);
           break;
         }
         case "CLEAR": {
           scrollPosition = window.scrollY;
-          const element = document.getElementById("events");
-          while (element.firstChild) {
-            element.removeChild(element.firstChild);
-          }
-
-          const errors = document.getElementById("errors");
-          errors.parentNode.style.display = "none";
-          while (errors.firstChild) {
-            errors.removeChild(errors.firstChild);
-          }
-
-          const toRemove = [];
-          for (const node of document.body.children) {
-            if (node.classList == null || !node.classList.contains("persistent")) {
-              toRemove.push(node);
-            }
-          }
-          toRemove.forEach(x => document.body.removeChild(x));
-          
-          for (const prop of Object.getOwnPropertyNames(clerk)) {
-            delete clerk[prop];
-          }
-          
+          clear(sourceId, id === "-1" || id === "all");
           break;
         }
-        case "DEBUG":
-          debug = true;
-          break;
         case "LOG": {
           const newElement = document.createElement("div");
           newElement.innerText = data;
