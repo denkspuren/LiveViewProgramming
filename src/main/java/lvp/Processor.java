@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Gatherers;
+import java.util.stream.Stream;
 
 import lvp.commands.services.Text;
 import lvp.commands.services.Test;
@@ -59,7 +60,15 @@ public class Processor {
     void process(Process process, String sourceId) {
         try(BufferedReader reader = new BufferedReader(
             new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-            InstructionParser.parse(reader.lines()).gather(Gatherers.fold(() -> "", (prev, curr) ->
+            process(reader.lines(), sourceId, process);                
+        }
+        catch (Exception e) {
+            Logger.logError("Error reading process output: " + e.getMessage(), e);
+        }
+    }
+
+    void process(Stream<String> input, String sourceId, Process process) {
+        InstructionParser.parse(input).gather(Gatherers.fold(() -> "", (prev, curr) ->
                 switch (curr) {
                     case Command cmd -> processCommands(cmd, sourceId);
                     case Pipe pipe -> processPipe(pipe, prev, sourceId);
@@ -67,11 +76,6 @@ public class Processor {
                     case Register register -> processRegister(register);
                     default -> null;
                 })).forEachOrdered(_->{});
-                
-        }
-        catch (Exception e) {
-            Logger.logError("Error reading process output: " + e.getMessage(), e);
-        }
     }
 
     String processCommands(Command command, String sourceId) {

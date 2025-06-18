@@ -90,7 +90,8 @@ public class FileWatcher {
                 key = watcher.take();
                 processWatchKeyEvents(key);
             } catch (ClosedWatchServiceException | InterruptedException e) {
-                Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
+                if (isRunning)
+                    Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
                 if (e instanceof InterruptedException) Thread.currentThread().interrupt();
                 break;
             }

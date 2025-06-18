@@ -1,16 +1,22 @@
 package lvp;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.regex.Matcher;
+import java.util.stream.Stream;
 
 import lvp.skills.logging.LogLevel;
 import lvp.skills.logging.Logger;
 import lvp.skills.parser.ConfigParser;
+import lvp.skills.parser.InstructionParser;
 import lvp.skills.parser.PathParser;
 import lvp.skills.parser.ConfigParser.Source;
 
@@ -29,18 +35,64 @@ public class Main {
         if (!isLatestRelease()) {
             System.out.println("Warning: You are not using the latest release of Live View Programming. Please visit https://github.com/denkspuren/LiveViewProgramming/releases");
         }
+
+        Server server = null;
+        FileWatcher watcher = null;
+        Processor processor = null;
         
         try {
-            Server server = new Server(Math.abs(cfg.port()));
+            server = new Server(Math.abs(cfg.port()));
             Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
-            Processor processor = new Processor(server);
-            FileWatcher watcher = new FileWatcher(cfg.sources(), cfg.watchFilter(), cfg.sourceOnly(), processor);
+            processor = new Processor(server);
+            watcher = new FileWatcher(cfg.sources(), cfg.watchFilter(), cfg.sourceOnly(), processor);
             Runtime.getRuntime().addShutdownHook(new Thread(watcher::stop));
             watcher.start();
         } catch (IOException e) {
             System.err.println("Error starting lvp: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);
+        }
+
+        Scanner scanner = new Scanner(System.in);
+        while(true) {
+            String input = scanner.nextLine().strip();
+            if (input.startsWith("/"))
+                handleServerCommands(input.substring(1).strip());
+            else if (!input.isBlank() && !input.startsWith("Scan")) {
+                processor.process(Stream.of(input),  Base64.getUrlEncoder().withoutPadding().encodeToString("stdin".getBytes(StandardCharsets.UTF_8)), null);
+            } else {
+                System.err.println("Error: Invalid command. Use '/help' for available commands.");
+            }
+        }
+    }
+
+    private static void handleServerCommands(String command) {
+        String[] parts = command.split(" ", 2);
+        if (command.isBlank() || parts.length == 0) {
+            System.out.println("No command entered. Type '/help' for available commands.");
+            return;
+        }
+
+        switch (parts[0].toLowerCase()) {
+            case "exit" -> {
+                System.out.println("Exiting Live View Programming...");
+                System.exit(0);
+            }
+            case "log" -> {
+                if (parts.length < 2) {
+                    System.out.println("Usage: /log <level>");
+                    return;
+                }
+                LogLevel level = LogLevel.fromString(parts[1]);
+                if (level == null) {
+                    System.out.println("Invalid log level.");
+                } else {
+                    Logger.setLogLevel(level);
+                    System.out.println("Log level set to: " + level);
+                }
+            }
+            case "help" -> System.out.println("Available commands: /exit, /help, /log");
+            default -> System.out.println("Unknown command: " + command);
         }
     }
 
