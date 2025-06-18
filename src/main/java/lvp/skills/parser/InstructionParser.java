@@ -141,11 +141,11 @@ public class InstructionParser {
     }
 
     private static boolean trySingleCommand(String line, Downstream<? super Instruction>  out) {
-        Matcher matcher = SINGLE_LINE_COMMAND.matcher(line);
+        Matcher matcher = SINGLE_LINE_COMMAND.matcher(line).matches() ? SINGLE_LINE_COMMAND.matcher(line) : SINGLE_LINE_COMMAND_CONTENTLESS.matcher(line);
         if (!matcher.matches()) return false;
         String id = matcher.group(2) == null ? IdGen.generateID(10) : matcher.group(2);
         Logger.logDebug("Parsed single-line command: " + matcher.group(1) + formatFlag(id));
-        out.push(new Command(matcher.group(1), id, matcher.group(3)));
+        out.push(new Command(matcher.group(1), id, matcher.groupCount() == 3 ? matcher.group(3) : ""));
         return true;
     }
 
