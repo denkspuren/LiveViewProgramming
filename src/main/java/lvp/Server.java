@@ -49,7 +49,7 @@ public class Server {
 
         httpServer.createContext("/log", this::handleLog);
         httpServer.createContext("/interact", this::handleInteract);
-        httpServer.createContext("/read", this::handleRead);
+        httpServer.createContext("/scan", this::handleScan);
         httpServer.createContext("/events", this::handleEvents);
         httpServer.createContext("/", this::handleRoot);
 
@@ -75,7 +75,7 @@ public class Server {
         Logger.log(LogLevel.fromString(parts[0]), parts[1]);
     }
 
-    private void handleRead(HttpExchange exchange) throws IOException {
+    private void handleScan(HttpExchange exchange) throws IOException {
         String message = readRequestBody(exchange);
         if (message == null) return;
         String[] parts = message.split(":", 2);

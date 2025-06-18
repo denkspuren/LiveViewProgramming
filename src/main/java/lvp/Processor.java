@@ -26,7 +26,7 @@ import lvp.skills.parser.InstructionParser;
 import lvp.skills.parser.InstructionParser.Command;
 import lvp.skills.parser.InstructionParser.CommandRef;
 import lvp.skills.parser.InstructionParser.Pipe;
-import lvp.skills.parser.InstructionParser.Read;
+import lvp.skills.parser.InstructionParser.Scan;
 import lvp.skills.parser.InstructionParser.Register;
 public class Processor {
     Server server;
@@ -62,7 +62,7 @@ public class Processor {
                 switch (curr) {
                     case Command cmd -> processCommands(cmd, sourceId);
                     case Pipe pipe -> processPipe(pipe, prev, sourceId);
-                    case Read read -> processRead(read, process, sourceId);
+                    case Scan scan -> processScan(scan, process, sourceId);
                     case Register register -> processRegister(register);
                     default -> null;
                 })).forEachOrdered(_->{});
@@ -106,16 +106,16 @@ public class Processor {
         return current;
     }
 
-    String processRead(Read read, Process process, String sourceId) {
+    String processScan(Scan scan, Process process, String sourceId) {
         server.waitingProcesses.put(sourceId, process);
-        String inputField = HTMLElements.input("input" + read.id());
-        String button = HTMLElements.button("button" + read.id(), "Send", TextUtils.fillOut("""
+        String inputField = HTMLElements.input("input" + scan.id());
+        String button = HTMLElements.button("button" + scan.id(), "Send", TextUtils.fillOut("""
                 (()=>{
                     const input = document.getElementById("input${0}");
-                    fetch("read", { method: "post", body: "${1}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
+                    fetch("scan", { method: "post", body: "${1}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
                 })()
-                """, read.id(), sourceId));
-        targetProcessor.consumeHTML(new MetaInformation(sourceId, read.id()), inputField + button);
+                """, scan.id(), sourceId));
+        targetProcessor.consumeHTML(new MetaInformation(sourceId, scan.id()), inputField + button);
         return null;
     }
 
