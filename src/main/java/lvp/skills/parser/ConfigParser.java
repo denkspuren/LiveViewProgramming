@@ -15,7 +15,7 @@ public class ConfigParser {
     public record Source(Path path, String cmd) {}
 
     private static final Pattern OBJECT_PATTERN = Pattern.compile(
-        "\\{\\s*\"path\"\\s*:\\s*\"(.*?)\"\\s*,\\s*\"cmd\"\\s*:\\s*\"(.*?)\"\\s*\\},"
+        "\\{\\s*\"path\"\\s*:\\s*\"(.*?)\"\\s*,\\s*\"cmd\"\\s*:\\s*\"(.*?)\"\\s*\\},?"
     );
 
     public static Optional<List<Source>> parse(Path path) {
