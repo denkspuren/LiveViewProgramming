@@ -52,6 +52,7 @@ public class FileWatcher {
             .map(Path::normalize)
             .flatMap(root -> {
                 try {
+                    if (sourceOnly) return Stream.of(root);
                     return Files.find(root, Integer.MAX_VALUE, 
                         (_, attrs) -> attrs.isDirectory());
                 } catch (IOException e) {
