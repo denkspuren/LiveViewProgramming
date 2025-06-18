@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 import lvp.skills.logging.LogLevel;
 import lvp.skills.logging.Logger;
 import lvp.skills.parser.ConfigParser;
-import lvp.skills.parser.InstructionParser;
 import lvp.skills.parser.PathParser;
 import lvp.skills.parser.ConfigParser.Source;
 
@@ -55,7 +54,8 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
         while(true) {
-            String input = scanner.nextLine().strip();
+            String input = null;
+            try { input = scanner.nextLine().strip(); } catch (Exception _) { break;}
             if (input.startsWith("/"))
                 handleServerCommands(input.substring(1).strip());
             else if (!input.isBlank() && !input.startsWith("Scan")) {

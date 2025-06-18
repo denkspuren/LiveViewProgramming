@@ -27,6 +27,7 @@ import lvp.skills.parser.InstructionParser.Command;
 import lvp.skills.parser.InstructionParser.CommandRef;
 import lvp.skills.parser.InstructionParser.Pipe;
 import lvp.skills.parser.InstructionParser.Scan;
+import lvp.skills.parser.InstructionParser.Unknown;
 import lvp.skills.parser.InstructionParser.Register;
 public class Processor {
     public record MetaInformation(String sourceId, String id, boolean standalone) {}
@@ -74,6 +75,7 @@ public class Processor {
                     case Pipe pipe -> processPipe(pipe, prev, sourceId);
                     case Scan scan -> processScan(scan, process, sourceId);
                     case Register register -> processRegister(register);
+                    case Unknown unknown -> processUnknown(unknown, sourceId);
                     default -> null;
                 })).forEachOrdered(_->{});
     }
@@ -88,6 +90,7 @@ public class Processor {
             return services.get(command.name()).apply(new MetaInformation(sourceId, command.id(), true), command.content());
         } else {
             Logger.logError("Command not found: " + command.name());
+            targetProcessor.consumeError(new MetaInformation(sourceId, "", true), command.name() + command.content());
         }
 
         return null;
@@ -157,10 +160,14 @@ public class Processor {
         return null;
     }
 
+    String processUnknown(Unknown unknown, String sourceId) {
+        targetProcessor.consumeError(new MetaInformation(sourceId, "", true), unknown.message());
+        return null;
+    }
+
     void init(String sourceId) {
         server.clearEvents(sourceId);
-        server.sendServerEvent(SSEType.CLEAR, "", "", sourceId);
-        Text.clear();
+        Text.clear(sourceId);
     }
     
 }

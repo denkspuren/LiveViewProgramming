@@ -23,14 +23,6 @@ function errorLog(message) {
     .catch(console.error);
 }
 
-function clearErrorLog() {
-  const errors = document.getElementById("errors");
-  errors.parentNode.style.display = "none";
-  while (errors.firstChild) {
-    errors.removeChild(errors.firstChild);
-  }
-}
-
 function clear(sourceId, global) {
   const element = !global ? document.getElementById(sourceId) : document.getElementById("events");
   while (element.firstChild) {
@@ -41,17 +33,25 @@ function clear(sourceId, global) {
   styleElements.forEach(el => el.parentNode.removeChild(el));
   const scriptElements = document.body.querySelectorAll(global ? 'script' : `script.${sourceId}`);
   scriptElements.forEach(el => el.parentNode.removeChild(el));
+
+  const errors = document.getElementById("errors");
   
   
   if (!global) {
+    errors?.querySelectorAll(`.${sourceId}`).forEach(el => el.parentNode.removeChild(el));
     for (const prop of Object.getOwnPropertyNames(clerk[sourceId])) {
       delete clerk[sourceId][prop];
     }
   } else {
+    while (errors.firstChild) {
+      errors.removeChild(errors.firstChild);
+    }
     for (const prop of Object.getOwnPropertyNames(clerk)) {
       delete clerk[prop];
     }
   }
+    
+  if (!errors.hasChildNodes()) errors.parentNode.style.display = "none";
     
 }
 
@@ -123,11 +123,10 @@ function setUp() {
         case "LOG": {
           const newElement = document.createElement("div");
           newElement.innerText = data;
+          newElement.classList.add(sourceId);
           const errors = document.getElementById("errors");
           errors.appendChild(newElement);
           errors.parentNode.style.display = "";
-          scrollPosition = 0;
-          window.scrollTo(0, 0);
           break;
         }
         default:

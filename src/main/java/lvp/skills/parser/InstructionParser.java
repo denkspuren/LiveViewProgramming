@@ -17,12 +17,13 @@ import java.util.Arrays;
 public class InstructionParser {
 
     // ---- Instruction Types ----
-    public sealed interface Instruction permits Command, Register, Scan, Pipe {}
+    public sealed interface Instruction permits Command, Register, Scan, Pipe, Unknown {}
 
     public record Command(String name, String id, String content) implements Instruction {}
     public record Register(String name, String call, boolean skipId) implements Instruction {}
     public record Scan(String id) implements Instruction {}
     public record Pipe(List<CommandRef> commands) implements Instruction {}
+    public record Unknown(String message) implements Instruction {}
 
     public record CommandRef(String name, String id) {}
 
@@ -86,7 +87,7 @@ public class InstructionParser {
         if (tryScan(line, out)) return;
         if (trySingleCommand(line, out)) return;
         if (tryBlockStart(state, line)) return;
-
+        out.push(new Unknown(line));
         Logger.logError("Ignored unrecognized line: " + line);
     }
 

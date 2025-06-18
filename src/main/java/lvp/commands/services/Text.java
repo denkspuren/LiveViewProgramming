@@ -1,7 +1,8 @@
 package lvp.commands.services;
 
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lvp.Processor.MetaInformation;
 import lvp.skills.TextUtils;
@@ -9,10 +10,16 @@ import lvp.skills.logging.Logger;
 
 public class Text {
     private Text() {}
-    static Map<String, String> templates = new HashMap<>();
+    static Map<String, String> templates = new ConcurrentHashMap<>();
 
-    public static void clear() {
-        templates.clear();
+    public static void clear(String sourceId) {
+        Iterator<String> iterator = templates.keySet().iterator();
+        while (iterator.hasNext()) {
+            String key = iterator.next();
+            if (key.startsWith(sourceId + ":")) {
+                iterator.remove();
+            }
+        }
     }
 
     public static String codeblock(MetaInformation meta, String content) {
@@ -25,9 +32,9 @@ public class Text {
     }
 
     public static String of(MetaInformation meta, String content) {
-        String existing = templates.get(meta.id());
+        String existing = templates.get(meta.sourceId() + ":" + meta.id());
         if (existing == null || meta.standalone() && !content.isBlank()) {
-            templates.put(meta.id(), content);
+            templates.put(meta.sourceId() + ":" + meta.id(), content);
             return content;
         }
 

@@ -14,6 +14,10 @@ public class Targets {
         this.server = server;
     }
 
+    public void consumeError(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.LOG, content, meta.id(), meta.sourceId());
+    }
+
     public void consumeClear(MetaInformation meta, String content) {
         server.sendServerEvent(SSEType.CLEAR, "", meta.id(), meta.sourceId());
     }
