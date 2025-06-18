@@ -5,18 +5,18 @@ void main() {
         println("""
         Markdown: # Text Demo
         Text: newdemo.java;// ex1
-        | Codeblock | Text{example}
-        Text{title}: Codeblocks
-        Text{template}:
+        | Codeblock | Text[example]
+        Text[title]: Codeblocks
+        Text[template]:
         ## ${0}
         ```java
         ${1}
         ```
         ~~~
-        | Text{title} | Text{example} | Markdown
-        Text{template}: Hello World!
+        | Text[title] | Text[example] | Markdown
+        Text[template]: Hello World!
         | Markdown
-        Text{template}
+        Text[template]
         | Markdown
 
         """);
