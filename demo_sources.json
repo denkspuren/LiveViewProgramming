@@ -1,0 +1,4 @@
+[
+    { "path": "demo/**/demo.java", "cmd": "java --enable-preview -Dsun.stdout.encoding=UTF-8" },
+    { "path": "demo/sub1/demo.bat", "cmd": "" }
+]
