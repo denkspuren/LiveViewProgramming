@@ -145,7 +145,7 @@ public class FileWatcher {
             ProcessBuilder pb = new ProcessBuilder(isWindows ? new String[]{"cmd.exe", "/c", source.cmd(), source.path().toString()} : new String[]{"sh", "-c", source.cmd(),  source.path().toString()})
                 .redirectErrorStream(true);
             Process process = pb.start();
-            processor.process(process, source.path());
+            processor.process(process, source.id());
 
             boolean finished = process.waitFor(10, TimeUnit.SECONDS);
             if (!finished) {

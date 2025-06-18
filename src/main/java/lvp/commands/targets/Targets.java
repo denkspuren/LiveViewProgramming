@@ -5,6 +5,7 @@ import lvp.Server;
 import lvp.commands.targets.dot.GraphSpec;
 
 public class Targets {
+    public record MetaInformation(String sourceId, String id) {}
     Server server;
 
     public static Targets of(Server server) { return new Targets(server); }
@@ -13,27 +14,27 @@ public class Targets {
         this.server = server;
     }
 
-    public void consumeClear(String id, String content) {
-        server.sendServerEvent(SSEType.CLEAR, "");
+    public void consumeClear(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.CLEAR, "", meta.id(), meta.sourceId());
     }
     
-    public void consumeHTML(String id, String content) {
-        server.sendServerEvent(SSEType.WRITE, content);
+    public void consumeHTML(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.WRITE, content, meta.id(), meta.sourceId());
     }
 
-    public void consumeJS(String id, String content) {
-        server.sendServerEvent(SSEType.SCRIPT, content);
+    public void consumeJS(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.SCRIPT, content, meta.id(), meta.sourceId());
     }
 
-    public void consumeJSCall(String id, String content) {
-        server.sendServerEvent(SSEType.CALL, content);
+    public void consumeJSCall(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.CALL, content, meta.id(), meta.sourceId());
     }
 
-    public void consumeMarkdown(String id, String content) {
-        consumeHTML("container" + id, "<script id='" + id + "' type='preformatted'>" + content + "</script>");
+    public void consumeMarkdown(MetaInformation meta, String content) {
+        consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id()), "<script id='" + meta.id() + "' type='preformatted'>" + content + "</script>");
         // Using `preformatted` is a hack to get a Java String into the Browser without interpretation
         
-        consumeJSCall("call" + id, "var scriptElement = document.getElementById('" + id  + "');"
+        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id()), "var scriptElement = document.getElementById('" + meta.id() + "');"
         +
         """
         var divElement = document.createElement('div');
@@ -44,12 +45,12 @@ public class Targets {
         );
     }
 
-    public void consumeDot(String id, String content) {
+    public void consumeDot(MetaInformation meta, String content) {
         GraphSpec specs = GraphSpec.fromContent(content);
 
-        consumeHTML("container" + id, "<div id='dotContainer" + id + "'></div>");
-        consumeJS("script" + id, "clerk.dot" + id + " = new Dot(document.getElementById('dotContainer" + id + "'), " + specs.width().orElse(500) + ", " + specs.height().orElse(500) + ");");
-        consumeJSCall("call" + id, "clerk.dot" + id + ".draw(\"" + specs.dot() + "\")");
+        consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id()), "<div id='dotContainer" + meta.id() + "'></div>");
+        consumeJS(new MetaInformation(meta.sourceId(), "script" + meta.id()), "clerk.dot" + meta.id() + " = new Dot(document.getElementById('dotContainer" + meta.id() + "'), " + specs.width().orElse(500) + ", " + specs.height().orElse(500) + ");");
+        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id()), "clerk.dot" + meta.id() + ".draw(\"" + specs.dot() + "\")");
     }
     
 }

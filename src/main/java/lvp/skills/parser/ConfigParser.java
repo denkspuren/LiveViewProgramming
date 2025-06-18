@@ -1,9 +1,11 @@
 package lvp.skills.parser;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -12,7 +14,11 @@ import java.util.regex.Pattern;
 import lvp.skills.logging.Logger;
 
 public class ConfigParser {
-    public record Source(Path path, String cmd) {}
+    public record Source(Path path, String cmd) {
+        public String id() {
+            return Base64.getEncoder().encodeToString(path().toString().getBytes(StandardCharsets.UTF_8));
+        }
+    }
 
     private static final Pattern OBJECT_PATTERN = Pattern.compile(
         "\\{\\s*\"path\"\\s*:\\s*\"(.*?)\"\\s*,\\s*\"cmd\"\\s*:\\s*\"(.*?)\"\\s*\\},?"

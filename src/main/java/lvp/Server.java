@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 
+import com.sun.jdi.event.Event;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
@@ -26,7 +27,7 @@ import lvp.skills.logging.Logger;
 
 
 public class Server {
-    private record EventMessage(SSEType event, String data) {}
+    private record EventMessage(SSEType type, String data, String id, String sourceId) {}
 
     private final HttpServer httpServer;
 
@@ -39,7 +40,7 @@ public class Server {
 
     public final List<HttpExchange> webClients = new CopyOnWriteArrayList<>(); // thread-safe variant of ArrayList;
     List<EventMessage> events = new CopyOnWriteArrayList<>();
-    Map<Path, Process> waitingProcesses = new ConcurrentHashMap<>();
+    Map<String, Process> waitingProcesses = new ConcurrentHashMap<>();
 
     boolean isVerbose = false;
 
@@ -153,11 +154,9 @@ public class Server {
         exchange.getResponseHeaders().add("Connection", "keep-alive");
         exchange.sendResponseHeaders(200, 0);
 
-        if (isVerbose) sendMessageToClient(exchange, SSEType.DEBUG, "");
-
         webClients.add(exchange);
         if (!events.isEmpty()) {
-            events.forEach(event -> sendMessageToClient(exchange, event.event, event.data));
+            events.forEach(event -> sendMessageToClient(exchange, event));
         }
     }
 
@@ -182,16 +181,24 @@ public class Server {
         }
     }
 
-    public void sendServerEvent(SSEType sseType, String data) {
-        events.add(new EventMessage(sseType, data));
-        if (webClients.isEmpty()) return;        
-        webClients.removeIf(connection -> !sendMessageToClient(connection, sseType, data));
+    public void sendServerEvent(SSEType type, String data, String id, String sourceId) {
+        Logger.logDebug("Event: " + type + " with data: " + data + " to " + sourceId);
+        sendServerEvent(new EventMessage(type, Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8)), id, sourceId));
     }
 
-    private boolean sendMessageToClient(HttpExchange connection, SSEType event, String data) {
-        Logger.logDebug("Event: " + event + " with data: " + data);
+    private void sendServerEvent(EventMessage event) {
+        events.add(event);
+        if (webClients.isEmpty()) return;        
+        webClients.removeIf(connection -> !sendMessageToClient(connection, event));
+    }
+
+    private boolean sendMessageToClient(HttpExchange connection, EventMessage event) {
         try {
-            String message = "data: " + event + ":" +  Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8)) + "\n\n";
+            String message = "data: " + event.type() 
+                + ":" + event.sourceId() 
+                + ":" + event.id() 
+                + ":" +  event.data() 
+                + "\n\n";
             OutputStream os = connection.getResponseBody();
             os.write(message.getBytes(StandardCharsets.UTF_8));
             os.flush();
