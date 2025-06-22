@@ -37,7 +37,8 @@ public class Processor {
     Map<String, BiConsumer<MetaInformation, String>> targets;
     Map<String, BiFunction<MetaInformation, String, String>> services = new HashMap<>(Map.of(
             "Text", Text::of, 
-            "Codeblock", Text::codeblock, 
+            "Codeblock", Text::codeblock,
+            "Cutout", Text::cutout,
             "Turtle", Turtle::of,
             "Button", Interaction::button,
             "Input", Interaction::input,
@@ -97,10 +98,11 @@ public class Processor {
     }
 
     String processPipe(Pipe pipe, String input, String sourceId) {
-        if (input == null) return null;
         String current = input;
         for (CommandRef ref : pipe.commands()) {
             Logger.logDebug("Command: " + ref.name() + "{" + ref.id() + "}, " + current);
+            if (current == null) return null;
+
             if (targets.containsKey(ref.name())) {
                 targets.get(ref.name()).accept(new MetaInformation(sourceId, ref.id(), false), current);
                 return null;

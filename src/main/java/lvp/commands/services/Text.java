@@ -31,6 +31,16 @@ public class Text {
         return TextUtils.codeBlock(parts[0].strip(), parts[1].strip());
     }
 
+    //TODO: Allow multiple label
+    public static String cutout(MetaInformation meta, String content) {
+        String[] parts = content.split(";");
+        if (parts.length != 2) {
+            Logger.logError("(" + meta.id() + ") Invalid Codeblock Format.");
+            return null;
+        }
+        return TextUtils.cutOut(parts[0].strip(), parts[1].strip());
+    }
+
     public static String of(MetaInformation meta, String content) {
         String existing = memory.get(meta.sourceId() + ":" + meta.id());
         if (existing == null || meta.standalone() && !content.isBlank()) {

@@ -7,10 +7,12 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import lvp.Processor.MetaInformation;
 import lvp.skills.TextUtils;
@@ -25,12 +27,13 @@ public class Test {
 
         for (String line: content.lines().toList()) {
             if (line.isBlank()) continue;
-            if (line.strip().startsWith("Send:") || line.strip().startsWith("Expect:")) {
+            if (line.strip().startsWith("Send:") || line.strip().startsWith("Expect:") || line.strip().startsWith("Type:")) {
                 String[] parts = line.split(":", 2);
                 currentKey = parts[0].strip().toLowerCase();
                 String value = parts[1].strip();
                 fields.computeIfAbsent(currentKey, _ -> new ArrayList<>());
                 if (!value.isEmpty()) fields.get(currentKey).add(value);
+                if (currentKey.equals("type")) currentKey = null;
             } else if (currentKey != null) {
                 fields.get(currentKey).add(line);
             } else {
@@ -40,16 +43,18 @@ public class Test {
         }
         String send = String.join("\n", fields.get("send"));
         List<String> expect = fields.get("expect");
+        List<String> typeL = fields.get("type");
+        String type = typeL != null && typeL.size() == 1 ? typeL.getFirst() : "exact";
 
         if (send == null || expect == null) {
             Logger.logError("Test command requires 'Send' and 'Expect' fields.");
             return null;
         }
 
-        Logger.logDebug("Parsed test command: send=" + send + ", expect=" + expect);
+        Logger.logDebug("Parsed test command: send=" + send + ", expect=" + expect + ", type=" + type);
         String actual = executeJshell(send);
         if (actual == null) return "No Result";
-        List<String> actualParsed = actual.lines().map(Test::parseJshellOutput).toList();
+        List<String> actualParsed = actual.lines().map(Test::parseJshellOutput).filter(s -> !s.isBlank()).toList();
 
         return TextUtils.fillOut("""
             Result for Test ${0}:
@@ -57,8 +62,21 @@ public class Test {
             Response: ${2}
             Actual: ${3}
             Expected: ${4}
-            Status: ${5}
-            """, meta.id(), send, actual, actualParsed, expect, actualParsed.equals(expect) ? "Success" : "Failure");
+            Comparison: '${5}'
+            Status: ${6}
+            """, meta.id(), send, actual, actualParsed, expect, type, compare(actualParsed, expect, type) ? "Success" : "Failure");
+    }
+
+    private static boolean compare(List<String> actual, List<String> expected, String type) {
+        return switch(type) {
+            case "exact" -> actual.equals(expected);
+            case "oneof" -> expected.stream().allMatch(actual::contains);
+            case "same" -> actual.size() == expected.size() && new HashSet<>(actual).equals(new HashSet<>(expected));
+            default -> {
+                Logger.logError("Unknown Comparison Type.");
+                yield false;
+            }
+        };
     }
 
     private static String executeJshell(String send) {

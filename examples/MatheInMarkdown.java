@@ -1,8 +1,7 @@
-import lvp.Clerk;
-
 void main() {
-    Clerk.clear();
-    Clerk.markdown("""
+    println("""
+    Clear
+    Markdown:
     # Mathe Beispiele
     ## Simple Math
     Man kann Formeln wie $2x_1+5x_2 = 12$ direkt in der Textzeile unterbringen.
@@ -31,6 +30,6 @@ void main() {
     \\Large
     1x^2 + 2x = 5
     $$
-
+    ~~~
     """);
 }

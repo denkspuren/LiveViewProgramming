@@ -1,1 +1,0 @@
-echo "Markdown: # Shell Demo"
