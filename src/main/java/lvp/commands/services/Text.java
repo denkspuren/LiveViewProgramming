@@ -1,5 +1,6 @@
 package lvp.commands.services;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,14 +32,15 @@ public class Text {
         return TextUtils.codeBlock(parts[0].strip(), parts[1].strip());
     }
 
-    //TODO: Allow multiple label
     public static String cutout(MetaInformation meta, String content) {
         String[] parts = content.split(";");
-        if (parts.length != 2) {
+        if (parts.length < 1) {
             Logger.logError("(" + meta.id() + ") Invalid Codeblock Format.");
             return null;
         }
-        return TextUtils.cutOut(parts[0].strip(), parts[1].strip());
+        if (parts.length == 1)
+            return TextUtils.read(parts[0].strip());
+        return TextUtils.cutOut(parts[0].strip(), Arrays.stream(parts).skip(1).map(String::strip).toArray(String[]::new));
     }
 
     public static String of(MetaInformation meta, String content) {

@@ -38,7 +38,7 @@ public class TextUtils { // Class with static methods for file operations
         try {
             List<String> lines = Files.readAllLines(path);
             for (String line : lines) {
-                isInLabels = Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
+                isInLabels = labels == null || labels.length == 0 || labels[0].isBlank() || Arrays.stream(labels).anyMatch(label -> line.trim().equals(label));
                 if (isInLabels) {
                     if (skipLines && includeStartLabel)
                         snippet.add(line);

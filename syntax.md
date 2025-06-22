@@ -3,6 +3,7 @@
 - `[]` -> Optional
 - `::=` -> Definiert als
 - `''` -> Literal
+
 ```
 INSTRUCTION ::=     COMMAND | REGISTER | PIPE
 ```
