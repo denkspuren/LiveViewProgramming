@@ -25,7 +25,7 @@ public class Text {
     public static String codeblock(MetaInformation meta, String content) {
         String[] parts = content.split(";");
         if (parts.length != 2) {
-            Logger.logError("Invalid Codeblock Format.");
+            Logger.logError("(" + meta.id() + ") Invalid Codeblock Format.");
             return null;
         }
         return TextUtils.codeBlock(parts[0].strip(), parts[1].strip());

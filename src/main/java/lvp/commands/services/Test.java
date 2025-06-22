@@ -5,6 +5,9 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -13,19 +16,30 @@ import lvp.Processor.MetaInformation;
 import lvp.skills.TextUtils;
 import lvp.skills.logging.Logger;
 
-//TODO: multiple actual and expect
 public class Test {
+    private Test() {}
     private static final String JSHELL_PROMPT = "jshell>";
     public static String test(MetaInformation meta, String content) {
-        Map<String, String> fields = content.lines()
-            .filter(line -> !line.isBlank())
-            .map(line -> line.split(":", 2))
-            .filter(parts -> parts.length == 2)
-            .map(parts -> Map.entry(parts[0].strip().toLowerCase(), parts[1].strip()))
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, List<String>> fields = new HashMap<>(); 
+        String currentKey = null;
 
-        String send = fields.get("send");
-        String expect = fields.get("expect");
+        for (String line: content.lines().toList()) {
+            if (line.isBlank()) continue;
+            if (line.strip().startsWith("Send:") || line.strip().startsWith("Expect:")) {
+                String[] parts = line.split(":", 2);
+                currentKey = parts[0].strip().toLowerCase();
+                String value = parts[1].strip();
+                fields.computeIfAbsent(currentKey, _ -> new ArrayList<>());
+                if (!value.isEmpty()) fields.get(currentKey).add(value);
+            } else if (currentKey != null) {
+                fields.get(currentKey).add(line);
+            } else {
+                Logger.logError("Unexpected line " + line);
+                return null;
+            }
+        }
+        String send = String.join("\n", fields.get("send"));
+        List<String> expect = fields.get("expect");
 
         if (send == null || expect == null) {
             Logger.logError("Test command requires 'Send' and 'Expect' fields.");
@@ -35,7 +49,7 @@ public class Test {
         Logger.logDebug("Parsed test command: send=" + send + ", expect=" + expect);
         String actual = executeJshell(send);
         if (actual == null) return "No Result";
-        String actualParsed = actual.lines().map(Test::parseJshellOutput).findFirst().orElse("");
+        List<String> actualParsed = actual.lines().map(Test::parseJshellOutput).toList();
 
         return TextUtils.fillOut("""
             Result for Test ${0}:
@@ -74,6 +88,7 @@ public class Test {
             }
         } catch (Exception e) {
             Logger.logError("Error in jshell", e);
+            Thread.currentThread().interrupt();
         }
         return result;
     }
