@@ -31,26 +31,30 @@ Sie können die `.jar`-Datei auch selber generieren, wenn Sie zudem die Versions
 Passen Sie den Beispielaufruf an die aktuelle Version an:
 
 ```
-java -jar lvp-<Version>.jar --log --watch=demo.java
+java -jar lvp-<Version>.jar --log demo.java
 ```
 
 Wenn Sie die Version `lvp-0.5.0.jar` heruntergeladen haben, lautet der Aufruf:
 
 ```
-java -jar lvp-0.5.0.jar --log --watch=demo.java
+java -jar lvp-0.5.0.jar --log demo.java
 ```
 
 #### Übersicht der möglichen Kommandozeilenargumente
 
-| Argument         | Alias   | Bedeutung                                 | Beispiel                                      |
-|------------------|---------|-------------------------------------------|-----------------------------------------------|
-| --watch=DATEI    | -w      | Zu überwachende Datei oder Verzeichnis     | --watch=path/to/<br>--watch=demo.java                  |
-| --pattern=PATTERN| -p      | Dateinamensmuster (z.B. *.java)           | --pattern=*.java                              |
-| --log[=LEVEL]    | -l      | Log-Level (Error, Info, Debug)            | --log=Debug                                   |
-| PORT             |         | Portnummer für den Server                 | 50001                                         |
+| Argument                   | Alias | Bedeutung                                                                 | Beispiel                                 |
+|----------------------------|-------|---------------------------------------------------------------------------|------------------------------------------|
+| `--cmd=CMD`                |       | Startbefehl für die Ausführung (z. B. Java mit Optionen)                  | `--cmd="java --enable-preview"`          |
+| `--log[=LEVEL]`            | `-l`  | Log-Level (`Error`, `Info`, `Debug`)                                      | `--log=Debug`                            |
+| `--port`                   | `-p`  | Portnummer für den Server                                                 | `--port=50002`                           |
+| `--config`                 | `-c`  | Lädt Konfiguration aus `sources.json`                                     | `--config`                               |
+| `--source-only`            | `-s`  | Ignoriert alle Nicht-Source-Dateien                                       | `--source-only`                          |
+| `--watch-filter=PATTERN`   | `-w`  | Filter für Dateien, die ein Neuladen der Inhalte auslösen können          | `--watch-filter=./deps/*.java`           |
+| `SOURCES`                  |       | Quellen, die durch LVP ausgeführt werden                                  | `demo1.java demo2.java` <br> `sources/*.java` |
+
 
 > Mehrere Argumente können kombiniert werden, z.B.:  
-> `java -jar lvp-<Version>.jar --watch=src --pattern=*.java --log=Debug 50001`
+> `java -jar lvp-<Version>.jar --watch-filter=src/lib/**/*.java --log=Debug --port=50001 --config src/*View.java`
 
 ### 3. So nutzt man das _Live View Programming_
 
