@@ -10,10 +10,10 @@ import lvp.skills.logging.Logger;
 
 public class Text {
     private Text() {}
-    static Map<String, String> templates = new ConcurrentHashMap<>();
+    static Map<String, String> memory = new ConcurrentHashMap<>();
 
     public static void clear(String sourceId) {
-        Iterator<String> iterator = templates.keySet().iterator();
+        Iterator<String> iterator = memory.keySet().iterator();
         while (iterator.hasNext()) {
             String key = iterator.next();
             if (key.startsWith(sourceId + ":")) {
@@ -32,9 +32,9 @@ public class Text {
     }
 
     public static String of(MetaInformation meta, String content) {
-        String existing = templates.get(meta.sourceId() + ":" + meta.id());
+        String existing = memory.get(meta.sourceId() + ":" + meta.id());
         if (existing == null || meta.standalone() && !content.isBlank()) {
-            templates.put(meta.sourceId() + ":" + meta.id(), content);
+            memory.put(meta.sourceId() + ":" + meta.id(), content);
             return content;
         }
 
@@ -42,6 +42,6 @@ public class Text {
             return existing;
         }
 
-        return TextUtils.linearFillOut(existing, content);
+        return TextUtils.linearFillOut(content, existing);
     }
 }
