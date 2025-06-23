@@ -45,21 +45,9 @@ public class FileWatcher {
         this.sourceOnly = sourceOnly;
         
         watcher = FileSystems.getDefault().newWatchService();
-        sources.stream()
-            .map(Source::path)
-            .map(Path::getParent)
-            .filter(Objects::nonNull)
+        
+        (sourceOnly ? getSourceFolder(sources) : getFolderTree())
             .map(Path::normalize)
-            .flatMap(root -> {
-                try {
-                    if (sourceOnly) return Stream.of(root);
-                    return Files.find(root, Integer.MAX_VALUE, 
-                        (_, attrs) -> attrs.isDirectory());
-                } catch (IOException e) {
-                    Logger.logError("Error walking directory: " + root.toAbsolutePath(), e);
-                    return Stream.empty();
-                }
-            })
             .distinct()
             .forEach(dir -> {
                 try {
@@ -72,6 +60,26 @@ public class FileWatcher {
                 }
             });
         
+    }
+
+    private Stream<Path> getSourceFolder(List<Source> input) {
+        return input.stream()
+                .map(Source::path)
+                .map(Path::getParent)            
+                .filter(Objects::nonNull);
+    }
+
+    private Stream<Path> getFolderTree() {
+        return Stream.of(Path.of("."))
+                .flatMap(root -> {
+                    try {
+                        return Files.find(root, Integer.MAX_VALUE, 
+                            (_, attrs) -> attrs.isDirectory()).filter(p -> !p.toString().contains(".git"));
+                    } catch (IOException e) {
+                        Logger.logError("Error walking directory: " + root.toAbsolutePath(), e);
+                        return Stream.empty();
+                    }
+                });
     }
 
     public void start() {

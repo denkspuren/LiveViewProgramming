@@ -1,6 +1,7 @@
-import static java.io.IO.println;
-
 import java.util.Scanner;
+
+/// Register with:
+/// Register: Reverse java --enable-preview external.java
 
 void main() {
     Scanner scanner = new Scanner(System.in);
