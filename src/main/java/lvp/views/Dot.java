@@ -2,17 +2,16 @@ package lvp.views;
 
 import lvp.Clerk;
 
+//TODO: Rewrite for next minor / major release
+// This is a temporary solution to use the Viz.js library without changing the api.
 public class Dot implements Clerk {    
     final String ID;
-    int width, height;
 
     public Dot(int width, int height) {
-        this.width = width;
-        this.height = height;
         ID = Clerk.getHashID(this);
 
         Clerk.write("<div id='dotContainer" + ID + "'></div>");
-        Clerk.script("clerk.dot" + ID + " = new Dot(document.getElementById('dotContainer" + ID + "'), " + this.width + ", " + this.height + ");");
+        Clerk.script("clerk.dot" + ID + " = new Dot(document.getElementById('dotContainer" + ID + "'));");
     }
 
     public Dot() { this(500, 500); }
