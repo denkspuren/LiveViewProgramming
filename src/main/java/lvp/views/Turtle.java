@@ -236,7 +236,7 @@ public class Turtle implements Clerk{
                 yield String.format(Locale.US,
                     """
                         <text svg-id="%d" x="%.2f" y="%.2f" dx="%.2f" dy="%.2f"
-                            style="color: rgba(%d,%d,%d,%.2f); font:%s;">%s</text>
+                            style="fill: rgba(%d,%d,%d,%.2f); font:%s;">%s</text>
                     """,
                     text.id(), text.x(), ySvg, text.dx(), text.dy(),
                     text.color().r(), text.color().g(), text.color().b(), text.color().a(),
