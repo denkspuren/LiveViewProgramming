@@ -1,6 +1,5 @@
 package lvp;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -13,6 +12,8 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.stream.Stream;
 
+import lvp.sinks.server_sink.Server;
+import lvp.sinks.server_sink.ServerSink;
 import lvp.skills.logging.LogLevel;
 import lvp.skills.logging.Logger;
 import lvp.skills.parser.ConfigParser;
@@ -35,15 +36,11 @@ public class Main {
             System.out.println("Warning: You are not using the latest release of Live View Programming. Please visit https://github.com/denkspuren/LiveViewProgramming/releases");
         }
 
-        Server server = null;
-        FileWatcher watcher = null;
         Processor processor = null;
-        
         try {
-            server = new Server(Math.abs(cfg.port()));
-            Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
-            processor = new Processor(server);
-            watcher = new FileWatcher(cfg.sources(), cfg.watchFilter(), cfg.sourceOnly(), processor);
+            processor = new Processor();
+            processor.registerSink(new ServerSink(cfg.port()));
+            FileWatcher watcher = new FileWatcher(cfg.sources(), cfg.watchFilter(), cfg.sourceOnly(), processor);
             Runtime.getRuntime().addShutdownHook(new Thread(watcher::stop));
             watcher.start();
         } catch (IOException e) {

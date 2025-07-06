@@ -1,11 +1,15 @@
-import static java.io.IO.println;
 
 // ex1
 void main() {
         
         println("""
         Clear
+        
+        
+        
+        
         Markdown: # Text Demo
+
         Text: newdemo.java;// ex1
         | Codeblock | Text[example]
         Text[title]: Codeblocks

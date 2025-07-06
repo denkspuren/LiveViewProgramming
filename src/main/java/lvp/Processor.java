@@ -2,10 +2,12 @@ package lvp;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
@@ -14,49 +16,28 @@ import java.util.stream.Collectors;
 import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
-import lvp.commands.services.Text;
-import lvp.commands.services.Test;
-import lvp.commands.services.Turtle;
-import lvp.commands.services.Interaction;
-import lvp.commands.targets.Targets;
-import lvp.skills.HTMLElements;
-import lvp.skills.TextUtils;
+import lvp.sinks.Sink;
+import lvp.skills.TriConsumer;
 import lvp.skills.logging.Logger;
 import lvp.skills.parser.InstructionParser;
-import lvp.skills.parser.InstructionParser.Command;
-import lvp.skills.parser.InstructionParser.CommandRef;
-import lvp.skills.parser.InstructionParser.Pipe;
-import lvp.skills.parser.InstructionParser.Scan;
-import lvp.skills.parser.InstructionParser.Unknown;
-import lvp.skills.parser.InstructionParser.Register;
+import lvp.skills.parser.InstructionParser.*;
+import lvp.transformer.*;
 public class Processor {
     public record MetaInformation(String sourceId, String id, boolean standalone) {}
-
-    Server server;
-    Targets targetProcessor;
-    Map<String, BiConsumer<MetaInformation, String>> targets;
-    Map<String, BiFunction<MetaInformation, String, String>> services = new HashMap<>(Map.of(
+    
+    Map<String, BiConsumer<MetaInformation, String>> channel = new HashMap<>();
+    Map<String, BiFunction<MetaInformation, String, String>> transformer = new HashMap<>(Map.of(
             "Text", Text::of, 
             "Codeblock", Text::codeblock,
             "Cutout", Text::cutout,
             "Turtle", Turtle::of,
-            "Button", Interaction::button,
-            "Input", Interaction::input,
-            "Checkbox", Interaction::checkbox,
             "Test", Test::test));
+    Map<String, TriConsumer<MetaInformation, Process, String>> scans = new HashMap<>(Map.of(
+        "CommandScan", this::consumeCommandScan
+    ));
+    List<Sink> sinks = List.of();
 
-    public Processor(Server server) {
-        this.server = server;
-        targetProcessor = Targets.of(server);
-        targets = Map.of(
-            "Markdown", targetProcessor::consumeMarkdown, 
-            "Dot", targetProcessor::consumeDot,
-            "Html", targetProcessor::consumeHTML, 
-            "JavaScript", targetProcessor::consumeJS, 
-            "JavaScriptCall", targetProcessor::consumeJSCall,
-            "Css", targetProcessor::consumeCss,
-            "SubViewStyle", targetProcessor::consumeSubViewStyle,
-            "Clear", targetProcessor::consumeClear);
+    public Processor() {
     }
 
     void process(Process process, String sourceId) {
@@ -74,7 +55,6 @@ public class Processor {
                 switch (curr) {
                     case Command cmd -> processCommands(cmd, sourceId);
                     case Pipe pipe -> processPipe(pipe, prev, sourceId);
-                    case Scan scan -> processScan(scan, process, sourceId);
                     case Register register -> processRegister(register);
                     case Unknown unknown -> processUnknown(unknown, sourceId);
                     default -> null;
@@ -84,14 +64,14 @@ public class Processor {
     String processCommands(Command command, String sourceId) {
         Logger.logDebug("Command: " + command.name() + "{" + command.id() + "}, " + command.content());
         
-        if (targets.containsKey(command.name())) {
-            targets.get(command.name()).accept(new MetaInformation(sourceId, command.id(), true), command.content());
+        if (channel.containsKey(command.name())) {
+            channel.get(command.name()).accept(new MetaInformation(sourceId, command.id(), true), command.content());
         }
-        else if (services.containsKey(command.name())) {
-            return services.get(command.name()).apply(new MetaInformation(sourceId, command.id(), true), command.content());
+        else if (transformer.containsKey(command.name())) {
+            return transformer.get(command.name()).apply(new MetaInformation(sourceId, command.id(), true), command.content());
         } else {
             Logger.logError("Command not found: " + command.name());
-            targetProcessor.consumeError(new MetaInformation(sourceId, "", true), command.name() + command.content());
+            sinks.forEach(s -> s.error(new MetaInformation(sourceId, "", true), command.name() + command.content()));
         }
 
         return null;
@@ -103,12 +83,12 @@ public class Processor {
             Logger.logDebug("Command: " + ref.name() + "{" + ref.id() + "}, " + current);
             if (current == null) return null;
 
-            if (targets.containsKey(ref.name())) {
-                targets.get(ref.name()).accept(new MetaInformation(sourceId, ref.id(), false), current);
+            if (channel.containsKey(ref.name())) {
+                channel.get(ref.name()).accept(new MetaInformation(sourceId, ref.id(), false), current);
                 return null;
             }
-            else if (services.containsKey(ref.name())) {
-                current = services.get(ref.name()).apply(new MetaInformation(sourceId, ref.id(), false), current);
+            else if (transformer.containsKey(ref.name())) {
+                current = transformer.get(ref.name()).apply(new MetaInformation(sourceId, ref.id(), false), current);
             } else {
                 Logger.logError("Command not found: " + ref.name());
             }
@@ -116,21 +96,21 @@ public class Processor {
         return current;
     }
 
-    String processScan(Scan scan, Process process, String sourceId) {
-        server.waitingProcesses.put(sourceId, process);
-        String inputField = HTMLElements.input("input" + scan.id());
-        String button = HTMLElements.button("button" + scan.id(), "Send", TextUtils.fillOut("""
-                (()=>{
-                    const input = document.getElementById("input${0}");
-                    fetch("scan", { method: "post", body: "${1}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
-                })()
-                """, scan.id(), sourceId));
-        targetProcessor.consumeHTML(new MetaInformation(sourceId, scan.id(), true), inputField + button);
+    String consumeCommandScan(MetaInformation meta, Process process, String prev) {
+        if (prev != null) {
+            try {
+                process.getOutputStream().write(prev.getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                Logger.logError("Error writeing to output stream of '" + meta.sourceId() + "'", e);
+            }
+        } else {
+            Logger.logError("No previous command output to can.");
+        }
         return null;
     }
 
     String processRegister(Register register) {
-        services.put(register.name(), (meta, content) -> {
+        transformer.put(register.name(), (meta, content) -> {
             boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
             String out = null;
             try {
@@ -163,13 +143,19 @@ public class Processor {
     }
 
     String processUnknown(Unknown unknown, String sourceId) {
-        targetProcessor.consumeError(new MetaInformation(sourceId, "", true), unknown.message());
+        sinks.forEach(s -> s.error(new MetaInformation(sourceId, "", true), unknown.message()));
         return null;
     }
 
     void init(String sourceId) {
-        server.clearEvents(sourceId);
+        sinks.forEach(s -> s.clear(sourceId));
         Text.clear(sourceId);
+    }
+
+    void registerSink(Sink sink) {
+        channel.putAll(sink.registerChannel());
+        transformer.putAll(sink.registerTransformer());
+        sinks.add(sink);
     }
     
 }

@@ -17,11 +17,10 @@ import java.util.Arrays;
 public class InstructionParser {
 
     // ---- Instruction Types ----
-    public sealed interface Instruction permits Command, Register, Scan, Pipe, Unknown {}
+    public sealed interface Instruction permits Command, Register, Pipe, Unknown {}
 
     public record Command(String name, String id, String content) implements Instruction {}
     public record Register(String name, String call, boolean skipId) implements Instruction {}
-    public record Scan(String id) implements Instruction {}
     public record Pipe(List<CommandRef> commands) implements Instruction {}
     public record Unknown(String message) implements Instruction {}
 
@@ -31,7 +30,6 @@ public class InstructionParser {
     private static final Pattern SINGLE_LINE_COMMAND = Pattern.compile("^(\\w+)(?:\\[([^}]+)\\])?:\\s*(.+)$");
     private static final Pattern BLOCK_START = Pattern.compile("^(\\w+)(?:\\[([^}]+)\\])?:\\s*$");
     private static final Pattern SINGLE_LINE_COMMAND_CONTENTLESS = Pattern.compile("^(\\w+)(?:\\[([^}]+)\\])?\\s*$");
-    private static final Pattern SCAN = Pattern.compile("^Scan(?:\\[([^}]+)\\])?:\\s*$");
     private static final Pattern REGISTER = Pattern.compile("^Register(?:\\[([^}]+)\\])?:\\s+(\\w+)\\s+(.+)$");
     private static final Pattern PIPE_LINE = Pattern.compile("^\\s*\\|(.+)$");
     private static final Pattern PIPE_ENTRY = Pattern.compile("^(\\w+)(?:\\[([^}]+)\\])?$");
@@ -84,7 +82,6 @@ public class InstructionParser {
 
         if (tryPipe(line, out)) return;
         if (tryRegister(line, out)) return;
-        if (tryScan(line, out)) return;
         if (trySingleCommand(line, out)) return;
         if (tryBlockStart(state, line)) return;
         out.push(new Unknown(line));
@@ -128,16 +125,6 @@ public class InstructionParser {
         String skipIdFlag = matcher.group(1);
         Logger.logDebug("Parsed register" + formatFlag(skipIdFlag) + ": " + matcher.group(2) + " -> " + matcher.group(3));
         out.push(new Register(matcher.group(2), matcher.group(3), skipIdFlag != null && skipIdFlag.equals("skipId")));
-        return true;
-    }
-
-    private static boolean tryScan(String line, Downstream<? super Instruction>  out) {
-        Matcher matcher = SCAN.matcher(line);
-        if (!matcher.matches()) return false;
-
-        String id = matcher.group(1) == null ? IdGen.generateID(10) : matcher.group(1);
-        Logger.logDebug("Parsed Read" + formatFlag(id));
-        out.push(new Scan(id));
         return true;
     }
 

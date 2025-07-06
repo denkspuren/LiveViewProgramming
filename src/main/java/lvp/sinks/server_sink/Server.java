@@ -1,4 +1,4 @@
-package lvp;
+package lvp.sinks.server_sink;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +26,7 @@ import lvp.skills.logging.Logger;
 
 
 public class Server {
-    private record EventMessage(SSEType type, String data, String id, String sourceId) {}
+    record EventMessage(SSEType type, String data, String id, String sourceId) {}
 
     private final HttpServer httpServer;
 
@@ -34,8 +34,8 @@ public class Server {
     static int defaultPort = 50_001;
     static final String INDEX = "/web/index.html";
 
-    static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
-    static int getDefaultPort() { return defaultPort; }
+    public static void setDefaultPort(int port) { defaultPort = port != 0 ? Math.abs(port) : 50_001; }
+    public static int getDefaultPort() { return defaultPort; }
 
     public final List<HttpExchange> webClients = new CopyOnWriteArrayList<>();
     List<EventMessage> events = new CopyOnWriteArrayList<>();
@@ -243,14 +243,6 @@ public class Server {
         }
         exchange.close();
         return null;
-    }
-
-    public void clearEvents(String sourceId) {
-        events.removeIf(event -> event.sourceId().equals(sourceId));
-        if (waitingProcesses.containsKey(sourceId)) {
-            waitingProcesses.get(sourceId).destroyForcibly();
-            waitingProcesses.remove(sourceId);
-        }
     }
 
     public void stop() {

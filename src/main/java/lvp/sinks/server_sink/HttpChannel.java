@@ -1,16 +1,18 @@
-package lvp.commands.targets;
+package lvp.sinks.server_sink;
+
 
 import lvp.Processor.MetaInformation;
-import lvp.SSEType;
-import lvp.Server;
-import lvp.commands.targets.dot.GraphSpec;
+import lvp.sinks.server_sink.dot.GraphSpec;
+import lvp.skills.HTMLElements;
+import lvp.skills.TextUtils;
 
-public class Targets {
+public class HttpChannel {
     Server server;
 
-    public static Targets of(Server server) { return new Targets(server); }
 
-    private Targets(Server server) {
+    public static HttpChannel of(Server server) { return new HttpChannel(server); }
+
+    private HttpChannel(Server server) {
         this.server = server;
     }
 
@@ -63,6 +65,18 @@ public class Targets {
         consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id(), meta.standalone()), "<div id='dotContainer" + meta.id() + "'></div>");
         consumeJS(new MetaInformation(meta.sourceId(), "script" + meta.id(), meta.standalone()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + " = new Dot(document.getElementById('dotContainer" + meta.id() + "'), " + specs.width().orElse(500) + ", " + specs.height().orElse(500) + ");");
         consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id(), meta.standalone()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + ".draw(\"" + specs.dot() + "\")");
+    }
+
+    public void consumeInputScan(MetaInformation meta, Process process, String content) {
+        server.waitingProcesses.put(meta.sourceId(), process);
+        String inputField = HTMLElements.input("input" + meta.id());
+        String button = HTMLElements.button("button" + meta.id(), "Send", TextUtils.fillOut("""
+                (()=>{
+                    const input = document.getElementById("input${0}");
+                    fetch("scan", { method: "post", body: "${1}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
+                })()
+                """, meta.id(), meta.sourceId()));
+        consumeHTML(meta, inputField + button);
     }
     
 }

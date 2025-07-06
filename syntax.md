@@ -35,6 +35,23 @@ CALL ::=        STRING
 PIPE ::= '|' COMMAND ['|' COMMAND '|' ...]
 ```
 
+## Targets
+
+- Markdown
+- Html
+- JavaScript
+- JavaScriptCall
+- Clear
+- Dot
+
+### Dot
+```
+Dot:
+[width: WIDTH]
+[height: HEIGHT]
+GRAPH
+~~~
+```
 
 ## Default Services
 
@@ -111,20 +128,3 @@ checked: BOOLEAN
 ~~~
 ```
 
-## Targets
-
-- Markdown
-- Html
-- JavaScript
-- JavaScriptCall
-- Clear
-- Dot
-
-### Dot
-```
-Dot:
-[width: WIDTH]
-[height: HEIGHT]
-GRAPH
-~~~
-```

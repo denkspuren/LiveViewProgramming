@@ -3,9 +3,9 @@ import static java.io.IO.println;
 import java.util.Scanner;
 
 void main() {
-    println("Clear: ~");
+    println("Clear");
     println("Markdown: # Blocking Input");
-    println("Read:");
+    println("Scan:");
     Scanner scanner = new Scanner(System.in);
     String d = scanner.nextLine();
 

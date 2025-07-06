@@ -1,4 +1,4 @@
-package lvp.commands.targets.dot;
+package lvp.sinks.server_sink.dot;
 
 import java.util.ArrayList;
 import java.util.List;
