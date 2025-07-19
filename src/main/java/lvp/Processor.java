@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.stream.Gatherers;
 import java.util.stream.Stream;
 
 import lvp.sinks.Sink;
+import lvp.skills.Scan;
 import lvp.skills.TriConsumer;
 import lvp.skills.logging.Logger;
 import lvp.skills.parser.InstructionParser;
@@ -35,7 +37,7 @@ public class Processor {
     Map<String, TriConsumer<MetaInformation, Process, String>> scans = new HashMap<>(Map.of(
         "CommandScan", this::consumeCommandScan
     ));
-    List<Sink> sinks = List.of();
+    List<Sink> sinks = new ArrayList<>();
 
     public Processor() {
     }
@@ -53,55 +55,58 @@ public class Processor {
     void process(Stream<String> input, String sourceId, Process process) {
         InstructionParser.parse(input).gather(Gatherers.fold(() -> "", (prev, curr) ->
                 switch (curr) {
-                    case Command cmd -> processCommands(cmd, sourceId);
-                    case Pipe pipe -> processPipe(pipe, prev, sourceId);
+                    case Command cmd -> processCommands(cmd, sourceId, process);
+                    case Pipe pipe -> processPipe(pipe, prev, sourceId, process);
                     case Register register -> processRegister(register);
                     case Unknown unknown -> processUnknown(unknown, sourceId);
                     default -> null;
                 })).forEachOrdered(_->{});
     }
 
-    String processCommands(Command command, String sourceId) {
+    String processCommands(Command command, String sourceId, Process process) {
         Logger.logDebug("Command: " + command.name() + "{" + command.id() + "}, " + command.content());
-        
-        if (channel.containsKey(command.name())) {
-            channel.get(command.name()).accept(new MetaInformation(sourceId, command.id(), true), command.content());
-        }
-        else if (transformer.containsKey(command.name())) {
-            return transformer.get(command.name()).apply(new MetaInformation(sourceId, command.id(), true), command.content());
-        } else {
-            Logger.logError("Command not found: " + command.name());
-            sinks.forEach(s -> s.error(new MetaInformation(sourceId, "", true), command.name() + command.content()));
-        }
+        MetaInformation meta = new MetaInformation(sourceId, command.id(), true);
 
-        return null;
+        return executeCommand(command.name(), command.content(), meta, process);
     }
 
-    String processPipe(Pipe pipe, String input, String sourceId) {
+    String processPipe(Pipe pipe, String input, String sourceId, Process process) {
         String current = input;
         for (CommandRef ref : pipe.commands()) {
             Logger.logDebug("Command: " + ref.name() + "{" + ref.id() + "}, " + current);
             if (current == null) return null;
+            MetaInformation meta = new MetaInformation(sourceId, ref.id(), false);
 
-            if (channel.containsKey(ref.name())) {
-                channel.get(ref.name()).accept(new MetaInformation(sourceId, ref.id(), false), current);
-                return null;
-            }
-            else if (transformer.containsKey(ref.name())) {
-                current = transformer.get(ref.name()).apply(new MetaInformation(sourceId, ref.id(), false), current);
-            } else {
-                Logger.logError("Command not found: " + ref.name());
-            }
+            current = executeCommand(ref.name(), current, meta, process);
         }
         return current;
+    }
+
+    String executeCommand(String name, String content, MetaInformation meta, Process process) {
+        if (channel.containsKey(name)) {
+            channel.get(name).accept(meta, content);
+            return null;
+        }
+        else if (transformer.containsKey(name)) {
+            return transformer.get(name).apply(meta, content);
+        }
+        else if (scans.containsKey(name))  {
+            scans.get(name).accept(meta, process, content);
+            return null;
+        }
+        else {
+            Logger.logError("Command not found: " + name);
+            sinks.forEach(s -> s.error(meta, name + content));
+        }
+        return null;
     }
 
     String consumeCommandScan(MetaInformation meta, Process process, String prev) {
         if (prev != null) {
             try {
-                process.getOutputStream().write(prev.getBytes(StandardCharsets.UTF_8));
+                Scan.sendToSource(process, prev);
             } catch (IOException e) {
-                Logger.logError("Error writeing to output stream of '" + meta.sourceId() + "'", e);
+                Logger.logError("Error while writing in OutputStream for " + meta.sourceId(), e);
             }
         } else {
             Logger.logError("No previous command output to can.");
@@ -155,6 +160,7 @@ public class Processor {
     void registerSink(Sink sink) {
         channel.putAll(sink.registerChannel());
         transformer.putAll(sink.registerTransformer());
+        scans.putAll(sink.registerScan());
         sinks.add(sink);
     }
     

@@ -19,6 +19,7 @@ import java.util.concurrent.Executors;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 
+import lvp.skills.Scan;
 import lvp.skills.TextUtils;
 import lvp.skills.TextUtils.ReplacementType;
 import lvp.skills.logging.LogLevel;
@@ -91,18 +92,16 @@ public class Server {
         exchange.sendResponseHeaders(200, 0);
         exchange.close();
 
-        OutputStream stream = waitingProcesses.get(parts[0]).getOutputStream();
-        if (stream == null) {
-            Logger.logError("Stream not found: " + message);
+        Process process = waitingProcesses.get(parts[0]);
+        if (process == null) {
+            Logger.logError("Process not found: " + message);
             return;
         }
         try {
-            stream.write(Base64.getDecoder().decode(parts[1]));
-            stream.flush();
+            Scan.sendToSource(process, new String(Base64.getDecoder().decode(parts[1]), StandardCharsets.UTF_8));
         } catch (IOException e) {
             Logger.logError("Error while writing stream for: " + parts[0], e);
         } finally {
-            stream.close();
             waitingProcesses.remove(parts[0]);
         }
 
