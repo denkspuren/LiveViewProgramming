@@ -53,7 +53,7 @@ public class ServerSink implements Sink {
 
     @Override
     public void error(MetaInformation meta, String message) {
-        channel.consumeHTML(meta, message);
+        channel.consumeError(meta, message);
     }
 
 
