@@ -2,7 +2,6 @@ package lvp.sinks.server_sink;
 
 
 import lvp.Processor.MetaInformation;
-import lvp.sinks.server_sink.dot.GraphSpec;
 import lvp.skills.HTMLElements;
 import lvp.skills.TextUtils;
 
@@ -60,11 +59,7 @@ public class HttpChannel {
     }
 
     public void consumeDot(MetaInformation meta, String content) {
-        GraphSpec specs = GraphSpec.fromContent(content);
-
-        consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id(), meta.standalone()), "<div id='dotContainer" + meta.id() + "'></div>");
-        consumeJS(new MetaInformation(meta.sourceId(), "script" + meta.id(), meta.standalone()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + " = new Dot(document.getElementById('dotContainer" + meta.id() + "'), " + specs.width().orElse(500) + ", " + specs.height().orElse(500) + ");");
-        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id(), meta.standalone()), "clerk['" + meta.sourceId() + "'].dot" + meta.id() + ".draw(\"" + specs.dot() + "\")");
+        server.sendServerEvent(SSEType.DOT, content, meta.id(), meta.sourceId());
     }
 
     public void consumeInputScan(MetaInformation meta, Process process, String content) {

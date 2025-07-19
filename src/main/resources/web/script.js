@@ -129,6 +129,15 @@ function setUp() {
           errors.parentNode.style.display = "";
           break;
         }
+        case "DOT": {
+          const newElement = document.createElement("div");
+          newElement.id = id;
+          subView.appendChild(newElement);
+          Viz.instance().then(function(viz) {
+              newElement.appendChild(viz.renderSVGElement(dotString));
+          });
+          break;
+        }
         default:
           errorLog("Unknown Action");
           break;
