@@ -6,6 +6,6 @@ target/
 build
 test.java
 Test.java
-!**/services/Test.java
+!**/transformer/Test.java
 .vscode
 sources.json
