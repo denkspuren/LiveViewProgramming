@@ -39,28 +39,22 @@ public class Processor {
     ));
     List<Sink> sinks = new ArrayList<>();
 
-    public Processor() {
-    }
-
     void process(Process process, String sourceId) {
         try(BufferedReader reader = new BufferedReader(
             new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-            process(reader.lines(), sourceId, process);                
+            
+            InstructionParser.parse(reader.lines()).gather(Gatherers.fold(() -> "", (prev, curr) ->
+                    switch (curr) {
+                        case Command cmd -> processCommands(cmd, sourceId, process);
+                        case Pipe pipe -> processPipe(pipe, prev, sourceId, process);
+                        case Register register -> processRegister(register);
+                        case Unknown unknown -> processUnknown(unknown, sourceId);
+                        default -> null;
+                    })).forEachOrdered(_->{});              
         }
         catch (Exception e) {
             Logger.logError("Error reading process output: " + e.getMessage(), e);
         }
-    }
-
-    void process(Stream<String> input, String sourceId, Process process) {
-        InstructionParser.parse(input).gather(Gatherers.fold(() -> "", (prev, curr) ->
-                switch (curr) {
-                    case Command cmd -> processCommands(cmd, sourceId, process);
-                    case Pipe pipe -> processPipe(pipe, prev, sourceId, process);
-                    case Register register -> processRegister(register);
-                    case Unknown unknown -> processUnknown(unknown, sourceId);
-                    default -> null;
-                })).forEachOrdered(_->{});
     }
 
     String processCommands(Command command, String sourceId, Process process) {
