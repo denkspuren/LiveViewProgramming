@@ -55,9 +55,7 @@ public class Main {
             try { input = scanner.nextLine().strip(); } catch (Exception _) { break;}
             if (input.startsWith("/"))
                 handleServerCommands(input.substring(1).strip());
-            else if (!input.isBlank() && !input.startsWith("Scan")) {
-                processor.process(Stream.of(input),  Base64.getUrlEncoder().withoutPadding().encodeToString("stdin".getBytes(StandardCharsets.UTF_8)), null);
-            } else {
+            else {
                 System.err.println("Error: Invalid command. Use '/help' for available commands.");
             }
         }
