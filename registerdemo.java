@@ -5,7 +5,7 @@ void main() {
             Register: Reverse java --enable-preview external.java
             Reverse: Hello World
             | Markdown
-            Register{skipId}: Wc wc
+            Register[skipId]: Wc wc
             Wc:
             Hello World
             Test
