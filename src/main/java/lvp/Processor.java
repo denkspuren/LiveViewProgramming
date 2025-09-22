@@ -15,20 +15,19 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Gatherers;
-import java.util.stream.Stream;
 
+import lvp.services.*;
 import lvp.sinks.Sink;
 import lvp.skills.Scan;
 import lvp.skills.TriConsumer;
 import lvp.skills.logging.Logger;
 import lvp.skills.parser.InstructionParser;
 import lvp.skills.parser.InstructionParser.*;
-import lvp.transformer.*;
 public class Processor {
     public record MetaInformation(String sourceId, String id, boolean standalone) {}
     
     Map<String, BiConsumer<MetaInformation, String>> channel = new HashMap<>();
-    Map<String, BiFunction<MetaInformation, String, String>> transformer = new HashMap<>(Map.of(
+    Map<String, BiFunction<MetaInformation, String, String>> services = new HashMap<>(Map.of(
             "Text", Text::of, 
             "Codeblock", Text::codeblock,
             "Cutout", Text::cutout,
@@ -50,7 +49,7 @@ public class Processor {
                         case Register register -> processRegister(register);
                         case Unknown unknown -> processUnknown(unknown, sourceId);
                         default -> null;
-                    })).forEachOrdered(_->{});              
+                    })).forEachOrdered(_ -> {});              
         }
         catch (Exception e) {
             Logger.logError("Error reading process output: " + e.getMessage(), e);
@@ -81,8 +80,8 @@ public class Processor {
             channel.get(name).accept(meta, content);
             return null;
         }
-        else if (transformer.containsKey(name)) {
-            return transformer.get(name).apply(meta, content);
+        else if (services.containsKey(name)) {
+            return services.get(name).apply(meta, content);
         }
         else if (scans.containsKey(name))  {
             scans.get(name).accept(meta, process, content);
@@ -109,7 +108,7 @@ public class Processor {
     }
 
     String processRegister(Register register) {
-        transformer.put(register.name(), (meta, content) -> {
+        services.put(register.name(), (meta, content) -> {
             boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
             String out = null;
             try {
@@ -153,7 +152,7 @@ public class Processor {
 
     void registerSink(Sink sink) {
         channel.putAll(sink.registerChannel());
-        transformer.putAll(sink.registerTransformer());
+        services.putAll(sink.registerTransformer());
         scans.putAll(sink.registerScan());
         sinks.add(sink);
     }

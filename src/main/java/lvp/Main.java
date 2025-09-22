@@ -1,17 +1,13 @@
 package lvp;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Matcher;
-import java.util.stream.Stream;
-
 import lvp.sinks.server_sink.Server;
 import lvp.sinks.server_sink.ServerSink;
 import lvp.skills.logging.LogLevel;
@@ -28,7 +24,7 @@ import java.net.http.HttpResponse;
 public class Main {
     private record Config(List<Source> sources, int port, LogLevel logLevel, Optional<String> watchFilter, boolean sourceOnly){}
 
-    private static final Path LVP_CONFIG_PATH = Path.of("./sources.json");
+    private static final Path LVP_SOURCES_PATH = Path.of("./sources.json");
     public static void main(String[] args) {
         Config cfg = parseArgs(args);
 
@@ -91,6 +87,7 @@ public class Main {
         }
     }
 
+    // Documentation in README
     private static Config parseArgs(String[] args) {
         List<String> files = new ArrayList<>();
         Optional<String> cmd = Optional.empty();
@@ -106,27 +103,19 @@ public class Main {
             String value = parts.length > 1 ? parts[1].strip() : "";
 
             switch (key) {
-                case "-l", "--log":
-                    logLevel = value.isBlank() ? LogLevel.Info : LogLevel.fromString(value);
-                    break;
-                case "--port", "-p":
-                    try { port = Integer.parseInt(value); } catch(NumberFormatException _) {}
-                    break;
-                case "--cmd":
-                    cmd = value.isBlank() ? Optional.empty() : Optional.of(value);
-                    break;
-                case "--config", "-c":
-                    sources = loadConfig();
-                    break;
-                case "--watch-filter", "-w":
-                    watchFilter = value.isBlank() ? Optional.empty() : Optional.of(value);
-                    break;
-                case "--source-only", "-s":
-                    sourceOnly = true;
-                    break;
-                default:
+                case "-l", "--log" -> logLevel = value.isBlank() ? LogLevel.Info : LogLevel.fromString(value);
+                case "--port", "-p" -> {
+                    try { port = Integer.parseInt(value); } catch(NumberFormatException _) {
+                        System.err.println("Error: Invalid port number. Not a number: " + value);
+                    }
+                }
+                case "--cmd" -> cmd = value.isBlank() ? Optional.empty() : Optional.of(value);
+                case "--config", "-c" -> sources = loadWatchConfig();
+                case "--watch-filter", "-w" -> watchFilter = value.isBlank() ? Optional.empty() : Optional.of(value);
+                case "--source-only", "-s" -> sourceOnly = true;
+                default -> {
                     if (!arg.isBlank()) files.add(arg.strip());
-                    break;
+                }
             }
         }
 
@@ -162,14 +151,15 @@ public class Main {
         return paths.isEmpty() ? Optional.empty() : Optional.of(paths);
     }
 
-    private static Optional<List<Source>> loadConfig() {
-        if (!Files.isRegularFile(LVP_CONFIG_PATH) || !Files.exists(LVP_CONFIG_PATH)) {
-            Logger.logError("Config not found at: " + LVP_CONFIG_PATH.normalize().toAbsolutePath());
+    private static Optional<List<Source>> loadWatchConfig() {
+        if (!Files.isRegularFile(LVP_SOURCES_PATH) || !Files.exists(LVP_SOURCES_PATH)) {
+            Logger.logError("Config not found at: " + LVP_SOURCES_PATH.normalize().toAbsolutePath());
             return Optional.empty();
         }
-        return ConfigParser.parse(LVP_CONFIG_PATH);
+        return ConfigParser.parse(LVP_SOURCES_PATH);
     }
 
+    // Returns false only, when a new version is available. If the version can't be checked, it will return true
     public static boolean isLatestRelease() {
         try (HttpClient client = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()

@@ -168,11 +168,17 @@ public class Server {
         Logger.logDebug("Sending '" + resourcePath + "'");
 
         try (final InputStream stream = Server.class.getResourceAsStream(resourcePath)) {
-            final byte[] bytes = stream.readAllBytes();
-            exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(resourcePath)) + "; charset=utf-8");
-            exchange.sendResponseHeaders(200, bytes.length);
-            exchange.getResponseBody().write(bytes);
-            exchange.getResponseBody().flush();
+
+            if (stream == null) {
+                exchange.sendResponseHeaders(404, -1);
+            }
+            else {
+                final byte[] bytes = stream.readAllBytes();
+                exchange.getResponseHeaders().add("Content-Type", Files.probeContentType(Path.of(resourcePath)) + "; charset=utf-8");
+                exchange.sendResponseHeaders(200, bytes.length);
+                exchange.getResponseBody().write(bytes);
+            }
+                exchange.getResponseBody().flush();
         } finally {
             exchange.close();
         }

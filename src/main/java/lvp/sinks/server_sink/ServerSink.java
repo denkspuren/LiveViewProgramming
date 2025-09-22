@@ -6,9 +6,9 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import lvp.Processor.MetaInformation;
+import lvp.services.Interaction;
 import lvp.sinks.Sink;
 import lvp.skills.TriConsumer;
-import lvp.transformer.Interaction;
 
 public class ServerSink implements Sink {
 

@@ -74,7 +74,7 @@ public class FileWatcher {
                 .flatMap(root -> {
                     try {
                         return Files.find(root, Integer.MAX_VALUE, 
-                            (_, attrs) -> attrs.isDirectory()).filter(p -> !p.toString().contains(".git"));
+                            (_, attrs) -> attrs.isDirectory()).filter(p -> !p.toString().startsWith("."));
                     } catch (IOException e) {
                         Logger.logError("Error walking directory: " + root.toAbsolutePath(), e);
                         return Stream.empty();
@@ -109,11 +109,11 @@ public class FileWatcher {
 
     private void processWatchKeyEvents(WatchKey key) {
         for (WatchEvent<?> ev : key.pollEvents()) {
-            Path changed = (Path) ev.context();
-            if (Files.isDirectory(changed)) continue;
+            Path changedFile = (Path) ev.context();
+            if (Files.isDirectory(changedFile)) continue;
 
-            Path dir = (Path) key.watchable();
-            Path fullPath = dir.resolve(changed).normalize().toAbsolutePath();
+            Path watchedDir = (Path) key.watchable();
+            Path fullPath = watchedDir.resolve(changedFile).normalize().toAbsolutePath();
 
             Instant now = Instant.now();
             Instant last = lastModified.getOrDefault(fullPath, Instant.EPOCH);
@@ -128,7 +128,7 @@ public class FileWatcher {
                 Logger.logInfo("Event for source: " + fullPath + " (" + ev.kind().name() + ")");
                 executor.submit(() -> run(source.get()));
             }
-            else if (!sourceOnly && (watchFilter.isEmpty() || watchFilter.get().matches(changed))) {
+            else if (!sourceOnly && (watchFilter.isEmpty() || watchFilter.get().matches(changedFile))) {
                 Logger.logInfo("Event for file: " + fullPath + " (" + ev.kind().name() + ")");
                 execute(sources);
             }
