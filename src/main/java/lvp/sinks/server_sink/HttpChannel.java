@@ -1,0 +1,77 @@
+package lvp.sinks.server_sink;
+
+
+import lvp.Processor.MetaInformation;
+import lvp.skills.HTMLElements;
+import lvp.skills.TextUtils;
+
+public class HttpChannel {
+    Server server;
+
+
+    public static HttpChannel of(Server server) { return new HttpChannel(server); }
+
+    private HttpChannel(Server server) {
+        this.server = server;
+    }
+
+    public void consumeError(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.LOG, content, meta.id(), meta.sourceId());
+    }
+
+    public void consumeClear(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.CLEAR, "", meta.id(), meta.sourceId());
+    }
+    
+    public void consumeHTML(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.WRITE, content, meta.id(), meta.sourceId());
+    }
+
+    public void consumeJS(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.SCRIPT, content, meta.id(), meta.sourceId());
+    }
+
+    public void consumeJSCall(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.CALL, content, meta.id(), meta.sourceId());
+    }
+
+    public void consumeCss(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.CSS, content, meta.id(), meta.sourceId());
+    }
+
+    public void consumeSubViewStyle(MetaInformation meta, String content) {
+        consumeCss(meta, "#subViewContainer-" + meta.sourceId() + " { " + content + " }");
+    }
+
+    public void consumeMarkdown(MetaInformation meta, String content) {
+        consumeHTML(new MetaInformation(meta.sourceId(), "container" + meta.id(), meta.standalone()), "<script id='" + meta.id() + "' type='preformatted'>" + content + "</script>");
+        // Using `preformatted` is a hack to get a Java String into the Browser without interpretation
+        
+        consumeJSCall(new MetaInformation(meta.sourceId(), "call" + meta.id(), meta.standalone()), "var scriptElement = document.getElementById('" + meta.id() + "');"
+        +
+        """
+        var divElement = document.createElement('div');
+        divElement.id = scriptElement.id;
+        divElement.innerHTML = window.md.render(scriptElement.textContent);
+        scriptElement.parentNode.replaceChild(divElement, scriptElement);
+        """
+        );
+    }
+
+    public void consumeDot(MetaInformation meta, String content) {
+        server.sendServerEvent(SSEType.DOT, content, meta.id(), meta.sourceId());
+    }
+
+    public void consumeInputScan(MetaInformation meta, Process process, String content) {
+        server.waitingProcesses.put(meta.sourceId(), process);
+        String inputField = HTMLElements.input("input" + meta.id());
+        String button = HTMLElements.button("button" + meta.id(), "Send", TextUtils.fillOut("""
+                (()=>{
+                    const input = document.getElementById("input${0}");
+                    fetch("scan", { method: "post", body: "${1}:" + btoa(String.fromCharCode(...new TextEncoder().encode(input.value))) }).catch(console.error);
+                })()
+                """, meta.id(), meta.sourceId()));
+        consumeHTML(meta, inputField + button);
+    }
+    
+}
