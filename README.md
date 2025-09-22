@@ -1,8 +1,8 @@
-# _Live View Programming_ mit Java
+# _Live View Programming_ mit jeder Programmiersprache
 
-Das _Live View Programming_ (LVP) bietet Ihnen für die Java-Programmierung _Views_ und _Skills_ an. Views sind dazu da, um mediale Inhalte im Web-Browser darzustellen, also Texte, Bilder, Grafiken, Videos, inteaktive Animationen etc. Skills stellen nützliche Fähigkeiten bereit, die man in Kombination mit Views (z.B. zur Dokumentation von Code) gebrauchen kann.
+Das _Live View Programming_ (LVP) bietet Ihnen für die Programmierung ein einfaches Textprotokoll an, um mediale Inhalte im Web-Browser darzustellen, also Texte, Bilder, Grafiken, Videos, inteaktive Animationen etc. Kommandos stellen auch nützliche Fähigkeiten bereit, die man z.B. zur Dokumentation von Code gebrauchen kann.
 
-All diese Views und Skills nutzt man programmierend mit Java. Mit jeder Code-Änderung wird die Ansicht im Browser _live_ aktualisiert. Es ist – ehrlich gesagt – ziemlich cool, wenn man die Veränderungen dann im Browser sieht. Probieren Sie die Demo aus!
+**Eine detaillierte Übersicht des Protokolls mit allen Kommandos folgt noch.**
 
 ## 🚀 Nutze das _Live View Programming_
 
@@ -34,10 +34,10 @@ Passen Sie den Beispielaufruf an die aktuelle Version an:
 java -jar lvp-<Version>.jar --log demo.java
 ```
 
-Wenn Sie die Version `lvp-0.5.0.jar` heruntergeladen haben, lautet der Aufruf:
+Wenn Sie die Version `lvp-1.0.0.jar` heruntergeladen haben, lautet der Aufruf:
 
 ```
-java -jar lvp-0.5.0.jar --log demo.java
+java -jar lvp-1.0.0.jar --log demo.java
 ```
 
 #### Übersicht der möglichen Kommandozeilenargumente
@@ -62,7 +62,7 @@ Die Datei `demo.java` dient als einfaches Beispiel für den Einstieg in das Live
 
 Damit LVP funktioniert, **muss der Server die Datei beobachten (watchen)** – sobald Änderungen erkannt werden, wird der Code automatisch neu ausgeführt und die Ausgabe aktualisiert.
 
-Innerhalb einer [`void main()`-Methode](https://openjdk.org/jeps/495) lassen sich interaktive Inhalte erzeugen, indem man Methoden des `Clerk`-Interfaces verwendet. Diese Inhalte werden anschließend im Browser angezeigt.
+Innerhalb einer [`void main()`-Methode](https://openjdk.org/jeps/495) lassen sich interaktive Inhalte erzeugen, indem man `println`-Ausgaben entsprechend dem Protokoll erzeugt. Diese Inhalte werden anschließend im Browser angezeigt.
 
 **Beispiel:**
 
@@ -70,10 +70,10 @@ Innerhalb einer [`void main()`-Methode](https://openjdk.org/jeps/495) lassen sic
 import lvp.Clerk;
 
 void main() {
-    Clerk.markdown("# Hello World");
+    println("Markdown: # Hello World");
 }
 ```
-Dieser einfache Aufruf rendert eine Markdown-Überschrift direkt im Browser. Weitere Ausgaben, Grafiken oder Interaktionen können durch zusätzliche Clerk-Methoden, Views oder Skills ergänzt werden.
+Dieser einfache Aufruf rendert eine Markdown-Überschrift direkt im Browser. Weitere Ausgaben, Grafiken oder Interaktionen können durch zusätzliche Kommandos ergänzt werden.
 
 ### Troubleshooting
 
@@ -106,7 +106,7 @@ kill -9 11840
 ```
 Dabei ist 11840 durch die ermittelte PID zu ersetzen.
 
-## 💟 Motivation: Views bereichern das Programmieren
+## 💟 Motivation: Views bereichern das Programmieren (Outdated)
 
 Das _Live View Programming_ versteht sich als ein Angebot, in ein bestehendes Programm _Views_ einzubauen und zu verwenden, die im Web-Browser angezeigt werden. Es macht nicht nur Spaß, wenn man zum Beispiel Grafiken im Browser erzeugen kann -- man sieht auch die Programmierfehler, die einem unterlaufen. Wenn man etwa in der Turtle-View eine Schildkröte mit einem Stift über die Zeichenfläche schickt, zeigt sich unmittelbar, ob man Wiederholungen über Schleifen richtig aufgesetzt oder die Rekursion korrekt umgesetzt hat. Die visuelle Repräsentation gibt über das Auge eine direkte Rückmeldung. Feedback motiviert und hilft beim Verständnis.
 
