@@ -74,7 +74,7 @@ public class FileWatcher {
                 .flatMap(root -> {
                     try {
                         return Files.find(root, Integer.MAX_VALUE, 
-                            (_, attrs) -> attrs.isDirectory()).filter(p -> !p.toString().startsWith("."));
+                            (_, attrs) -> attrs.isDirectory()).filter(p -> !p.toString().startsWith(".git"));
                     } catch (IOException e) {
                         Logger.logError("Error walking directory: " + root.toAbsolutePath(), e);
                         return Stream.empty();
