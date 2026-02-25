@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import static java.lang.IO.println;
 
 /// Register with:
 /// Register: Reverse java --enable-preview external.java

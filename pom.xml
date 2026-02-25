@@ -13,7 +13,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.release>24</maven.compiler.release>
+    <maven.compiler.release>25</maven.compiler.release>
   </properties>
 
 
@@ -52,7 +52,7 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.13.0</version>
           <configuration>
-            <release>24</release>
+            <release>25</release>
             <compilerArgs>--enable-preview</compilerArgs>
           </configuration>
         </plugin>

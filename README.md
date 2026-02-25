@@ -1,8 +1,12 @@
 # _Live View Programming_ mit jeder Programmiersprache
 
-Das _Live View Programming_ (LVP) bietet Ihnen für die Programmierung ein einfaches Textprotokoll an, um mediale Inhalte im Web-Browser darzustellen, also Texte, Bilder, Grafiken, Videos, inteaktive Animationen etc. Kommandos stellen auch nützliche Fähigkeiten bereit, die man z.B. zur Dokumentation von Code gebrauchen kann.
+Live View Programming (LVP) stellt ein einfaches Textprotokoll bereit, mit dem sich mediale Inhalte direkt im Web-Browser darstellen lassen, darunter Texte, Bilder, Grafiken, Videos und interaktive Animationen.
 
-**Eine detaillierte Übersicht des Protokolls mit allen Kommandos folgt noch.**
+Das Protokoll dient als sprachunabhängige Schnittstelle zwischen Ihrem eigenen Programm und LVP. Die Kommunikation erfolgt über Kommandos, die durch gewöhnliche Konsolenausgaben erzeugt werden. Diese Kommandos können Inhalte transformieren und sie im Browser medial aufbereitet anzeigen.
+
+Auf diese Weise stellt LVP praktische Funktionen bereit, die sich beispielsweise für die Code-Dokumentation, die Erzeugung von Turtle-Grafiken oder das Erstellen interaktiver HTML-Elemente nutzen lassen.
+
+
 
 ## 🚀 Nutze das _Live View Programming_
 
@@ -10,7 +14,7 @@ Wenn Sie das _Live View Programming_ ausprobieren möchten, ist Folgendes zu tun
 
 ### 1. Lade die `.jar`-Datei herunter
 
-* Stellen Sie sicher, dasss Sie mit einem aktuellen JDK (Java Development Kit) arbeiten; es empfiehlt sich das [TemurinJDK](https://adoptium.net/temurin/releases/)
+* Stellen Sie sicher, dasss Sie mit einem aktuellen JDK (Java Development Kit) arbeiten; es empfiehlt sich das [OpenJDK](https://jdk.java.net/25/)
 * Laden Sie die aktuelle `.jar`-Datei herunter, die Ihnen als Asset zum [aktuellen Release](https://github.com/denkspuren/LiveViewProgramming/releases) als Download angeboten wird; die Datei hat den Namen `lvp-<Version>.jar`
 * Laden Sie `demo.java`-Datei herunter, die Ihnen ebenfalls als Asset zum [aktuellen Release](https://github.com/denkspuren/LiveViewProgramming/releases) als Download angeboten wird.
 
@@ -56,26 +60,74 @@ java -jar lvp-1.0.0.jar --log demo.java
 > Mehrere Argumente können kombiniert werden, z.B.:  
 > `java -jar lvp-<Version>.jar --watch-filter=src/lib/**/*.java --log=Debug --port=50001 --config src/*View.java`
 
-### 3. So nutzt man das _Live View Programming_
+### 3. Einbinden von Quellen
+Damit eigene Programme mit LVP kommunizieren können, werden sie innerhalb von LVP als Laufzeitumgebung ausgeführt. Diese Programme werden im Kontext von LVP als Quellen bezeichnet.
 
-Die Datei `demo.java` dient als einfaches Beispiel für den Einstieg in das Live View Programming (LVP).  
+Die Programme selbst benötigen keine zusätzlichen Abhängigkeiten und können in beliebigen Programmiersprachen geschrieben sein. Es gibt zwei Möglichkeiten, Quellen in LVP zu definieren.
 
-Damit LVP funktioniert, **muss der Server die Datei beobachten (watchen)** – sobald Änderungen erkannt werden, wird der Code automatisch neu ausgeführt und die Ausgabe aktualisiert.
+#### Variante 1: Übergabe über die Konsole
 
-Innerhalb einer [`void main()`-Methode](https://openjdk.org/jeps/495) lassen sich interaktive Inhalte erzeugen, indem man `println`-Ausgaben entsprechend dem Protokoll erzeugt. Diese Inhalte werden anschließend im Browser angezeigt.
+Wie oben gezeigt, können Quellen als Argument beim Konsolenaufruf übergeben werden. Dabei lassen sich beliebig viele Quellen definieren. Alle angegebenen Quellen werden mit dem über --cmd übergebenen Befehl ausgeführt.
 
-**Beispiel:**
+Wird das Argument `--cmd` nicht gesetzt, versucht LVP standardmäßig, die Quellen als Java-Programme auszuführen.
+
+#### Variante 2: Konfigurationsdatei (sources.json)
+
+Bei einer größeren Anzahl von Quellen oder wenn Quellen unterschiedlich gestartet werden sollen (z. B. mit verschiedenen Startbefehlen), empfiehlt sich die Verwendung einer sources.json-Datei im Wurzelverzeichnis der Ausführung.
+
+Wird LVP mit dem Argument `--config` gestartet, werden die in dieser Datei definierten Quellen zusätzlich ausgeführt.
+
+Ein Beispiel für den Aufbau der Datei befindet sich im Ordner examples.
+
+Beide Varianten lassen sich auch kombinieren.
+
+### 4. Das Protokoll
+Im Folgenden eine grobe Übersicht über den generellen Aufbau des Protokolls. Ein ausführlicheres Beispiel finden Sie in `demo.java`, sowie weitere kleine Beispiele in dem Ordner `examples`.
+
+Einzeilige Kommandos:
+```java
+println("Markdown: # Ich bin eine Überschrift");
+```
+
+Mehrzeilige Kommandos:
+```java
+println("""
+  Markdown:
+  # Ich bin eine Überschrift
+  Ich bin **Text**.
+  ~~~
+""");
+```
+Kommandos bestehen aus einem Namen und einem Inhalt. Dabei wird zwischen einzeiligen und mehrzeiligen Kommandos unterschieden. Ein mehrzeiliges Kommando wird durch `~~~` beendet.
+
+<br/>
 
 ```java
-import lvp.Clerk;
+println("""
+  Text[template]:
+  ## Beispiel
+  Irgendein ${0} anzeigen.
+  ~~~
+  | Markdown
 
-void main() {
-    println("Markdown: # Hello World");
-}
+  Text: Beispiel
+  | Text[template] | Markdown
+""")
+
 ```
-Dieser einfache Aufruf rendert eine Markdown-Überschrift direkt im Browser. Weitere Ausgaben, Grafiken oder Interaktionen können durch zusätzliche Kommandos ergänzt werden.
+Durch Piping können die Ergebnisse eines Kommandos an ein anderes Kommando weitergegeben werden.
 
-### Troubleshooting
+### Kommandos und Anweisungen
+[Hier folgt eine Übersicht über alle Kommandos]
+- Register
+- Markdown
+- Html
+- Css
+- Javascript
+- ....
+
+
+## Troubleshooting
 
 > Error starting server: Address already in use: bind
 
