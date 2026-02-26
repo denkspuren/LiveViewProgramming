@@ -117,7 +117,16 @@ println("""
 ```
 Durch Piping können die Ergebnisse eines Kommandos an ein anderes Kommando weitergegeben werden.
 
+Desweiteren können Kommandos IDs zugewiesen werden. Das hat unterschiedliche Kommandoabhängige Auswirkungen, z.B. können Kommandos mit IDs später durch die ID wieder aufgerufen werden, oder sie werden im Browser mit dieser ID versehen, um sie z.B. durch JavaScript oder CSS ansprechen zu können.
+
 ## Kommandos und Anweisungen
+
+### Register
+Das Kommando `Register` ermöglicht es, eigene CLI-Anwendungen unter einem bestimmten Namen zu registrieren. Auf diese Weise können eigene Kommandos definiert und genutzt werden. Die Kommandoinhalte werden über STDIN an die registrierte Anwendung übergeben. Das Ergebnis der Anwendung wird über STDOUT ausgelesen und kann weiterverarbeitet werden.
+Normalerweise erwarten die Kommandos neben dem Inhalt auch eine Kommando ID. Dieses Verhalten kann beim Registrieren unterdrückt werden.
+
+- `Register NAME CMD`
+- `Register[skipId] NAME CMD`
 
 ### Channelkommandos
 Kommandos, wie `Markdown`, `Html` oder `Dot`, die Inhalte im Browser anzeigen, werden als Channelkommandos bezeichnet. Sie haben keine Ausgabe, die weiterverarbeitet werden könnte, da ihr Ergebnis direkt im Browser landet.
