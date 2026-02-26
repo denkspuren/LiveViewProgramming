@@ -134,7 +134,7 @@ function setUp() {
           newElement.id = id;
           subView.appendChild(newElement);
           Viz.instance().then(function(viz) {
-              newElement.appendChild(viz.renderSVGElement(dotString));
+              newElement.appendChild(viz.renderSVGElement(data));
           });
           break;
         }
