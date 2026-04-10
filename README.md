@@ -6,8 +6,6 @@ Das Protokoll dient als sprachunabhängige Schnittstelle zwischen Ihrem eigenen 
 
 Auf diese Weise stellt LVP praktische Funktionen bereit, die sich beispielsweise für die Code-Dokumentation, die Erzeugung von Turtle-Grafiken oder das Erstellen interaktiver HTML-Elemente nutzen lassen.
 
-
-
 ## 🚀 Nutze das _Live View Programming_
 
 Wenn Sie das _Live View Programming_ ausprobieren möchten, ist Folgendes zu tun:
@@ -131,67 +129,82 @@ Normalerweise erwarten die Kommandos neben dem Inhalt auch eine Kommando ID. Die
 ### Channelkommandos
 Kommandos, wie `Markdown`, `Html` oder `Dot`, die Inhalte im Browser anzeigen, werden als Channelkommandos bezeichnet. Sie haben keine Ausgabe, die weiterverarbeitet werden könnte, da ihr Ergebnis direkt im Browser landet.
 
-#### Markdown
+#### 🟩 `Markdown`
+
 **Eingabe:** Markdown-Text
 
 **Ergebnis:** Umwandlung des Markdown-Textes in HTML und Anzeige im Browser.
 
-#### Html
+#### 🟩 `Html`
+
 **Eingabe:** HTML-Text
 
 **Ergebnis:** Einfügen des HTML-Textes in den Html-Body.
 
-#### Css
+#### 🟩 `Css`
+
 **Eingabe:** CSS-Text
 
 **Ergebnis:** Einbettung des CSS-Textes in einen Style-Tag im Browser.
 
-#### JavaScript
+#### 🟩 `JavaScript`
+
 **Eingabe:** JavaScript-Code
 
 **Ergebnis:** Einfügen des JavaScript-Codes in einen Script-Tag im Browser.
 
-#### JavaScriptCall
+#### 🟩 `JavaScriptCall`
+
 **Eingabe:** JavaScript-Code
 
 **Ergebnis:** Ausführung des JavaScript-Codes im Browser.
 
-#### SubViewStyle
+#### 🟩 `SubViewStyle`
+
 **Eingabe:** CSS-Text
 
 **Ergebnis:** Einbettung des CSS-Textes in eine CSS-Klasse, die auf die SubView angewendet wird, in der das Kommando ausgeführt wird.
 
-#### Dot
+#### 🟩 `Dot`
+
 **Eingabe:** Graphenbeschreibung in der Dot-Sprache
 
 **Ergebnis:** Umwandlung der Graphenbeschreibung in eine Grafik und Anzeige im Browser.
 
-#### Clear
+#### 🟩 `Clear`
+
 **Eingabe:** Keine
 
 **Ergebnis:** Löschen aller Inhalte im Browser.
 
 ### Servicekommandos
+
 Servicekommandos, wie `Text` oder `Codeblock`, haben eine Ausgabe, die weiterverarbeitet werden kann. Sie können zum Beispiel durch Piping an Channelkommandos weitergegeben werden, um sie im Browser anzuzeigen.
 
-#### Text
+#### 🟦 `Text`
+
 **Eingabe:** Text
 
 **Ausgabe:** Der eingegebene Text wird als Ausgabe zurückgegeben und kann weiterverarbeitet werden.
 
 Dieses Kommando hat zwei besondere Eigenschaften:
+
 1. Es kann sich Inhalte merken, wenn eine ID angegeben wird. Diese Inhalte können später durch die Angabe der ID wieder abgerufen werden.
 2. Es kann als Template genutzt werden, indem Platzhalter definiert werden. Diese werden aufgefüllt, wenn der gespeicherte Inhalt durch Piping weitere Eingaben erhält.
 
-#### Codeblock
+#### 🟦 `Codeblock`
+
 **Eingabe:** `path;label`
+
 - Path: Pfad zu einer Quelldatei
 - Label: Kommentarlabel, das den Bereich in der Quelldatei markiert, der angezeigt werden soll.
 
 **Ausgabe:** Der Code-Abschnitt, der durch das Label markiert ist, wird als Ausgabe zurückgegeben, dazu Metainhalte, um den Code-Block im Browser interaktiv zu machen.
 
-#### Cutout
+#### 🟦 `Cutout`
+
 **Eingabe:** `path;label`
+
 - Path: Pfad zu einer Quelldatei
 - Label: Kommentarlabel, das den Bereich in der Quelldatei markiert, der angezeigt werden soll.
 
@@ -199,7 +212,8 @@ Dieses Kommando hat zwei besondere Eigenschaften:
 
 (Anders als beim Codeblock-Kommando können hier keine interaktiven Code-Blöcke erzeugt werden)
 
-#### Turtle
+#### 🟦 `Turtle`
+
 **Eingabe:**
 - `init WIDTH HEIGHT` -> Initialisiert die Zeichenfläche mit der angegebenen Breite und Höhe
 - `init XMIN XMAX YMIN YMAX STARTX STARTY STARTANGLE` -> Initialisiert die Zeichenfläche mit den angegebenen Koordinaten und der Startposition der Schildkröte
@@ -219,10 +233,11 @@ Dieses Kommando hat zwei besondere Eigenschaften:
 
 **Ausgabe:** Die Turtle-Grafik als SVG-Text
 
-#### Test
+#### 🟦 `Test`
 Dieses Kommando ermöglicht es, Java-Code zu testen, indem es die Ausgabe des Codes mit einer erwarteten Ausgabe vergleicht.
 
 **Eingabe:**
+
 -  `Send CODE` -> Java-Code, der ausgewertet werden soll
 - `Expect STRING` -> Erwartete Ausgabe des Java-Codes
 - `Type TYPE` -> Optionaler Parameter, der den Typ des Vergleichs angibt:
@@ -232,8 +247,10 @@ Dieses Kommando ermöglicht es, Java-Code zu testen, indem es die Ausgabe des Co
 
 **Ausgabe:** Die Zusammenfassung und das Ergebnis des Tests.
 
-#### Button
+#### 🟦 `Button`
+
 **Eingabe:**
+
 - `Text: TEXT` -> Text, der auf dem Button angezeigt wird
 - `[width: WIDTH]` -> Optionaler Parameter, der die Breite des Buttons angibt
 - `[height: HEIGHT]` -> Optionaler Parameter, der die Höhe des Buttons angibt
@@ -243,8 +260,10 @@ Dieses Kommando ermöglicht es, Java-Code zu testen, indem es die Ausgabe des Co
 
 **Ausgabe:** HTML-Text für einen Button mit dazugehörigem JavaScript, der die angegebene Ersetzung in der Quelldatei vornimmt, wenn der Button geklickt wird.
 
-#### Input
+#### 🟦 `Input`
+
 **Eingabe:**
+
 - `path: PATH` -> Pfad zu einer Quelldatei, in der Code ausgetauscht werden soll, wenn eine Eingabe bestätigt wird
 - `label: "LABEL"` -> Kommentarlabel, das den Bereich in der Quelldatei markiert, der ausgetauscht werden soll
 - `template: TEMPLATE` -> Das Template, in das die Eingabe des Input-Feldes eingesetzt werden soll. Der Platzhalter `$` im Template wird durch die Eingabe ersetzt. Das Resultat wird in die Quelldatei eingesetzt.
@@ -253,8 +272,10 @@ Dieses Kommando ermöglicht es, Java-Code zu testen, indem es die Ausgabe des Co
 
 **Ausgabe:** HTML-Text für ein Eingabefeld mit dazugehörigem JavaScript, der die angegebene Ersetzung in der Quelldatei vornimmt, wenn eine Eingabe bestätigt wird.
 
-#### Checkbox
+#### 🟦 `Checkbox`
+
 **Eingabe:**
+
 - `path: PATH` -> Pfad zu einer Quelldatei, in der Code ausgetauscht werden soll, wenn die Checkbox aktiviert oder deaktiviert wird
 - `label: "LABEL"` -> Kommentarlabel, das den Bereich in der Quelldatei markiert, der ausgetauscht werden soll
 - `template: TEMPLATE` -> Das Template, in das der aktuelle Wert der Checkbox eingesetzt werden soll. Der Platzhalter `$` im Template wird durch den aktuellen Wert der Checkbox (true oder false) ersetzt. Das Resultat wird in die Quelldatei eingesetzt.
@@ -264,12 +285,14 @@ Dieses Kommando ermöglicht es, Java-Code zu testen, indem es die Ausgabe des Co
 ### Scankommandos
 Scankommandos werden genutzt, um Informationen zurück an die Quelle zu senden.
 
-#### CommandScan
+#### 🟧 `CommandScan`
+
 **Eingabe:** Keine (Kann nur durch Piping einen Input erhalten)
 
 **Ausgabe:** Das Kommando empfängt die Ausgabe des vorherigen Kommandos und sendet sie zurück an die Quelle, die das Kommando ursprünglich ausgeführt hat.
 
-#### InputScan
+#### 🟧 `InputScan`
+
 **Eingabe:** Keine
 
 **Ausgabe:** Das Kommando erzeugt ein Eingabefeld im Browser und sendet die Benutzereingabe zurück an die Quelle, die das Kommando ursprünglich ausgeführt hat.
