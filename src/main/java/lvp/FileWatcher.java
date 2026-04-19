@@ -152,7 +152,7 @@ public class FileWatcher {
         try {
             boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
             Logger.logInfo("Running: " + source.cmd() + " " + source.path());
-            ProcessBuilder pb = new ProcessBuilder(isWindows ? new String[]{"cmd.exe", "/c", source.cmd(), source.path().toString()} : new String[]{"sh", "-c", source.cmd(),  source.path().toString()})
+            ProcessBuilder pb = new ProcessBuilder(isWindows ? new String[]{"cmd.exe", "/c", source.cmd(), source.path().toString()} : new String[]{"sh", "-c", source.cmd() + " " + source.path().toString()})
                 .redirectErrorStream(true);
             Process process = pb.start();
             processor.process(process, source.id());
