@@ -396,5 +396,5 @@ Einige haben schon Beiträge zum LVP geliefert, meist sind es Studierende von mi
 * Mein Prototyp zum [Java Live Reloading](https://github.com/denkspuren/JavaLiveReloading) gab den Anstoss, eine neue Architektur umzusetzen und sich von der JShell als interaktives Medium zu verabschieden.
 * Die angestrebte und [hier](https://github.com/denkspuren/LiveViewProgramming/issues/77) skizzierte neue Architekturbasis ist aus dem Dialog zwischen Ramon und mir hervorgegangen. Sie wird das LVP mit ganz neuen Fähigkeiten ausstatten.
 
-Herzlichst,<br>
-Dominikus Herzberg
+Viel Spaß beim Ausprobieren,<br>
+Dominikus Herzberg und Ramon Biehl
