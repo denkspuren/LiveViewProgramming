@@ -3,101 +3,165 @@ package lvp;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 import java.util.regex.Matcher;
+import lvp.sinks.server_sink.Server;
+import lvp.sinks.server_sink.ServerSink;
+import lvp.skills.logging.LogLevel;
+import lvp.skills.logging.Logger;
+import lvp.skills.parser.ConfigParser;
+import lvp.skills.parser.PathParser;
+import lvp.skills.parser.ConfigParser.Source;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import lvp.logging.LogLevel;
-import lvp.logging.Logger;
-
 public class Main {
-    private record Config(Path path, String fileNamePattern, int port, LogLevel logLevel){}
+    private record Config(List<Source> sources, int port, LogLevel logLevel, Optional<String> watchFilter, boolean sourceOnly){}
+
+    private static final Path LVP_SOURCES_PATH = Path.of("./sources.json");
     public static void main(String[] args) {
         Config cfg = parseArgs(args);
-        Logger.setLogLevel(cfg.logLevel());
 
         if (!isLatestRelease()) {
             System.out.println("Warning: You are not using the latest release of Live View Programming. Please visit https://github.com/denkspuren/LiveViewProgramming/releases");
         }
-        
-        try {
-            Server server = new Server(Math.abs(cfg.port()), cfg.logLevel().equals(LogLevel.Debug));
-            Runtime.getRuntime().addShutdownHook(new Thread(server::stop));
 
-            if(cfg.path() != null) {
-                FileWatcher watcher = new FileWatcher(cfg.path(), cfg.fileNamePattern(), server);
-                Runtime.getRuntime().addShutdownHook(new Thread(watcher::stop));
-                watcher.watchLoop(server);
-            }
+        Processor processor = null;
+        try {
+            processor = new Processor();
+            processor.registerSink(new ServerSink(cfg.port()));
+            FileWatcher watcher = new FileWatcher(cfg.sources(), cfg.watchFilter(), cfg.sourceOnly(), processor);
+            Runtime.getRuntime().addShutdownHook(new Thread(watcher::stop));
+            watcher.start();
         } catch (IOException e) {
-            System.err.println("Error starting server: " + e.getMessage());
+            System.err.println("Error starting lvp: " + e.getMessage());
             e.printStackTrace();
             System.exit(1);
         }
+
+        Scanner scanner = new Scanner(System.in);
+        while(true) {
+            String input = null;
+            try { input = scanner.nextLine().strip(); } catch (Exception _) { break;}
+            if (input.startsWith("/"))
+                handleServerCommands(input.substring(1).strip());
+            else {
+                System.err.println("Error: Invalid command. Use '/help' for available commands.");
+            }
+        }
     }
 
+    private static void handleServerCommands(String command) {
+        String[] parts = command.split(" ", 2);
+        if (command.isBlank() || parts.length == 0) {
+            System.out.println("No command entered. Type '/help' for available commands.");
+            return;
+        }
+
+        switch (parts[0].toLowerCase()) {
+            case "exit" -> {
+                System.out.println("Exiting Live View Programming...");
+                System.exit(0);
+            }
+            case "log" -> {
+                if (parts.length < 2) {
+                    System.out.println("Usage: /log <level>");
+                    return;
+                }
+                LogLevel level = LogLevel.fromString(parts[1]);
+                if (level == null) {
+                    System.out.println("Invalid log level.");
+                } else {
+                    Logger.setLogLevel(level);
+                    System.out.println("Log level set to: " + level);
+                }
+            }
+            case "help" -> System.out.println("Available commands: /exit, /help, /log");
+            default -> System.out.println("Unknown command: " + command);
+        }
+    }
+
+    // Documentation in README
     private static Config parseArgs(String[] args) {
-        String fileNamePattern = null;
-        Path fileName = null;
-        Path path = null;
+        List<String> files = new ArrayList<>();
+        Optional<String> cmd = Optional.empty();
         int port = Server.getDefaultPort();
         LogLevel logLevel = LogLevel.Error;
+        Optional<List<Source>> sources = Optional.empty();
+        Optional<String> watchFilter = Optional.empty();
+        boolean sourceOnly = false;
 
         for (String arg : args) {
             String[] parts = arg.split("=", 2);
-            String key = parts[0].trim();
-            String value = parts.length > 1 ? parts[1].trim() : "";
+            String key = parts[0].strip();
+            String value = parts.length > 1 ? parts[1].strip() : "";
 
             switch (key) {
-                case "-l":
-                case "--log":
-                    logLevel = value.isBlank() ? LogLevel.Info : LogLevel.fromString(value);
-                    break;
-                case "-p":
-                case "--pattern":
-                    fileNamePattern = value.isBlank() ? "*" : value;
-                    break;
-                case "--watch":
-                case "-w":
-                    path = value.isBlank() ? Paths.get(".") : Paths.get(value).normalize();
-                    break;
-                default:
-                    try { port = Integer.parseInt(arg.trim()); } catch(NumberFormatException _) {}
-                    break;
+                case "-l", "--log" -> logLevel = value.isBlank() ? LogLevel.Info : LogLevel.fromString(value);
+                case "--port", "-p" -> {
+                    try { port = Integer.parseInt(value); } catch(NumberFormatException _) {
+                        System.err.println("Error: Invalid port number. Not a number: " + value);
+                    }
+                }
+                case "--cmd" -> cmd = value.isBlank() ? Optional.empty() : Optional.of(value);
+                case "--config", "-c" -> sources = loadWatchConfig();
+                case "--watch-filter", "-w" -> watchFilter = value.isBlank() ? Optional.empty() : Optional.of(value);
+                case "--source-only", "-s" -> sourceOnly = true;
+                default -> {
+                    if (!arg.isBlank()) files.add(arg.strip());
+                }
             }
         }
+
+        Logger.setLogLevel(logLevel);
 
         if (port < 1 || port > 65535) {
             System.err.println("Error: Invalid port number. Must be between 1 and 65535.");
             System.exit(1);
         }
+        Logger.logDebug(files.isEmpty() ? "No files provided." : "Files to execute: " + files);
+        Optional<List<Path>> paths = getFilePaths(files);
 
-        if (path == null) return new Config(null, null, port, logLevel);
-
-        if (!Files.exists(path)) {
-            System.err.println("Error: Path not found " + path);
+        if (paths.isEmpty() && sources.isEmpty()) {
+            System.err.println("Error: No valid files to execute.");
             System.exit(1);
         }
 
-        if(!Files.isDirectory(path)) {
-            if (path.getFileName().toString().endsWith(".java")) fileName = path.getFileName();
-            path = path.getParent() != null ?  path.getParent() : Paths.get(".");
+        if (!paths.isEmpty()) {
+            sources = Optional.of(sources.orElseGet(ArrayList::new));
+            String c = cmd.orElse("java -Dsun.stdout.encoding=UTF-8 --enable-preview");
+            List<Source> sourcesFromPaths = paths.get().stream().map(path -> new Source(path, c)).toList();
+            sources.ifPresent(lst -> lst.addAll(sourcesFromPaths));
         }
 
-        if (fileName == null && fileNamePattern == null) {
-            System.err.println("Error: No Java file or pattern specified.");
-            System.exit(1);
-        }
-
-        return new Config(path, fileNamePattern != null ? fileNamePattern : fileName.toString(), port, logLevel);
+        return new Config(sources.get(), port, logLevel, watchFilter, sourceOnly);
     }
 
+    private static Optional<List<Path>> getFilePaths(List<String> files) {
+        List<Path> paths = new ArrayList<>();
+        for (String file : files) {
+            PathParser.parse(file).ifPresent(paths::addAll);
+        }
+        return paths.isEmpty() ? Optional.empty() : Optional.of(paths);
+    }
+
+    private static Optional<List<Source>> loadWatchConfig() {
+        if (!Files.isRegularFile(LVP_SOURCES_PATH) || !Files.exists(LVP_SOURCES_PATH)) {
+            Logger.logError("Config not found at: " + LVP_SOURCES_PATH.normalize().toAbsolutePath());
+            return Optional.empty();
+        }
+        return ConfigParser.parse(LVP_SOURCES_PATH);
+    }
+
+    // Returns false only, when a new version is available. If the version can't be checked, it will return true
     public static boolean isLatestRelease() {
-        try {
-            HttpClient client = HttpClient.newHttpClient();
+        try (HttpClient client = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.github.com/repos/denkspuren/LiveViewProgramming/releases/latest"))
                 .header("Accept", "application/vnd.github+json")
@@ -119,7 +183,7 @@ public class Main {
         }
     }
 
-    public static String extractJsonField(String json, String field) {
+    private static String extractJsonField(String json, String field) {
         Matcher matcher = java.util.regex.Pattern
             .compile("\"" + field + "\"\\s*:\\s*\"([^\"]+)\"")
             .matcher(json);

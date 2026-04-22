@@ -1,8 +1,10 @@
-# _Live View Programming_ mit Java
+# _Live View Programming_ mit jeder Programmiersprache
 
-Das _Live View Programming_ (LVP) bietet Ihnen für die Java-Programmierung _Views_ und _Skills_ an. Views sind dazu da, um mediale Inhalte im Web-Browser darzustellen, also Texte, Bilder, Grafiken, Videos, inteaktive Animationen etc. Skills stellen nützliche Fähigkeiten bereit, die man in Kombination mit Views (z.B. zur Dokumentation von Code) gebrauchen kann.
+Live View Programming (LVP) stellt ein einfaches Textprotokoll bereit, mit dem sich mediale Inhalte direkt im Web-Browser darstellen lassen, darunter Texte, Bilder, Grafiken, Videos und interaktive Animationen.
 
-All diese Views und Skills nutzt man programmierend mit Java. Mit jeder Code-Änderung wird die Ansicht im Browser _live_ aktualisiert. Es ist – ehrlich gesagt – ziemlich cool, wenn man die Veränderungen dann im Browser sieht. Probieren Sie die Demo aus!
+Das Protokoll dient als sprachunabhängige Schnittstelle zwischen Ihrem eigenen Programm und LVP. Die Kommunikation erfolgt über Kommandos, die durch gewöhnliche Konsolenausgaben erzeugt werden. Diese Kommandos können Inhalte transformieren und sie im Browser medial aufbereitet anzeigen.
+
+Auf diese Weise stellt LVP praktische Funktionen bereit, die sich beispielsweise für die Code-Dokumentation, die Erzeugung von Turtle-Grafiken oder das Erstellen interaktiver HTML-Elemente nutzen lassen.
 
 ## 🚀 Nutze das _Live View Programming_
 
@@ -10,7 +12,7 @@ Wenn Sie das _Live View Programming_ ausprobieren möchten, ist Folgendes zu tun
 
 ### 1. Lade die `.jar`-Datei herunter
 
-* Stellen Sie sicher, dasss Sie mit einem aktuellen JDK (Java Development Kit) arbeiten; es empfiehlt sich das [TemurinJDK](https://adoptium.net/temurin/releases/)
+* Stellen Sie sicher, dasss Sie mit einem aktuellen JDK (Java Development Kit) arbeiten; es empfiehlt sich das [OpenJDK](https://jdk.java.net/25/)
 * Laden Sie die aktuelle `.jar`-Datei herunter, die Ihnen als Asset zum [aktuellen Release](https://github.com/denkspuren/LiveViewProgramming/releases) als Download angeboten wird; die Datei hat den Namen `lvp-<Version>.jar`
 * Laden Sie `demo.java`-Datei herunter, die Ihnen ebenfalls als Asset zum [aktuellen Release](https://github.com/denkspuren/LiveViewProgramming/releases) als Download angeboten wird.
 
@@ -31,47 +33,271 @@ Sie können die `.jar`-Datei auch selber generieren, wenn Sie zudem die Versions
 Passen Sie den Beispielaufruf an die aktuelle Version an:
 
 ```
-java -jar lvp-<Version>.jar --log --watch=demo.java
+java -jar lvp-<Version>.jar --log demo.java
 ```
 
-Wenn Sie die Version `lvp-0.5.0.jar` heruntergeladen haben, lautet der Aufruf:
+Wenn Sie die Version `lvp-1.0.0.jar` heruntergeladen haben, lautet der Aufruf:
 
 ```
-java -jar lvp-0.5.0.jar --log --watch=demo.java
+java -jar lvp-1.0.0.jar --log demo.java
 ```
 
 #### Übersicht der möglichen Kommandozeilenargumente
 
-| Argument         | Alias   | Bedeutung                                 | Beispiel                                      |
-|------------------|---------|-------------------------------------------|-----------------------------------------------|
-| --watch=DATEI    | -w      | Zu überwachende Datei oder Verzeichnis     | --watch=path/to/<br>--watch=demo.java                  |
-| --pattern=PATTERN| -p      | Dateinamensmuster (z.B. *.java)           | --pattern=*.java                              |
-| --log[=LEVEL]    | -l      | Log-Level (Error, Info, Debug)            | --log=Debug                                   |
-| PORT             |         | Portnummer für den Server                 | 50001                                         |
+| Argument                   | Alias | Bedeutung                                                                 | Beispiel                                 |
+|----------------------------|-------|---------------------------------------------------------------------------|------------------------------------------|
+| `--cmd=CMD`                |       | Startbefehl für die Ausführung (z. B. Java mit Optionen)                  | `--cmd="java --enable-preview"`          |
+| `--log[=LEVEL]`            | `-l`  | Log-Level (`Error`, `Info`, `Debug`)                                      | `--log=Debug`                            |
+| `--port`                   | `-p`  | Portnummer für den Server                                                 | `--port=50002`                           |
+| `--config`                 | `-c`  | Lädt Konfiguration aus `sources.json`                                     | `--config`                               |
+| `--source-only`            | `-s`  | Ignoriert alle Nicht-Source-Dateien                                       | `--source-only`                          |
+| `--watch-filter=PATTERN`   | `-w`  | Filter für Dateien, die ein Neuladen der Inhalte auslösen können          | `--watch-filter=./deps/*.java`           |
+| `SOURCES`                  |       | Quellen, die durch LVP ausgeführt werden                                  | `demo1.java demo2.java` <br> `sources/*.java` |
+
 
 > Mehrere Argumente können kombiniert werden, z.B.:  
-> `java -jar lvp-<Version>.jar --watch=src --pattern=*.java --log=Debug 50001`
+> `java -jar lvp-<Version>.jar --watch-filter=src/lib/**/*.java --log=Debug --port=50001 --config src/*View.java`
 
-### 3. So nutzt man das _Live View Programming_
+### 3. Einbinden von Quellen
+Damit eigene Programme mit LVP kommunizieren können, werden sie innerhalb von LVP als Laufzeitumgebung ausgeführt. Diese Programme werden im Kontext von LVP als Quellen bezeichnet.
 
-Die Datei `demo.java` dient als einfaches Beispiel für den Einstieg in das Live View Programming (LVP).  
+Die Programme selbst benötigen keine zusätzlichen Abhängigkeiten und können in beliebigen Programmiersprachen geschrieben sein. Es gibt zwei Möglichkeiten, Quellen in LVP zu definieren.
 
-Damit LVP funktioniert, **muss der Server die Datei beobachten (watchen)** – sobald Änderungen erkannt werden, wird der Code automatisch neu ausgeführt und die Ausgabe aktualisiert.
+#### Variante 1: Übergabe über die Konsole
 
-Innerhalb einer [`void main()`-Methode](https://openjdk.org/jeps/495) lassen sich interaktive Inhalte erzeugen, indem man Methoden des `Clerk`-Interfaces verwendet. Diese Inhalte werden anschließend im Browser angezeigt.
+Wie oben gezeigt, können Quellen als Argument beim Konsolenaufruf übergeben werden. Dabei lassen sich beliebig viele Quellen definieren. Alle angegebenen Quellen werden mit dem über --cmd übergebenen Befehl ausgeführt.
 
-**Beispiel:**
+Wird das Argument `--cmd` nicht gesetzt, versucht LVP standardmäßig, die Quellen als Java-Programme auszuführen.
+
+#### Variante 2: Konfigurationsdatei (sources.json)
+
+Bei einer größeren Anzahl von Quellen oder wenn Quellen unterschiedlich gestartet werden sollen (z. B. mit verschiedenen Startbefehlen), empfiehlt sich die Verwendung einer sources.json-Datei im Wurzelverzeichnis der Ausführung.
+
+Wird LVP mit dem Argument `--config` gestartet, werden die in dieser Datei definierten Quellen zusätzlich ausgeführt.
+
+Ein Beispiel für den Aufbau der Datei befindet sich im Ordner examples.
+
+Beide Varianten lassen sich auch kombinieren.
+
+### 4. Das Protokoll
+Im Folgenden eine grobe Übersicht über den generellen Aufbau des Protokolls. Ein ausführlicheres Beispiel finden Sie in `demo.java`, sowie weitere kleine Beispiele in dem Ordner `examples`.
+
+Einzeilige Kommandos:
+```java
+println("Markdown: # Ich bin eine Überschrift");
+```
+
+Mehrzeilige Kommandos:
+```java
+println("""
+  Markdown:
+  # Ich bin eine Überschrift
+  Ich bin **Text**.
+  ~~~
+""");
+```
+Kommandos bestehen aus einem Namen und einem Inhalt. Dabei wird zwischen einzeiligen und mehrzeiligen Kommandos unterschieden. Ein mehrzeiliges Kommando wird durch `~~~` beendet. Die meisten Kommandos können sowohl einzeilig als auch mehrzeilig genutzt werden. Es gibt hier jedoch auch einige Ausnahmen, wie das Turtle-Kommando, das nur mehrzeilig genutzt werden kann oder das Codeblock-Kommando, das nur einzeilig genutzt werden kann.
+
+<br/>
 
 ```java
-import lvp.Clerk;
+println("""
+  Text[template]:
+  ## Beispiel
+  Irgendein ${0} anzeigen.
+  ~~~
+  | Markdown
 
-void main() {
-    Clerk.markdown("# Hello World");
-}
+  Text: Beispiel
+  | Text[template] | Markdown
+""")
+
 ```
-Dieser einfache Aufruf rendert eine Markdown-Überschrift direkt im Browser. Weitere Ausgaben, Grafiken oder Interaktionen können durch zusätzliche Clerk-Methoden, Views oder Skills ergänzt werden.
+Durch Piping können die Ergebnisse eines Kommandos an ein anderes Kommando weitergegeben werden.
 
-### Troubleshooting
+Desweiteren können Kommandos IDs zugewiesen werden. Das hat unterschiedliche Kommandoabhängige Auswirkungen, z.B. können Kommandos mit IDs später durch die ID wieder aufgerufen werden, oder sie werden im Browser mit dieser ID versehen, um sie z.B. durch JavaScript oder CSS ansprechen zu können.
+
+## Kommandos und Anweisungen
+
+### Register
+Das Kommando `Register` ermöglicht es, eigene CLI-Anwendungen unter einem bestimmten Namen zu registrieren. Auf diese Weise können eigene Kommandos definiert und genutzt werden. Die Kommandoinhalte werden über STDIN an die registrierte Anwendung übergeben. Das Ergebnis der Anwendung wird über STDOUT ausgelesen und kann weiterverarbeitet werden.
+Normalerweise erwarten die Kommandos neben dem Inhalt auch eine Kommando ID. Dieses Verhalten kann beim Registrieren unterdrückt werden.
+
+- `Register NAME CMD`
+- `Register[skipId] NAME CMD`
+
+### Channelkommandos
+Kommandos, wie `Markdown`, `Html` oder `Dot`, die Inhalte im Browser anzeigen, werden als Channelkommandos bezeichnet. Sie haben keine Ausgabe, die weiterverarbeitet werden könnte, da ihr Ergebnis direkt im Browser landet.
+
+#### 🟩 `Markdown`
+
+**Eingabe:** Markdown-Text
+
+**Ergebnis:** Umwandlung des Markdown-Textes in HTML und Anzeige im Browser.
+
+#### 🟩 `Html`
+
+**Eingabe:** HTML-Text
+
+**Ergebnis:** Einfügen des HTML-Textes in den Html-Body.
+
+#### 🟩 `Css`
+
+**Eingabe:** CSS-Text
+
+**Ergebnis:** Einbettung des CSS-Textes in einen Style-Tag im Browser.
+
+#### 🟩 `JavaScript`
+
+**Eingabe:** JavaScript-Code
+
+**Ergebnis:** Einfügen des JavaScript-Codes in einen Script-Tag im Browser.
+
+#### 🟩 `JavaScriptCall`
+
+**Eingabe:** JavaScript-Code
+
+**Ergebnis:** Ausführung des JavaScript-Codes im Browser.
+
+#### 🟩 `SubViewStyle`
+
+**Eingabe:** CSS-Text
+
+**Ergebnis:** Einbettung des CSS-Textes in eine CSS-Klasse, die auf die SubView angewendet wird, in der das Kommando ausgeführt wird.
+
+#### 🟩 `Dot`
+
+**Eingabe:** Graphenbeschreibung in der Dot-Sprache
+
+**Ergebnis:** Umwandlung der Graphenbeschreibung in eine Grafik und Anzeige im Browser.
+
+#### 🟩 `Clear`
+
+**Eingabe:** Keine
+
+**Ergebnis:** Löschen aller Inhalte im Browser.
+
+### Servicekommandos
+
+Servicekommandos, wie `Text` oder `Codeblock`, haben eine Ausgabe, die weiterverarbeitet werden kann. Sie können zum Beispiel durch Piping an Channelkommandos weitergegeben werden, um sie im Browser anzuzeigen.
+
+#### 🟦 `Text`
+
+**Eingabe:** Text
+
+**Ausgabe:** Der eingegebene Text wird als Ausgabe zurückgegeben und kann weiterverarbeitet werden.
+
+Dieses Kommando hat zwei besondere Eigenschaften:
+
+1. Es kann sich Inhalte merken, wenn eine ID angegeben wird. Diese Inhalte können später durch die Angabe der ID wieder abgerufen werden.
+2. Es kann als Template genutzt werden, indem Platzhalter definiert werden. Diese werden aufgefüllt, wenn der gespeicherte Inhalt durch Piping weitere Eingaben erhält.
+
+#### 🟦 `Codeblock`
+
+**Eingabe:** `path;label`
+
+- Path: Pfad zu einer Quelldatei
+- Label: Kommentarlabel, das den Bereich in der Quelldatei markiert, der angezeigt werden soll.
+
+**Ausgabe:** Der Code-Abschnitt, der durch das Label markiert ist, wird als Ausgabe zurückgegeben, dazu Metainhalte, um den Code-Block im Browser interaktiv zu machen.
+
+#### 🟦 `Cutout`
+
+**Eingabe:** `path;label`
+
+- Path: Pfad zu einer Quelldatei
+- Label: Kommentarlabel, das den Bereich in der Quelldatei markiert, der angezeigt werden soll.
+
+**Ausgabe:** Der Code-Abschnitt, der durch das Label markiert ist, wird als Ausgabe zurückgegeben.
+
+(Anders als beim Codeblock-Kommando können hier keine interaktiven Code-Blöcke erzeugt werden)
+
+#### 🟦 `Turtle`
+
+**Eingabe:**
+- `init WIDTH HEIGHT` -> Initialisiert die Zeichenfläche mit der angegebenen Breite und Höhe
+- `init XMIN XMAX YMIN YMAX STARTX STARTY STARTANGLE` -> Initialisiert die Zeichenfläche mit den angegebenen Koordinaten und der Startposition der Schildkröte
+- `penup` -> Hebt den Stift der Schildkröte
+- `pendown` -> Senkt den Stift der Schildkröte
+- `forward DISTANCE` -> Bewegt die Schildkröte um die angegebene Distanz vorwärts
+- `backward DISTANCE` -> Bewegt die Schildkröte um die angegebene Distanz rückwärts
+- `left ANGLE` -> Dreht die Schildkröte um den angegebenen Winkel nach links
+- `right ANGLE` -> Dreht die Schildkröte um den angegebenen Winkel
+- `color RGB[A]` -> Setzt die Farbe des Stifts der Schildkröte auf die angegebene Farbe, definiert durch die RGB-Werte und optional einem Alpha-Wert für die Transparenz
+- `text TEXT [FONT]` -> Zeichnet den angegebenen Text an der aktuellen Position der Schildkröte, optional mit einer Schriftart
+- `width WIDTH` -> Setzt die Breite des Stifts der Schildkröte auf die angegebene Breite
+- `push` -> Speichert die aktuelle Position und Ausrichtung der Schildkröte auf einem Stack
+- `pop` -> Stellt die zuletzt gespeicherte Position und Ausrichtung der Schildkröte wieder her
+- `timeline` -> Erzeugt einen Slider im Browser, mit dem durch den Ausführungsverlauf der Turtle-Befehle navigiert werden kann
+- `save NAME` -> Speichert die Turtle-Grafik unter dem angegebenen Namen als SVG-Datei
+
+**Ausgabe:** Die Turtle-Grafik als SVG-Text
+
+#### 🟦 `Test`
+Dieses Kommando ermöglicht es, Java-Code zu testen, indem es die Ausgabe des Codes mit einer erwarteten Ausgabe vergleicht.
+
+**Eingabe:**
+
+-  `Send CODE` -> Java-Code, der ausgewertet werden soll
+- `Expect STRING` -> Erwartete Ausgabe des Java-Codes
+- `Type TYPE` -> Optionaler Parameter, der den Typ des Vergleichs angibt:
+  - `Exact` (Standard): Erwartete Ausgabe muss genau mit der tatsächlichen Ausgabe übereinstimmen (Equals)
+  - `same`: Erwartete Ausgabe muss mit der tatsächlichen Ausgabe identisch sein (==)
+  - `oneof`: Erwartete Ausgabe muss in der tatsächlichen Ausgabe enthalten sein (contains)
+
+**Ausgabe:** Die Zusammenfassung und das Ergebnis des Tests.
+
+#### 🟦 `Button`
+
+**Eingabe:**
+
+- `Text: TEXT` -> Text, der auf dem Button angezeigt wird
+- `[width: WIDTH]` -> Optionaler Parameter, der die Breite des Buttons angibt
+- `[height: HEIGHT]` -> Optionaler Parameter, der die Höhe des Buttons angibt
+- `path: PATH` -> Pfad zu einer Quelldatei, in der Code ausgetauscht werden soll, wenn der Button geklickt wird
+- `label: "LABEL"` -> Kommentarlabel, das den Bereich in der Quelldatei markiert, der ausgetauscht werden soll
+- `replacement: REPLACEMENT` -> Der Code, der in die Quelldatei eingesetzt werden soll, wenn der Button geklickt wird.
+
+**Ausgabe:** HTML-Text für einen Button mit dazugehörigem JavaScript, der die angegebene Ersetzung in der Quelldatei vornimmt, wenn der Button geklickt wird.
+
+#### 🟦 `Input`
+
+**Eingabe:**
+
+- `path: PATH` -> Pfad zu einer Quelldatei, in der Code ausgetauscht werden soll, wenn eine Eingabe bestätigt wird
+- `label: "LABEL"` -> Kommentarlabel, das den Bereich in der Quelldatei markiert, der ausgetauscht werden soll
+- `template: TEMPLATE` -> Das Template, in das die Eingabe des Input-Feldes eingesetzt werden soll. Der Platzhalter `$` im Template wird durch die Eingabe ersetzt. Das Resultat wird in die Quelldatei eingesetzt.
+- `[placeholder: PLACEHOLDER]` -> Optionaler Parameter, der einen Platzhaltertext für das Eingabefeld angibt
+- `[type: TYPE]` -> Optionaler Parameter, der den Typ des Eingabefelds angibt (z.B. "text", "number", "email")
+
+**Ausgabe:** HTML-Text für ein Eingabefeld mit dazugehörigem JavaScript, der die angegebene Ersetzung in der Quelldatei vornimmt, wenn eine Eingabe bestätigt wird.
+
+#### 🟦 `Checkbox`
+
+**Eingabe:**
+
+- `path: PATH` -> Pfad zu einer Quelldatei, in der Code ausgetauscht werden soll, wenn die Checkbox aktiviert oder deaktiviert wird
+- `label: "LABEL"` -> Kommentarlabel, das den Bereich in der Quelldatei markiert, der ausgetauscht werden soll
+- `template: TEMPLATE` -> Das Template, in das der aktuelle Wert der Checkbox eingesetzt werden soll. Der Platzhalter `$` im Template wird durch den aktuellen Wert der Checkbox (true oder false) ersetzt. Das Resultat wird in die Quelldatei eingesetzt.
+
+**Ausgabe:** HTML-Text für eine Checkbox mit dazugehörigem JavaScript, der die angegebene Ersetzung in der Quelldatei vornimmt, wenn die Checkbox aktiviert oder deaktiviert wird.
+
+### Scankommandos
+Scankommandos werden genutzt, um Informationen zurück an die Quelle zu senden.
+
+#### 🟧 `CommandScan`
+
+**Eingabe:** Keine (Kann nur durch Piping einen Input erhalten)
+
+**Ausgabe:** Das Kommando empfängt die Ausgabe des vorherigen Kommandos und sendet sie zurück an die Quelle, die das Kommando ursprünglich ausgeführt hat.
+
+#### 🟧 `InputScan`
+
+**Eingabe:** Keine
+
+**Ausgabe:** Das Kommando erzeugt ein Eingabefeld im Browser und sendet die Benutzereingabe zurück an die Quelle, die das Kommando ursprünglich ausgeführt hat.
+
+## Troubleshooting
 
 > Error starting server: Address already in use: bind
 
@@ -102,7 +328,7 @@ kill -9 11840
 ```
 Dabei ist 11840 durch die ermittelte PID zu ersetzen.
 
-## 💟 Motivation: Views bereichern das Programmieren
+## 💟 Motivation: Views bereichern das Programmieren (Outdated)
 
 Das _Live View Programming_ versteht sich als ein Angebot, in ein bestehendes Programm _Views_ einzubauen und zu verwenden, die im Web-Browser angezeigt werden. Es macht nicht nur Spaß, wenn man zum Beispiel Grafiken im Browser erzeugen kann -- man sieht auch die Programmierfehler, die einem unterlaufen. Wenn man etwa in der Turtle-View eine Schildkröte mit einem Stift über die Zeichenfläche schickt, zeigt sich unmittelbar, ob man Wiederholungen über Schleifen richtig aufgesetzt oder die Rekursion korrekt umgesetzt hat. Die visuelle Repräsentation gibt über das Auge eine direkte Rückmeldung. Feedback motiviert und hilft beim Verständnis.
 
@@ -170,5 +396,5 @@ Einige haben schon Beiträge zum LVP geliefert, meist sind es Studierende von mi
 * Mein Prototyp zum [Java Live Reloading](https://github.com/denkspuren/JavaLiveReloading) gab den Anstoss, eine neue Architektur umzusetzen und sich von der JShell als interaktives Medium zu verabschieden.
 * Die angestrebte und [hier](https://github.com/denkspuren/LiveViewProgramming/issues/77) skizzierte neue Architekturbasis ist aus dem Dialog zwischen Ramon und mir hervorgegangen. Sie wird das LVP mit ganz neuen Fähigkeiten ausstatten.
 
-Herzlichst,<br>
-Dominikus Herzberg
+Viel Spaß beim Ausprobieren,<br>
+Dominikus Herzberg und Ramon Biehl

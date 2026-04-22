@@ -1,130 +1,172 @@
 package lvp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.ClosedWatchServiceException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
-import java.nio.file.Paths;
 import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.ArrayList;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
-import lvp.logging.Logger;
+import lvp.skills.logging.Logger;
+import lvp.skills.parser.ConfigParser.Source;
 
 public class FileWatcher {
     private WatchService watcher;
-    private ScheduledExecutorService debounceExecutor;
-    private final AtomicReference<ScheduledFuture<?>> pendingTask = new AtomicReference<>();
-    
+    private ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    private Map<Path, Instant> lastModified = new ConcurrentHashMap<>();
     private boolean isRunning = true;
-    Path dir;
-    String fileNamePattern;
-
-    public FileWatcher(Path dir, String fileNamePattern, Server server) throws IOException{
-        this.dir = dir;
-        this.fileNamePattern = fileNamePattern;
-
-        watcher = FileSystems.getDefault().newWatchService();
-        dir.register(watcher,
-            StandardWatchEventKinds.ENTRY_CREATE,
-            StandardWatchEventKinds.ENTRY_MODIFY);
-        Logger.logInfo("Watching in " + dir.normalize().toAbsolutePath() + "");
+    private static final Duration DEBOUNCE_DURATION = Duration.ofMillis(500);
+    
+    List<Source> sources;
+    Processor processor;
+    Optional<PathMatcher> watchFilter;
+    boolean sourceOnly;
+    
+    public FileWatcher(List<Source> sources, Optional<String> watchFilter, boolean sourceOnly, Processor processor) throws IOException{
+        this.processor = processor;
+        this.sources = sources;
+        this.watchFilter = watchFilter.isEmpty() ? Optional.empty() : 
+            Optional.of(FileSystems.getDefault().getPathMatcher("glob:" + watchFilter.get()));
+        this.sourceOnly = sourceOnly;
         
-        for (Path path : getMatchingFiles()) {
-            Logger.logInfo("Running initial file: " + path.toAbsolutePath().normalize());
-            runJava(path, server);
-        }
+        watcher = FileSystems.getDefault().newWatchService();
+        
+        (sourceOnly ? getSourceFolder(sources) : getFolderTree())
+            .map(Path::normalize)
+            .distinct()
+            .forEach(dir -> {
+                try {
+                    dir.register(watcher,
+                        StandardWatchEventKinds.ENTRY_CREATE,
+                        StandardWatchEventKinds.ENTRY_MODIFY);
+                    Logger.logInfo("Watching in " + dir.toAbsolutePath() + "");
+                } catch (IOException e) {
+                    Logger.logError("Error registering directory for watching: " + dir.toAbsolutePath(), e);
+                }
+            });
+        
     }
 
-    public void watchLoop(Server server) {
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + fileNamePattern);
-        debounceExecutor = Executors.newSingleThreadScheduledExecutor();
-        long debounceDelay = 200;            
+    private Stream<Path> getSourceFolder(List<Source> input) {
+        return input.stream()
+                .map(Source::path)
+                .map(Path::getParent)            
+                .filter(Objects::nonNull);
+    }
+
+    private Stream<Path> getFolderTree() {
+        return Stream.of(Path.of("."))
+                .flatMap(root -> {
+                    try {
+                        return Files.find(root, Integer.MAX_VALUE, 
+                            (_, attrs) -> attrs.isDirectory()).filter(p -> !p.toString().startsWith(".git"));
+                    } catch (IOException e) {
+                        Logger.logError("Error walking directory: " + root.toAbsolutePath(), e);
+                        return Stream.empty();
+                    }
+                });
+    }
+
+    public void start() {
+        for (Source source : sources) {
+            Logger.logInfo("Running initial file: " + source.path());
+            lastModified.put(source.path(), Instant.now());
+            executor.submit(() -> run(source));
+        }
+        executor.submit(this::watchLoop);
+    }
+
+    private void watchLoop() {
         while (isRunning) {
             WatchKey key;
             try {
                 key = watcher.take();
-            } catch (InterruptedException | ClosedWatchServiceException e) {
+                processWatchKeyEvents(key);
+            } catch (ClosedWatchServiceException | InterruptedException e) {
                 if (isRunning)
                     Logger.logError("Watcher loop terminated due to exception: " + e.getMessage(), e);
+                if (e instanceof InterruptedException) Thread.currentThread().interrupt();
                 break;
             }
-            for (WatchEvent<?> ev : key.pollEvents()) {
-                Path changed = (Path) ev.context();
-                if (matcher.matches(changed) && !Files.isDirectory(changed)) {
-                    Logger.logInfo("Event für Datei: " + changed.toAbsolutePath() + " (" + ev.kind().name() + ")");
-                    
-                    ScheduledFuture<?> prev = pendingTask.getAndSet(
-                        debounceExecutor.schedule(() -> runJava(dir.resolve(changed), server), debounceDelay, TimeUnit.MILLISECONDS)
-                    );
-                    if (prev != null && !prev.isDone()) prev.cancel(false);
-                }
+            if (!key.reset()) isRunning = false;
+        }
+    }
+
+    private void processWatchKeyEvents(WatchKey key) {
+        for (WatchEvent<?> ev : key.pollEvents()) {
+            Path changedFile = (Path) ev.context();
+            if (Files.isDirectory(changedFile)) continue;
+
+            Path watchedDir = (Path) key.watchable();
+            Path fullPath = watchedDir.resolve(changedFile).normalize().toAbsolutePath();
+
+            Instant now = Instant.now();
+            Instant last = lastModified.getOrDefault(fullPath, Instant.EPOCH);
+            Logger.logDebug(last + " -> " + now + " (" + Duration.between(last, now).toMillis() + "ms)");
+            if (Duration.between(last, now).compareTo(DEBOUNCE_DURATION) < 0) return;
+            lastModified.put(fullPath, now);
+
+            Optional<Source> source = sources.stream()
+                .filter(s -> s.path().equals(fullPath))
+                .findFirst();
+            if (source.isPresent()) {
+                Logger.logInfo("Event for source: " + fullPath + " (" + ev.kind().name() + ")");
+                executor.submit(() -> run(source.get()));
             }
-            
-            if (!key.reset()) break;
+            else if (!sourceOnly && (watchFilter.isEmpty() || watchFilter.get().matches(changedFile))) {
+                Logger.logInfo("Event for file: " + fullPath + " (" + ev.kind().name() + ")");
+                execute(sources);
+            }
+        }
+    }
+
+    private void execute(List<Source> sources) {
+        for (Source source : sources) {
+            executor.submit(() -> run(source));
         }
     }
 
     public void stop() {
         isRunning = false;
-        if (watcher != null) try { watcher.close(); } catch (IOException e) { e.printStackTrace(); }
-        if (debounceExecutor != null) debounceExecutor.shutdownNow();
+        if (watcher != null) try { watcher.close(); } catch (IOException _) { }
+        if (executor != null) executor.shutdownNow();
     }
 
-    private void runJava(Path path, Server server) {
+    private void run(Source source) {
+        processor.init(source.id());
         try {
-            Path jarLocation = Paths.get(getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toAbsolutePath().normalize();
-            server.events.clear();
-            Logger.logInfo("Executing java --enable-preview --class-path " + jarLocation + " " + path.normalize().toString());
-            ProcessBuilder pb = new ProcessBuilder("java", "--enable-preview", "--class-path", jarLocation.toString(), path.normalize().toString())
+            boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
+            Logger.logInfo("Running: " + source.cmd() + " " + source.path());
+            ProcessBuilder pb = new ProcessBuilder(isWindows ? new String[]{"cmd.exe", "/c", source.cmd(), source.path().toString()} : new String[]{"sh", "-c", source.cmd() + " " + source.path().toString()})
                 .redirectErrorStream(true);
             Process process = pb.start();
+            processor.process(process, source.id());
 
-            try(BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        Logger.logDebug("(JavaClient) " + line);
-                        server.read(line);
-                    }
-                    Logger.logInfo("Execution finished");
-                }
-
-            boolean finished = process.waitFor(30, TimeUnit.SECONDS);
+            boolean finished = process.waitFor(10, TimeUnit.SECONDS);
             if (!finished) {
                 process.destroyForcibly();
                 Logger.logError("Timeout: process killed");
+            } else {
+                Logger.logInfo("Process finished successfully");
             }
 
         } catch (Exception e) {
             Logger.logError("Error in Java Process", e);
         }
-    }
-
-    public List<Path> getMatchingFiles() throws IOException {
-        List<Path> matchingFiles = new ArrayList<>();
-        PathMatcher matcher = FileSystems.getDefault().getPathMatcher("glob:" + fileNamePattern);
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
-            for (Path entry : stream) {
-                if (!Files.isDirectory(entry) && matcher.matches(entry.getFileName())) {
-                    matchingFiles.add(entry);
-                }
-            }
-        }
-        return matchingFiles;
     }
 }
