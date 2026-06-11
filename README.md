@@ -135,11 +135,43 @@ Kommandos, wie `Markdown`, `Html` oder `Dot`, die Inhalte im Browser anzeigen, w
 
 **Ergebnis:** Umwandlung des Markdown-Textes in HTML und Anzeige im Browser.
 
+**Beispiel in Java:**
+```java
+IO.println("""
+            Markdown:
+            # Überschrift 1
+            ## Überschrift 2
+            Dies ist ein einfacher Text.
+
+            1. Aufzählung
+            2. Aufzählung
+            ...
+
+            * Stichpunkt
+            * Stichpunkt
+            
+            Hier lässt sich die komplette Markdown-Syntax verwenden.
+            ~~~
+            """);
+```
+
+**Hinweis: Am Ende sind die drei ~~~ notwendig, damit der LVP weiß was alles zu dem Kommando gehört.**
+
 #### 🟩 `Html`
 
 **Eingabe:** HTML-Text
 
 **Ergebnis:** Einfügen des HTML-Textes in den Html-Body.
+
+**Beispiel in Java:**
+```java
+IO.println("""
+          Html:
+          <h1>Überschrift 1</h1>
+          ~~~
+          """
+  );
+```
 
 #### 🟩 `Css`
 
@@ -147,17 +179,48 @@ Kommandos, wie `Markdown`, `Html` oder `Dot`, die Inhalte im Browser anzeigen, w
 
 **Ergebnis:** Einbettung des CSS-Textes in einen Style-Tag im Browser.
 
+**Beispiel in Java:**
+
+```java
+IO.println("""
+        Css:
+            h1 {color: red; }
+        ~~~
+        """);
+```
+
 #### 🟩 `JavaScript`
 
 **Eingabe:** JavaScript-Code
 
 **Ergebnis:** Einfügen des JavaScript-Codes in einen Script-Tag im Browser.
 
+**Beispiel in Java:**
+
+```java
+IO.println("""
+          JavaScript:
+          function myFunction(){
+          console.log("Hello JavaScript!")}
+          ~~~
+          """)
+```
+
 #### 🟩 `JavaScriptCall`
 
 **Eingabe:** JavaScript-Code
 
-**Ergebnis:** Ausführung des JavaScript-Codes im Browser.
+**Ergebnis:** Ausführung des JavaScript-Codes im Browser. Es können auch vorher übertragene JS-Funktionen aufegerufen werden.
+
+**Beispiel in Java:**
+
+```java
+IO.println("""
+          JavaScriptCall:
+          myFunction()
+          ~~~
+          """)
+```
 
 #### 🟩 `SubViewStyle`
 
@@ -165,17 +228,53 @@ Kommandos, wie `Markdown`, `Html` oder `Dot`, die Inhalte im Browser anzeigen, w
 
 **Ergebnis:** Einbettung des CSS-Textes in eine CSS-Klasse, die auf die SubView angewendet wird, in der das Kommando ausgeführt wird.
 
+**Beispiel in Java:**
+
+```java
+IO.println("""
+          SubViewStyle:
+              h1 {color: red; }
+          ~~~
+          """);
+```
+
+**Hinweis: Durch die Verteilung des Quellcodes auf mehrere Java-Dateien lassen sich sogenannte Subviews erstellen, der SubViewStyle wird zum stylen innerhalb dieser Subviews genutzt. In allen anderen Fällen hat der CSS Style Gültigkeit.**
+
 #### 🟩 `Dot`
 
 **Eingabe:** Graphenbeschreibung in der Dot-Sprache
 
 **Ergebnis:** Umwandlung der Graphenbeschreibung in eine Grafik und Anzeige im Browser.
 
+**Beispiel in Java:**
+
+```java
+IO.println("""
+          Dot:
+          digraph graphname
+          {
+              a -> b -> c;
+              b -> d;
+          }
+          ~~~
+          """);
+```
+
+[Mehr Infos zur DOT-Sprache](https://de.wikipedia.org/wiki/DOT_(Graphviz))
+
 #### 🟩 `Clear`
 
 **Eingabe:** Keine
 
 **Ergebnis:** Löschen aller Inhalte im Browser.
+
+**Beispiel in Java:**
+
+```java
+IO.println("""
+          Clear
+          """)
+```
 
 ### Servicekommandos
 
