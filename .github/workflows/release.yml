@@ -3,6 +3,9 @@ name: Bump Version and Release
 on:
   push:
     branches: "main"
+    paths:
+      - "src/**"
+      - "pom.xml"
 
 jobs:
   bump:
