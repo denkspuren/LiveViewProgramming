@@ -27,12 +27,13 @@ public class InstructionParser {
     public record CommandRef(String name, String id) {}
 
     // ---- Patterns ----
-    private static final Pattern SINGLE_LINE_COMMAND = Pattern.compile("^(\\w+)(?:\\[([^}]+)\\])?:\\s*(.+)$");
-    private static final Pattern BLOCK_START = Pattern.compile("^(\\w+)(?:\\[([^}]+)\\])?:\\s*$");
-    private static final Pattern SINGLE_LINE_COMMAND_CONTENTLESS = Pattern.compile("^(\\w+)(?:\\[([^}]+)\\])?\\s*$");
-    private static final Pattern REGISTER = Pattern.compile("^Register(?:\\[([^}]+)\\])?:\\s+(\\w+)\\s+(.+)$");
+    private static final Pattern SINGLE_LINE_COMMAND = Pattern.compile("^\\s*(\\w+)(?:\\[([^}]+)\\])?:\\s*(.+)$");
+    private static final Pattern BLOCK_START = Pattern.compile("^\\s*(\\w+)(?:\\[([^}]+)\\])?:\\s*$");
+    private static final Pattern SINGLE_LINE_COMMAND_CONTENTLESS = Pattern.compile("^\\s*(\\w+)(?:\\[([^}]+)\\])?\\s*$");
+    private static final Pattern REGISTER = Pattern.compile("^\\s*Register(?:\\[([^}]+)\\])?:\\s+(\\w+)\\s+(.+)$");
     private static final Pattern PIPE_LINE = Pattern.compile("^\\s*\\|(.+)$");
-    private static final Pattern PIPE_ENTRY = Pattern.compile("^(\\w+)(?:\\[([^}]+)\\])?$");
+    private static final Pattern PIPE_ENTRY = Pattern.compile("^\\s*(\\w+)(?:\\[([^}]+)\\])?$");
+
 
     // ---- Block Parsing State ----
     private static class BlockState {
